@@ -1,0 +1,95 @@
+Layer Selection: Default
+Brush Max Size: 10
+Brush Size: 9.75
+Fill Mode: True
+Fill Rate: 0.221
+
+Game Object: Assets/Prefabs/Rocks/Rock1.prefab
+Layer: Default
+Toggle: True
+Slider: 1
+Lock Orientation Toggle: False
+Random Rotation Toggle: True
+Random Rotation X: True
+Random Rotation Y: True
+Random Rotation Z: True
+Random Scale Toggle: True
+Random Scale Min: 3
+Random Scale Max: 4
+Fixed Rotation Toggle: False
+Fixed Rotation X: 0
+Fixed Rotation Y: 0
+Fixed Rotation Z: 0
+Depth: 0
+
+Game Object: Assets/Prefabs/Rocks/Rock2.prefab
+Layer: Default
+Toggle: True
+Slider: 1
+Lock Orientation Toggle: False
+Random Rotation Toggle: True
+Random Rotation X: True
+Random Rotation Y: True
+Random Rotation Z: True
+Random Scale Toggle: True
+Random Scale Min: 3
+Random Scale Max: 6
+Fixed Rotation Toggle: False
+Fixed Rotation X: 0
+Fixed Rotation Y: 0
+Fixed Rotation Z: 0
+Depth: 0
+
+Game Object: Assets/Prefabs/Rocks/Rock3.prefab
+Layer: Default
+Toggle: True
+Slider: 1
+Lock Orientation Toggle: False
+Random Rotation Toggle: True
+Random Rotation X: True
+Random Rotation Y: True
+Random Rotation Z: True
+Random Scale Toggle: True
+Random Scale Min: 3
+Random Scale Max: 3
+Fixed Rotation Toggle: False
+Fixed Rotation X: 0
+Fixed Rotation Y: 0
+Fixed Rotation Z: 0
+Depth: 0
+
+Game Object: Assets/Prefabs/Rocks/Rock4.prefab
+Layer: Default
+Toggle: True
+Slider: 1
+Lock Orientation Toggle: False
+Random Rotation Toggle: True
+Random Rotation X: True
+Random Rotation Y: True
+Random Rotation Z: True
+Random Scale Toggle: True
+Random Scale Min: 3
+Random Scale Max: 7
+Fixed Rotation Toggle: False
+Fixed Rotation X: 0
+Fixed Rotation Y: 0
+Fixed Rotation Z: 0
+Depth: 0
+
+Game Object: Assets/Prefabs/Rocks/Rock5.prefab
+Layer: Default
+Toggle: True
+Slider: 1
+Lock Orientation Toggle: False
+Random Rotation Toggle: True
+Random Rotation X: True
+Random Rotation Y: True
+Random Rotation Z: True
+Random Scale Toggle: True
+Random Scale Min: 3
+Random Scale Max: 9
+Fixed Rotation Toggle: False
+Fixed Rotation X: 0
+Fixed Rotation Y: 0
+Fixed Rotation Z: 0
+Depth: 0
