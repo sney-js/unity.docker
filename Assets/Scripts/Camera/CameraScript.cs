@@ -13,6 +13,7 @@ public class CameraScript : MonoBehaviour
 	public bool FollowsBounds = true;
 	public float minX = -1000f, maxX = 1000f, minY = -1000f, maxY = 1000f;
 	
+	
 	private Vector3 velocity = Vector3.zero;
 	private bool snap = true;
 	private Vector3 offSet;
