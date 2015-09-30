@@ -2,10 +2,10 @@
 
 echo "Building Unity3d Project..."
 DIR=`pwd`
-UNITY3D_LOC="/Applications/Unity/Unity.app/Contents/MacOS/Unity"
-USER="ssnehil@hotmail.com"
-PASS="Unity6558"
+UNITYLOC="/Applications/Unity/Unity.app/Contents/MacOS/Unity"
 
-eval $UNITY3D_LOC -quit -batchmode -projectPath $DIR -username $USER -password $PASS -executeMethod ToBuild.BuildMac
-
-echo "Build Complete!"
+BUILD="$UNITYLOC -quit -batchmode -projectPath $DIR -logFile $DIR"/Build.log"  -executeMethod ToBuild.BuildLinux"
+if eval $BUILD
+	then echo "Build Complete!"
+else echo "An Error Occurred."
+fi

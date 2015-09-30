@@ -17,8 +17,10 @@ Vagrant.configure(2) do |config|
 
   config.ssh.forward_x11=true
 
-  config.vm.provision "file", source: "Linux/Docker.x86_64", destination: "~/DevOps/Docker/Docker.x86_64"
-  config.vm.provision "file", source: "Linux/Docker_Data/", destination: "~/DevOps/Docker/Docker_Data"
+  #config.vm.provision "shell", path: "init.sh"
+
+  config.vm.provision "file", source: "Executables/Linux/Docker", destination: "~/DevOps/Docker/Docker"
+  config.vm.provision "file", source: "Executables/Linux/Docker_Data/", destination: "~/DevOps/Docker/Docker_Data"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
