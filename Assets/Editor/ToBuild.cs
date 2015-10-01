@@ -10,16 +10,43 @@ public class ToBuild : MonoBehaviour {
 	// Use this for initialization
 	static void BuildMac () {
 
-		BuildPipeline.BuildPlayer(getAllScenes(), installLocation + "MacOSx/"+appName, 
-		                          BuildTarget.StandaloneOSXUniversal, BuildOptions.None);
-	
+		ExecuteBuild (1);
 	}
 
 	static void BuildLinux() {
 		
-		BuildPipeline.BuildPlayer(getAllScenes(), installLocation + "Linux/"+appName, 
-		                          BuildTarget.StandaloneLinux64, BuildOptions.None);
+		ExecuteBuild (0);
 		
+	}
+
+	static void BuildWindows() {
+		
+		ExecuteBuild (2);
+		
+	}
+
+	static void ExecuteBuild(int platform){
+		string folder = "Default";
+		BuildTarget target = BuildTarget.StandaloneOSXUniversal;
+
+		switch (platform) {
+		case 0: folder = "Linux"; target = BuildTarget.StandaloneLinux64;
+			break;
+		case 1: folder = "MacOS";target = BuildTarget.StandaloneOSXUniversal;
+			break;
+		case 2: folder = "Windows"; target = BuildTarget.StandaloneWindows64;
+			break;
+		}
+
+		string execPath = installLocation + folder + "/" + appName;
+
+		try {
+			BuildPipeline.BuildPlayer (getAllScenes (), execPath, target, BuildOptions.None);
+			Debug.Log("::::::: Build Successful. Location of build: "+execPath);
+		} catch (System.Exception ex) {
+			Debug.Log("::::::: An error occurred while Building. Source: ToBuild.ExecuteBuild()");
+			EditorApplication.Exit(1);
+		}
 	}
 
 	static string[] getAllScenes(){

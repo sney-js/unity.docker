@@ -14,6 +14,10 @@ do
 		    UNITYLOC="$2"
 		    shift # past argument
 	    ;;
+	    -logfile)
+		    LOGLOC="$2"
+		    shift # past argument
+	    ;;
 	    *) # unknown option
 	    ;;
 	esac
@@ -39,7 +43,7 @@ echo "... Build Platform : "$BUILD_METHOD
 echo "... Building Now ... " 
 #----------------Run Build Command
 DIR=`pwd`
-BUILD="$UNITYLOC -quit -batchmode -projectPath $DIR -logFile $DIR'/Build.log' -executeMethod ToBuild.Build$BUILD_METHOD"
+BUILD="$UNITYLOC -quit -batchmode -projectPath $DIR -logFile $LOGLOC -executeMethod ToBuild.Build$BUILD_METHOD"
 	
 if $BUILD; then 
 	echo "... Build Complete!"
