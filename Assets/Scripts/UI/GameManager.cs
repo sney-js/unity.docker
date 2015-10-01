@@ -20,16 +20,16 @@ public class GameManager : MonoBehaviour
 	}
 
 	void Start(){
-		ChangeCursor(true);
+//		ChangeCursor(true);
 
-		loadingTexture = Resources.Load<Texture> ("Images/UI/background1.jpg");
-
+		loadingTexture = Resources.Load<Texture> ("Images/UI/background1");
 	}
 
 	void ChangeCursor(bool isCustom){
 		Texture2D cursor=null;
 		if (isCustom){
-			cursor = Resources.Load<Texture2D> ("Images/cursor.png");
+			cursor = Resources.Load<Texture2D> ("Images/cursor_32");
+//			print ("CURSOR :"+cursor.name);
 		}else{
 				Cursor.SetCursor(cursor, Vector2.zero, CursorMode.Auto);
 				print(cursor+"CURSOR"+Cursor.visible);
@@ -75,8 +75,10 @@ public class GameManager : MonoBehaviour
 
 	void OnGUI()
 	{
-		if(loading)
+		if(loading) {
 			GUI.DrawTexture (new Rect(0,0,Screen.width,Screen.height), loadingTexture, ScaleMode.ScaleAndCrop);
+			print("DRAWING TEXTURE: "+loadingTexture.name);
+		}
 		//Frame Rate
 		//		GUI.Label(new Rect(10,10, 100, 100), ((int)(1.0f / Time.smoothDeltaTime)).ToString());        
 	}

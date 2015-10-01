@@ -62,7 +62,7 @@ public class ButtonPresses : MonoBehaviour
 	
 		//-----------icons-------------------------
 		helptip = canvasObj.FindChild ("HelpTip").gameObject;
-		if (Application.loadedLevel == 1 && FlagHelpTip) {          
+		if (Application.loadedLevel == 1 && FlagHelpTip && GameManager.Run1) {          
 			ShowHelpTips ();
 		}
 

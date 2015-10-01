@@ -81,13 +81,13 @@ public class LevelManager : MonoBehaviour {
 			//----------------------------------------LOCK/BUTTON---------------------------------------------
 			bool levAllowed = IsLevelAllowed(i+1) && ok;
 			if (!levAllowed) ok=false;
-			print("Level "+(i+1)+" Allowed?="+levAllowed);
+//			print("Level "+(i+1)+" Allowed?="+levAllowed);
 
 //			bool lockRelease = ((achievedMedal==0 && !ok) || (i==totLevels-1 && !allGold) || (i==totLevels-2 && !allSilver))
 //				&& (i!=0);
 
 			Button button = level.FindChild("Button").gameObject.GetComponent<Button>();
-			button.gameObject.SetActive(levAllowed);
+			button.interactable = levAllowed;
 
 			level.Find("Lock").gameObject.SetActive(!levAllowed);
 
@@ -119,9 +119,7 @@ public class LevelManager : MonoBehaviour {
 
 		int lev = Application.loadedLevel;
 		int tot = Application.levelCount;
-		print ("SILVER: " + HasSilver);
 		if (lev == tot - 2 && HasSilver) {
-			print("Guess true");
 			return lev + 1;
 		}
 		else if (lev==tot-2 && !HasSilver) return 0;
@@ -141,7 +139,6 @@ public class LevelManager : MonoBehaviour {
 				return false;
 			}
 		}
-		print("AALL SILVER");
 		return true;
 	}
 
@@ -153,7 +150,6 @@ public class LevelManager : MonoBehaviour {
 				return false;
 			}
 		}
-		print("AALL GOLD");
 		return true;
 	}
 
@@ -170,7 +166,7 @@ public class LevelManager : MonoBehaviour {
 
 			for (int i = 0; i < totLevels; i++) {
 				Transform level = LevelGrid.transform.GetChild(i);
-				level.Find("Button").gameObject.GetComponent<Button>().enabled=true;
+				level.Find("Button").gameObject.GetComponent<Button>().interactable=true;
 				level.Find("Lock").gameObject.SetActive(false);
 			}
 		}

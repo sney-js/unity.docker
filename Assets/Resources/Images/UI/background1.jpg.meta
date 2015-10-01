@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: facf90bf7ac08f245b555e1775f9a24c
+labels:
+- Rough
 timeCreated: 1436285519
 licenseType: Free
 TextureImporter:
@@ -37,7 +39,6 @@ TextureImporter:
   lightmap: 0
   rGBM: 0
   compressionQuality: 50
-  allowsAlphaSplitting: 0
   spriteMode: 0
   spriteExtrude: 1
   spriteMeshType: 1

@@ -71,6 +71,7 @@ public class CameraScript : MonoBehaviour
 		follow = true;
 		float tempDamp = dampTime;
 		dampTime=10f;
+//		print ("Delay over. Follow true: "+follow);
 		yield return new WaitForSeconds(1f);
 		dampTime=tempDamp;
 	}
