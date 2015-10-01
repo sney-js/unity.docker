@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+#----------------extract arguments
 while [[ $# > 1 ]]
 do
 	key="$1"
@@ -14,37 +14,37 @@ do
 		    UNITYLOC="$2"
 		    shift # past argument
 	    ;;
-	    *)	
-	            # unknown option
+	    *) # unknown option
 	    ;;
 	esac
 	shift # past argument or value
 done
-
+#----------------extract Unity App Location
 if [ "$UNITYLOC" == "" ]; then 
 	UNITYLOC="/Applications/Unity/Unity.app/Contents/MacOS/Unity"
 fi
-
-
+#----------------extract platform
 if [ "$BUILD_PLATFORM" == "win" ]; then   
-	BUILD_METHOD="BuildWindows"
+	BUILD_METHOD="Windows"
 elif [ "$BUILD_PLATFORM" == "mac" ]; then   
-	BUILD_METHOD="BuildMac"
+	BUILD_METHOD="Mac"
 elif [ "$BUILD_PLATFORM" == "linux" ]; then   
-	BUILD_METHOD="BuildLinux" 
+	BUILD_METHOD="Linux" 
 else
-	BUILD_METHOD="BuildLinux"
+	BUILD_METHOD="Linux"
 fi
-
-echo "Build for : "$BUILD_PLATFORM
-echo "Unity Location : "$UNITYLOC
-
-echo "... Building Unity3d Project"
-
+#----------------print info
+echo "... Unity Location : "$UNITYLOC
+echo "... Build Platform : "$BUILD_METHOD
+echo "... Building Now ... " 
+#----------------Run Build Command
 DIR=`pwd`
-BUILD="$UNITYLOC -quit -batchmode -projectPath $DIR -logFile $DIR'/Build.log' -executeMethod ToBuild.$BUILD_METHOD"
+BUILD="$UNITYLOC -quit -batchmode -projectPath $DIR -logFile $DIR'/Build.log' -executeMethod ToBuild.Build$BUILD_METHOD"
 	
-if eval $BUILD
-	then echo "... Build Complete!"
-else echo "... An Error Occurred."
+if $BUILD; then 
+	echo "... Build Complete!"
+else 
+	echo "... An Error Occurred."
+	echo "    Command Used:"
+	echo "'$BUILD'"
 fi
