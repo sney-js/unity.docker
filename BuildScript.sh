@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#----------------usage
+if [ "$1" == "-help" ]; then
+  echo "Usage: 
+   -platform <win/mac/linux>
+   -unity <path/to/unit/app>
+   -logile <path/to/file.log> [if none provided, then print is shown as output]"
+  exit 0
+fi
 #----------------extract arguments
 while [[ $# > 1 ]]
 do
