@@ -10,7 +10,7 @@ do
 		    BUILD_PLATFORM="$2"
 		    shift # past argument
 	    ;;
-	    -unityPath)
+	    -unity)
 		    UNITYLOC="$2"
 		    shift # past argument
 	    ;;
@@ -43,8 +43,10 @@ BUILD="$UNITYLOC -quit -batchmode -projectPath $DIR -logFile $DIR'/Build.log' -e
 	
 if $BUILD; then 
 	echo "... Build Complete!"
+	exit 0
 else 
 	echo "... An Error Occurred."
 	echo "    Command Used:"
 	echo "'$BUILD'"
+	exit 1
 fi
