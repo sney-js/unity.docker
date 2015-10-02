@@ -3,7 +3,7 @@
 #----------------usage
 if [ "$1" == "-help" ]; then
   echo "Usage: 
-   -platform <win/mac/linux>
+   -platform <win/win32/mac/linux/linux32> [default=64 bit for win/linux. mac=universal]
    -unity <path/to/unit/app>
    -logile <path/to/file.log> [if none provided, then print is shown as output]"
   exit 0
@@ -41,7 +41,11 @@ if [ "$BUILD_PLATFORM" == "win" ]; then
 elif [ "$BUILD_PLATFORM" == "mac" ]; then   
 	BUILD_METHOD="Mac"
 elif [ "$BUILD_PLATFORM" == "linux" ]; then   
-	BUILD_METHOD="Linux" 
+	BUILD_METHOD="Linux"
+elif [ "$BUILD_PLATFORM" == "win32" ]; then   
+	BUILD_METHOD="Windows_32" 
+elif [ "$BUILD_PLATFORM" == "linux32" ]; then   
+	BUILD_METHOD="Linux_32"
 else
 	BUILD_METHOD="Linux"
 fi
