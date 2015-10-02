@@ -40,6 +40,7 @@ public class ToBuild : MonoBehaviour
 	{
 		string folder = "Default";
 		BuildTarget target = BuildTarget.StandaloneOSXUniversal;
+		string extension = "";
 
 		switch (platform) {
 		case 0:
@@ -53,6 +54,7 @@ public class ToBuild : MonoBehaviour
 		case 2:
 			folder = "Windows";
 			target = BuildTarget.StandaloneWindows64;
+			extension = ".exe";
 			break;
 		case 3:
 			folder = "Linux_32";
@@ -61,10 +63,11 @@ public class ToBuild : MonoBehaviour
 		case 4:
 			folder = "Windows_32";
 			target = BuildTarget.StandaloneWindows;
+			extension = ".exe";
 			break;
 		}
 
-		string execPath = installLocation + folder + "/" + appName;
+		string execPath = installLocation + folder + "/" + appName + extension;
 
 		try {
 			BuildPipeline.BuildPlayer (getAllScenes (), execPath, target, BuildOptions.None);
