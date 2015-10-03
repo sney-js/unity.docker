@@ -13,6 +13,7 @@ public class AnimationScript : MonoBehaviour {
 
 	public static IEnumerator FlashScreen (Image overlay, float overTime)
 	{
+		if (overlay==null) overlay = GameObject.Find("Canvas/DamageImage").gameObject.GetComponent<Image>();
 		float startTime = Time.time;
 		Color moreAlphaC = overlay.color;
 		Color normC = overlay.color;
@@ -33,12 +34,13 @@ public class AnimationScript : MonoBehaviour {
 
 	public void FadeOutDamageUI(float time){
 		Image damageImg = GameObject.Find("Canvas/DamageImage").GetComponent<Image>();
-		StartCoroutine( FadeImage(damageImg, time, 0f));
+		StartCoroutine( FadeImage(damageImg, time, 0f, 0f));
 		
 	}
 
-	public static IEnumerator FadeImage (Image overlay, float overTime,float to)
+	public static IEnumerator FadeImage (Image overlay, float overTime,float to, float after)
 	{
+		yield return new WaitForSeconds(after);
 		float startTime = Time.time;
 		Color moreAlphaC = overlay.color;
 		Color normC = overlay.color;
@@ -48,10 +50,11 @@ public class AnimationScript : MonoBehaviour {
 		if (to>0f) overlay.gameObject.SetActive(true);
 		while(Time.time < startTime + overTime)
 		{
+			print("Changing... info text...");
 			overlay	.color = Color.Lerp(moreAlphaC,normC, (Time.time - startTime)/overTime);
 			yield return null;
 		}
-		if (to==0f) overlay.gameObject.SetActive(false);
+//		if (to==0f) overlay.gameObject.SetActive(false);
 	}
 
 	public static IEnumerator LevelFailed (int msgID)

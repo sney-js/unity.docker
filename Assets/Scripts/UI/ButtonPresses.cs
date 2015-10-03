@@ -539,6 +539,17 @@ public class ButtonPresses : MonoBehaviour
 		menuShowing = false;
 		StartCoroutine (SetInactiveAfter (helptip, 1f));
 	}
+
+	//--------------------------------------------Cheats-----------------------------------//
+	public static void DimHealth ()
+	{
+		Instance.UI.FindChild("Health").GetComponent<CanvasGroup>().alpha=0.2f;
+	}
+
+	public static void DimFuel ()
+	{
+		Instance.UI.FindChild("Fuel").GetComponent<CanvasGroup>().alpha=0.2f;
+	}
 	//----------------------------------------------PAUSE RESUME GAME-----------------------------------
 //	public static void PauseGame(){
 //		Time.timeScale = Time.timeScale == 0 ? 1 : 0;

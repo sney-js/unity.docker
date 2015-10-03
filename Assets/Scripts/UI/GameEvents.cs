@@ -8,34 +8,33 @@ public class GameEvents : MonoBehaviour
 {
 
 	public static GameEvents Instance;
-
 	public WinTriggers WinWithTriggers;
 	public loseTriggers LoseWithTriggers;
 	public bool noWinLose = false;
-	
 	public static float maxFuel, maxHealth, FuelReading, HealthReading ;
 	public static int Score;
 	public static float timeTaken;
-	public static bool dockedWithTarget,docked, dockedWithSecondary, startCounting;
+	public static bool dockedWithTarget, docked, dockedWithSecondary, startCounting;
 	public static bool LevelSuccess, LevelFail;
 	public static bool StopListeningKeys, StopListeningKeysMain;
-
 	private Text timeText, scoreText, infoText;
 	private float currTimeSpeed;
 	private bool prevDocked = false;
 	private int failMsgID;
-
 	private float prevScore;
 	private bool infoMsgSet = false;
 	private GameObject PauseIcon;
+	private GameObject player;
+	bool cheated;
+
 	//-----------------------------------CLASSES---------------------------------------------------
 
 	[System.Serializable]
 	public class WinTriggers
 	{
-		public bool dockSuccess=true, timeWin=true, scoreWin=true, FullHealthWin, NoDockSecWin, FuelWin;
+		public bool dockSuccess = true, timeWin = true, scoreWin = true, FullHealthWin, NoDockSecWin, FuelWin;
 		public GameObject DockTo;
-		public int MinScore = 10, MustScore=-1, MinFuel=2000;
+		public int MinScore = 10, MustScore = -1, MinFuel = 2000;
 		public float MinTime = 80f;
 		public GameObject DockSecondary;
 		public bool JustWinNow = false;
@@ -77,12 +76,13 @@ public class GameEvents : MonoBehaviour
 
 		init ();
 
+		player = GameObject.Find ("Player").gameObject;
 		Transform UI = GameObject.Find ("Canvas/UI").transform;
 		timeText = UI.Find ("Time").gameObject.GetComponent<Text> ();
 		scoreText = UI.Find ("Score").gameObject.GetComponent<Text> ();
 		infoText = GameObject.Find ("Canvas/InfoOverImage/FailText").gameObject.GetComponent<Text> ();
 		PauseIcon = UI.FindChild ("PauseIcon").gameObject;
-		scoreText.enabled = WinWithTriggers.scoreWin || WinWithTriggers.MustScore>0;
+		scoreText.enabled = WinWithTriggers.scoreWin || WinWithTriggers.MustScore > 0;
 		scoreText.text = Score.ToString ("00");
 
 		if (LoseWithTriggers.hasCountdown)
@@ -96,7 +96,7 @@ public class GameEvents : MonoBehaviour
 	{
 		if (!noWinLose) {
 //		print ("Success: " + GameEvents.LevelSuccess);
-			simulationFeatures ();
+			GameFeaturesChecks ();
 			if (!LevelSuccess && !LevelFail) {
 				checkForFail ();
 				if (startCounting) {
@@ -106,7 +106,7 @@ public class GameEvents : MonoBehaviour
 						timeTaken += Time.deltaTime;
 					} 
 					updateTime (Mathf.Clamp (timeTaken, 0, float.PositiveInfinity));
-					if ((WinWithTriggers.scoreWin || WinWithTriggers.MustScore>0) && prevScore != Score) {
+					if ((WinWithTriggers.scoreWin || WinWithTriggers.MustScore > 0) && prevScore != Score) {
 						scoreText.text = Score.ToString ("00");
 						prevScore = Score;
 					}
@@ -139,13 +139,28 @@ public class GameEvents : MonoBehaviour
 		}
 	}
 
-	void simulationFeatures ()
+	void GameFeaturesChecks ()
 	{
 
 //		if (!StopListeningKeys)	SimulateSpeedCheck ();
 
 		if (Input.GetKeyDown (KeyCode.Space) && !StopListeningKeysMain) {
 			RestartLevel ();
+		}
+
+		if (Input.GetKey (KeyCode.LeftControl) && Input.GetKey (KeyCode.LeftShift)
+//		    && (Input.GetKey(KeyCode.LeftAlt))
+		    ) {
+			if (Input.GetKeyDown (KeyCode.K)) {
+				cheated = true;
+				LoseWithTriggers.noHealth = false;
+				player.GetComponent<Moves> ().unlimitedFuel = true;
+				ButtonPresses.DimFuel ();
+				ButtonPresses.DimHealth ();
+				Camera.main.GetComponent<CameraScript>().FollowsBounds=false;
+				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
+				StartCoroutine( AnimationScript.FlashScreen(flash,1f));
+			}
 		}
 
 	}
@@ -162,7 +177,7 @@ public class GameEvents : MonoBehaviour
 	public static void LevelNext ()
 	{
 		GameManager.Run1 = true;
-		Time.timeScale=1;
+		Time.timeScale = 1;
 //		if (Time.timeScale == 0)
 //			PauseGame ();
 		AutoFade.LoadLevel (LevelManager.GetNextLevel (), 0.33f, 1, Color.black);
@@ -171,7 +186,7 @@ public class GameEvents : MonoBehaviour
 	public static void LevelPrev ()
 	{
 		GameManager.Run1 = true;
-		Time.timeScale=1;
+		Time.timeScale = 1;
 //		if (Time.timeScale == 0)
 //			PauseGame ();
 		AutoFade.LoadLevel (Application.loadedLevel - 1, 0.33f, 1, Color.black);
@@ -179,7 +194,8 @@ public class GameEvents : MonoBehaviour
 
 	public static void PauseGame ()
 	{
-		if (Time.timeScale!=0) Instance.currTimeSpeed = Time.timeScale;
+		if (Time.timeScale != 0)
+			Instance.currTimeSpeed = Time.timeScale;
 		Time.timeScale = 0;
 		Instance.PauseIcon.SetActive (true);
 	}
@@ -188,21 +204,22 @@ public class GameEvents : MonoBehaviour
 	{
 //		if (Time.timeScale!=0) Instance.currTimeSpeed = Time.timeScale;
 		Instance.PauseIcon.SetActive (false);
-		Instance.StartCoroutine(Instance.UnpauseGradual(0.5f));
+		Instance.StartCoroutine (Instance.UnpauseGradual (0.5f));
 //		Time.timeScale = Instance.currTimeSpeed;
 	}
 
-	IEnumerator UnpauseGradual(float overTime){
+	IEnumerator UnpauseGradual (float overTime)
+	{
 		float startTime = Time.time;
 		float myDeltaTime = Time.deltaTime; 
 		float speed = 100f;
 		float destScale = 1f;
-		Time.timeScale=0.1f;
-		while(Time.time < startTime + overTime)
-		{
-			if (Time.timeScale==0) break;
+		Time.timeScale = 0.1f;
+		while (Time.time < startTime + overTime) {
+			if (Time.timeScale == 0)
+				break;
 //			Time.timeScale = Mathf.MoveTowards(0.1f, destScale, (Time.time - startTime)/overTime);
-			Time.timeScale = Mathf.SmoothStep(0.1f, destScale, (Time.time - startTime)/overTime);
+			Time.timeScale = Mathf.SmoothStep (0.1f, destScale, (Time.time - startTime) / overTime);
 //			SoundScript.UnPausePlay(Mathf.Pow((1-Time.timeScale)*0.2f,2f));
 			yield return null;
 		}
@@ -244,38 +261,50 @@ public class GameEvents : MonoBehaviour
 			success = true;
 		}
 		if (WinWithTriggers.JustWinNow) {
-			WinWithTriggers.JustWinNow=false;
-			Success();
+			WinWithTriggers.JustWinNow = false;
+			Success ();
 		}
-		//--------------------------no fail/success but docked-------------------
-		if (!LevelFail && !LevelSuccess && dockedWithTarget & Score < WinWithTriggers.MustScore) {
-			success=false;
-			if (!infoMsgSet) setInfoText ("You must score at least " + WinWithTriggers.MustScore);	  
+		//--------------------------no success but docked-------------------
+		if (!LevelFail && !LevelSuccess && dockedWithTarget) { 
+			if (Score < WinWithTriggers.MustScore) {
+				success = false;
+				if (!infoMsgSet) {
+					StartCoroutine(setInfoText ("You must score at least " + WinWithTriggers.MustScore, 0f));	  
+				}
+			}
+			if (cheated) {
+				success = false;
+				if (!infoMsgSet) {
+					StartCoroutine( setInfoText ("You used cheats!", 0f));	
+					StartCoroutine( setInfoText ("", 2f));	
+
+				}
+			}
 		}
 
+		//--------------------------------------------Call Success-----------------------------------//
 		if (success) {
 			Success ();
 		}
 
 	}
-
 	/**
 	 * msg = "" means fadeout whole group
 	 * */
-	void setInfoText (string msg)
+	IEnumerator setInfoText (string msg, float invokeAfter)
 	{
+		yield return new WaitForSeconds(invokeAfter);
 		Instance.infoText.text = msg;
-
+		print("GETTING HERE");
 		if (msg.Equals ("")) {
-//			Instance.infoText.enabled=false;
 			StartCoroutine (AnimationScript.FadeImage (
-				Instance.infoText.transform.parent.GetComponent<Image> (), 0.5f, 0f));
+				Instance.infoText.transform.parent.GetComponent<Image> (), 0.5f, 0f, 0f));
 		} else {
 			infoMsgSet = true;
-//			Instance.infoText.enabled=true;
 			StartCoroutine (AnimationScript.FadeImage (
-					Instance.infoText.transform.parent.GetComponent<Image> (), 0.5f, 0.3f));
+				Instance.infoText.transform.parent.GetComponent<Image> (), 0.5f, 0.3f, 0f));
 		}
+		yield return null;
 	}
 
 	void updateTime (float time)
@@ -293,8 +322,8 @@ public class GameEvents : MonoBehaviour
 			dockedWithTarget = true;
 		}
 		if (dockedWith == Instance.WinWithTriggers.DockSecondary) {
-			dockedWithSecondary=true;
-			print("DOCKEDSECOND");
+			dockedWithSecondary = true;
+			print ("DOCKEDSECOND");
 		}
 //		if (GameEvents.LevelFail) {
 //			dockedWith.GetComponent<HealthLoss> ().showOnSlider = true;
@@ -318,10 +347,11 @@ public class GameEvents : MonoBehaviour
 		dockedWithTarget = false;
 //		dockedWithSecondary=false;
 		Instance.infoMsgSet = false;
-		Instance.setInfoText ("");
+		Instance.StartCoroutine(Instance.setInfoText ("", 0f));
 		if (GameEvents.LevelFail) {
-			undockedWith.GetComponent<HealthLoss> ().showOnSlider = false;
-			GameObject.Find ("Player").gameObject.GetComponent<HealthLoss> ().showOnSlider = true;
+//			undockedWith.GetComponent<HealthLoss> ().showOnSlider = false;
+
+//			player.GetComponent<HealthLoss> ().showOnSlider = true;
 		}
 
 		if (undockedWith.name == "Satellite") {
@@ -355,35 +385,41 @@ public class GameEvents : MonoBehaviour
 
 	public static bool IsScoreChecked ()
 	{
-		return Score>=Instance.WinWithTriggers.MinScore;
+		return Score >= Instance.WinWithTriggers.MinScore;
 	}
 	
 	public static bool IsTimeChecked ()
 	{
-		return timeTaken<=Instance.WinWithTriggers.MinTime;
+		return timeTaken <= Instance.WinWithTriggers.MinTime;
 	}
 
 	public static bool IsHealthFull ()
 	{
-		return HealthReading==maxHealth;
+		return HealthReading == maxHealth;
 	}
 
 	public static bool IsFuelChecked ()
 	{
-		return (maxFuel- FuelReading)<=Instance.WinWithTriggers.MinFuel;
+		return (maxFuel - FuelReading) <= Instance.WinWithTriggers.MinFuel;
 	}
 
-	public static string[] GetCriteriasNames(){
+	public static string[] GetCriteriasNames ()
+	{
 		string[] str = new string[3];
-		str[0] = "DOCK";
+		str [0] = "DOCK";
 
 		WinTriggers wt = Instance.WinWithTriggers;
-		if (wt.scoreWin) str[1]="SCORE";
-		else if (wt.FullHealthWin) str[1]="HEALTH";
-		else if (wt.NoDockSecWin) str[1]="NODOCK";
-		else if (wt.FuelWin) str[1]="FUEL";
-		else str[1] = "NONE";
-		str[2] = "TIME";
+		if (wt.scoreWin)
+			str [1] = "SCORE";
+		else if (wt.FullHealthWin)
+			str [1] = "HEALTH";
+		else if (wt.NoDockSecWin)
+			str [1] = "NODOCK";
+		else if (wt.FuelWin)
+			str [1] = "FUEL";
+		else
+			str [1] = "NONE";
+		str [2] = "TIME";
 		return str;
 	}
 
@@ -403,15 +439,15 @@ public class GameEvents : MonoBehaviour
 		LevelSuccess = true;
 		StopListeningKeys = true;
 
-		Moves.allowMoving=false;
+		Moves.allowMoving = false;
 		ButtonPresses.Success ();
 		SoundScript.SuccessMusic ();
 
 		//retrieve as much data
 		AnimationScript.LevelSuccess (this);
 		//saved!
-		GameManager.SaveCriteriaData();
-		ButtonPresses.ToggleScoreButton() ;
+		GameManager.SaveCriteriaData ();
+		ButtonPresses.ToggleScoreButton ();
 		//-------------------
 		ScoreConnection.ReceiveScore (Application.loadedLevel, ScoreConnection.GetDateRanges () [2]);
 	}

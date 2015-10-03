@@ -280,7 +280,7 @@ public class CameraScript : MonoBehaviour
 	}
 
 	bool isOutOfBounds(Vector3 pos, float lim){
-		return (pos.x > maxX * lim || pos.y > maxY * lim || pos.x < minX * lim || pos.y < minY * lim);
+		return FollowsBounds && (pos.x > maxX * lim || pos.y > maxY * lim || pos.x < minX * lim || pos.y < minY * lim);
 	}
 
 	//--------------------------------------------Other-----------------------------------//
