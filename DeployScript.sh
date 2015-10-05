@@ -17,6 +17,10 @@ do
     scriptKey="$1"
 
     case $scriptKey in
+        -t|--target-host)
+            vmhost="$2"
+            shift
+        ;;
         -k|--ssh-key)
             sshKey="$2"
             shift
@@ -28,7 +32,7 @@ do
         -b|--binary-dir)
             binarydir="$2"
             shift
-        ;;          
+        ;;
          *)
         ;;
     esac
@@ -38,7 +42,7 @@ done
 chmod 600 $sshKey
 
 binarydir="$binarydir""*"
-echo "Binary Dir: $binarydir"
+echo "[$me] Binary Dir: $binarydir"
 
 echo "[$me] Compressing $configDir"
 COMPRESS="tar cvpf $ARCHIVENAME $binarydir"
@@ -48,6 +52,10 @@ if $COMPRESS; then
     echo "[$me] Deploying $ARCHIVENAME to stardock@$vmhost:$configDir ..."
     scp -oStrictHostKeyChecking=no -i $sshKey $ARCHIVENAME stardock@$vmhost:$configDir
     echo "[$me] Extracting..."
-    ssh -oStrictHostKeyChecking=no -i $sshKey stardock@$vmhost "cd $configDir; tar -xvf $ARCHIVENAME"
+    ssh -oStrictHostKeyChecking=no -i $sshKey stardock@$vmhost "cd $configDir; tar -xvf $ARCHIVENAME; ls -l $configDir"
     echo "[$me] Completed"
+    exit 0
+else
+    echo "[$me] Could not Archive folder."
+    exit 1
 fi
