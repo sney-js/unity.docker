@@ -28,12 +28,14 @@ do
         -b|--binary-dir)
             binarydir="$2"
             shift
-        ;;
+        ;;          
          *)
         ;;
     esac
     shift
 done
+
+chmod 600 $sshKey
 
 binarydir="$binarydir""*"
 echo "Binary Dir: $binarydir"
@@ -42,7 +44,7 @@ echo "[$me] Compressing $configDir"
 COMPRESS="tar cvpf $ARCHIVENAME $binarydir"
 if $COMPRESS; then
     echo "[$me] Cleaning $vmhost dir..."
-    ssh -o StrictHostKeyChecking=no -i $sshKey stardock@$vmhost "cd $configDir; rm -rf *"
+    ssh -o StrictHostKeyChecking=no -i $sshKey stardock@$vmhost "mkdir $configDir; cd $configDir; rm -rf *"
     echo "[$me] Deploying $ARCHIVENAME to stardock@$vmhost:$configDir ..."
     scp -oStrictHostKeyChecking=no -i $sshKey $ARCHIVENAME stardock@$vmhost:$configDir
     echo "[$me] Extracting..."
