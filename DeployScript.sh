@@ -1,39 +1,51 @@
 #!/bin/bash -e
-#Deployment script for Nagios configs.
 
 me="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
-
 ARCHIVENAME="SpaceDocker.tar"
-COMPRESS="tar cvpf $ARCHIVENAME binaries/*"
-SSH="ssh stardock@10.2.21.63"
-vmhost="10.2.21.63"
-sshKey=keyfile
-configDir="binaries" #/Snehil.Docker.game_SpaceDocker_Game_BuildDocker_md5.checksum ?
 
-while [ $# > 1 ]
+#example - ./DeployScript.sh -k stardock_keys -b Executables/MacOS/ -c /home/stardock/Documents/SpaceDocker/
+#go example - ./DeployScript.sh -k stardock_keys -b binaries/ -c binaries/
+
+# SSH="ssh stardock@10.2.21.63"
+vmhost="10.2.21.63"
+sshKey="stardock_keys"
+configDir="binaries" #/Snehil.Docker.game_SpaceDocker_Game_BuildDocker_md5.checksum ?
+binarydir="binaries/*"
+echo "hee"
+while [[ $# > 1 ]]
 do
     scriptKey="$1"
-    shift
 
     case $scriptKey in
         -k|--ssh-key)
-        sshKey="$1"
-        shift
+            sshKey="$2"
+            shift
+        ;;
+        -c|--config-dir)
+            configDir="$2"
+            shift
+        ;;
+        -b|--binary-dir)
+            binarydir="$2"
+            shift
         ;;
          *)
-        break
         ;;
     esac
+    shift
 done
-
+binarydir="$binarydir""*"
+echo "HELLOW"
+echo $binarydir
+COMPRESS="tar cvpf $ARCHIVENAME $binarydir"
 if $COMPRESS; then
     echo "... compressed binary. Connecting to server..."
     echo "[$me] Cleaning staging dir..."
-    ssh -o StrictHostKeyChecking=no -i $sshKey stardock@$vmhost "cd $configDir; rm -rf staging/*"
-    echo "[$me] Deploying $archiveName to stardock@$vmhost:$configDir ..."
-    scp -o StrictHostKeyChecking=no -i $sshKey $archiveName stardock@$vmhost:$configDir/staging
+    # ssh -o StrictHostKeyChecking=no -i $sshKey stardock@$vmhost "cd $configDir; rm -rf staging/*"
+    echo "[$me] Deploying $ARCHIVENAME to stardock@$vmhost:$configDir ..."
+    scp -oStrictHostKeyChecking=no -i $sshKey $ARCHIVENAME stardock@$vmhost:$configDir
     #echo "[$me] Verifying configuration..."
-    #ssh -o StrictHostKeyChecking=no -i $sshKey stardock@$vmhost "cd $configDir/staging; tar -xvf $archiveName"
+    #ssh -o StrictHostKeyChecking=no -i $sshKey stardock@$vmhost "cd $configDir/staging; tar -xvf $ARCHIVENAME"
     echo "[$me] Completed"
 fi
 
