@@ -20,7 +20,6 @@ public class SpringWell : MonoBehaviour {
 			
 			screenBounds [0] = lb;
 			screenBounds [1] = rt;
-			print ("WORLD BOUNDS:" + lb + "," + rt);
 		}
 	}
 	

@@ -167,11 +167,10 @@ public class GameEvents : MonoBehaviour
 
 	//--------------------------------------------------------------------------------------------------
 
-	public void LevelMainMenu ()
+	public static void LevelMainMenu ()
 	{
-		if (Time.timeScale == 0)
-			PauseGame ();
-		AutoFade.LoadLevel (0, 0.33f, 1, Color.black);
+		Time.timeScale = 1;
+		AutoFade.LoadLevel (0);
 	}
 
 	public static void LevelNext ()
@@ -180,7 +179,7 @@ public class GameEvents : MonoBehaviour
 		Time.timeScale = 1;
 //		if (Time.timeScale == 0)
 //			PauseGame ();
-		AutoFade.LoadLevel (LevelManager.GetNextLevel (), 0.33f, 1, Color.black);
+		AutoFade.LoadLevel (LevelManager.GetNextLevel ());
 	}
 
 	public static void LevelPrev ()
@@ -189,7 +188,7 @@ public class GameEvents : MonoBehaviour
 		Time.timeScale = 1;
 //		if (Time.timeScale == 0)
 //			PauseGame ();
-		AutoFade.LoadLevel (Application.loadedLevel - 1, 0.33f, 1, Color.black);
+		AutoFade.LoadLevel (Application.loadedLevel - 1);
 	}
 
 	public static void PauseGame ()
@@ -234,7 +233,7 @@ public class GameEvents : MonoBehaviour
 //		LevelSuccess=false;
 		AnimationScript.RestartCalled = true;
 		GameManager.Run1 = false;
-		AutoFade.LoadLevel (Application.loadedLevel, 0.33f, 1, Color.black);
+		AutoFade.LoadLevel (Application.loadedLevel);
 	}
 
 	//------------------------------------------FAIL CHECKS--------------------------------------------

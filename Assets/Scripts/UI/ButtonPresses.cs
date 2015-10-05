@@ -307,7 +307,6 @@ public class ButtonPresses : MonoBehaviour
 
 	public void showMoreSettings ()
 	{
-		print ("SHOWN");
 		MoreOptionsPanel.SetActive (true);
 		ResetToPrevSettings (OptionsSaved);
 	}
@@ -563,7 +562,8 @@ public class ButtonPresses : MonoBehaviour
 
 	public void MainMenu ()
 	{
-		GameManager.LoadLevelNum (0);
+		GameEvents.LevelMainMenu ();
+//		GameManager.LoadLevelNum (0);
 	}
 
 	public void Undock ()

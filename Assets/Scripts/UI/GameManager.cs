@@ -7,13 +7,13 @@ public class GameManager : MonoBehaviour
 	private float FixedTimeStepChanged;
 	private bool loading = true;
 	public static bool Run1=true;
-
+	public static GameManager instance;
 	Texture loadingTexture;
-
+	bool drawn = false;
 
 	void Awake ()
 	{
-//		DontDestroyOnLoad(gameObject);
+//		DontDestroyOnLoad(this);
 //		FixedTimeStepChanged=FixedTimeStep;
 		Time.timeScale=1;
 
@@ -21,8 +21,10 @@ public class GameManager : MonoBehaviour
 
 	void Start(){
 //		ChangeCursor(true);
-
-		loadingTexture = Resources.Load<Texture> ("Images/UI/background1");
+		instance = this;
+		if (loadingTexture==null){
+			loadingTexture = Resources.Load<Texture> ("Images/UI/background1");
+		}
 	}
 
 	void ChangeCursor(bool isCustom){
@@ -31,8 +33,8 @@ public class GameManager : MonoBehaviour
 			cursor = Resources.Load<Texture2D> ("Images/cursor_32");
 //			print ("CURSOR :"+cursor.name);
 		}else{
-				Cursor.SetCursor(cursor, Vector2.zero, CursorMode.Auto);
-				print(cursor+"CURSOR"+Cursor.visible);
+			Cursor.SetCursor(cursor, Vector2.zero, CursorMode.Auto);
+			print(cursor+"CURSOR"+Cursor.visible);
 		}
 	}
 	public void ResetProgress(){
@@ -62,10 +64,8 @@ public class GameManager : MonoBehaviour
 
 	void Update ()
 	{
-		if(Application.isLoadingLevel)
-			loading = true;
-		else
-			loading = false;
+		loading = Application.isLoadingLevel;
+
 //		if (FixedTimeStepChanged!=FixedTimeStep){
 //			Time.fixedDeltaTime = FixedTimeStep;
 //			FixedTimeStepChanged=FixedTimeStep;
@@ -75,14 +75,39 @@ public class GameManager : MonoBehaviour
 
 	void OnGUI()
 	{
-		if(loading) {
-			GUI.DrawTexture (new Rect(0,0,Screen.width,Screen.height), loadingTexture, ScaleMode.ScaleAndCrop);
-			print("DRAWING TEXTURE: "+loadingTexture.name);
-		}
+//		if(Application.isLoadingLevel) {
+////			GUI.DrawTexture (new Rect(0,0,Screen.width,Screen.height), loadingTexture, ScaleMode.ScaleAndCrop);
+//			Graphics.DrawTexture (new Rect(0,0,Screen.width,Screen.height), loadingTexture);
+//			print("DRAWING TEXTURE: "+loadingTexture.name);
+//			drawn=true;
+//		}
 		//Frame Rate
 		//		GUI.Label(new Rect(10,10, 100, 100), ((int)(1.0f / Time.smoothDeltaTime)).ToString());        
 	}
-	
+
+	public static IEnumerator FadeLoad (float overTime)
+	{
+		float startTime = Time.time;
+
+		Color transparent = new Color(0,0,0,0);
+		Color black = new Color(0,0,0,1);
+		GUI.color = transparent;
+//		Graphics.DrawTexture (new Rect(0,0,Screen.width,Screen.height), loadingTexture);
+		while (Time.time < startTime + overTime) {
+			GUI.color = Color.Lerp(GUI.color, black, (Time.time - startTime) / overTime);
+			print (GUI.color);
+			yield return null;
+		}
+
+
+		startTime = Time.time;
+		while (Time.time < startTime + overTime) {
+			print (GUI.color);
+			GUI.color = Color.Lerp(GUI.color,transparent, (Time.time - startTime) / overTime);
+			yield return null;
+		}
+	}
+
 	public void QuitGame ()
 	{
 		Application.Quit ();
@@ -91,6 +116,7 @@ public class GameManager : MonoBehaviour
 	public static void LoadLevelNum (int num)
 	{
 //		LoadingScreen.show();
+//		instance.StartCoroutine(FadeLoad(1f));
 		Application.LoadLevel (num);
 
 //		AutoFade.LoadLevel (num, 0.33f, 1, Color.black);

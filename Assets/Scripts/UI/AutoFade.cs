@@ -4,89 +4,86 @@ using System.Collections;
 public class AutoFade : MonoBehaviour
 {
 	private static AutoFade m_Instance = null;
-	private Material m_Material = null;
-	private string m_LevelName = "";
 	private int m_LevelIndex = 0;
 	private bool m_Fading = false;
 	
-	private static AutoFade Instance
-	{
-		get
-		{
-			if (m_Instance == null)
-			{
-				m_Instance = (new GameObject("AutoFade")).AddComponent<AutoFade>();
+	private static AutoFade Instance {
+		get {
+			if (m_Instance == null) {
+				m_Instance = (new GameObject ("AutoFade")).AddComponent<AutoFade> ();
 			}
 			return m_Instance;
 		}
 	}
-	public static bool Fading
-	{
+
+	public static bool Fading {
 		get { return Instance.m_Fading; }
 	}
-	
-	private void Awake()
+
+	Texture loadingTexture;
+
+	private void Awake ()
 	{
-		DontDestroyOnLoad(this);
+		DontDestroyOnLoad (this);
 		m_Instance = this;
-		m_Material = new Material("Shader \"Plane/No zTest\" { SubShader { Pass { Blend SrcAlpha OneMinusSrcAlpha ZWrite Off Cull Off Fog { Mode Off } BindChannels { Bind \"Color\",color } } } }");
+		loadingTexture = Resources.Load<Texture> ("Images/UI/background1");
 	}
 	
-	private void DrawQuad(Color aColor,float aAlpha)
+
+	private IEnumerator Fade (float aFadeOutTime, float aFadeInTime)
 	{
-		aColor.a = aAlpha;
-		m_Material.SetPass(0);
-		GL.PushMatrix();
-		GL.LoadOrtho();
-		GL.Begin(GL.QUADS);
-		GL.Color(aColor);   // moved here, needs to be inside begin/end
-		GL.Vertex3(0, 0, -1);
-		GL.Vertex3(0, 1, -1);
-		GL.Vertex3(1, 1, -1);
-		GL.Vertex3(1, 0, -1);
-		GL.End();
-		GL.PopMatrix();
-	}
-	
-	private IEnumerator Fade(float aFadeOutTime, float aFadeInTime, Color aColor)
-	{
-		float t = 0.0f;
-		while (t<1.0f)
-		{
-			yield return new WaitForEndOfFrame();
-			t = Mathf.Clamp01(t + Time.deltaTime / aFadeOutTime);
-			DrawQuad(aColor,t);
+
+		Rect rect = new Rect (0, 0, Screen.width, Screen.height);
+
+		Color transparent = new Color (1, 1, 1, 0);
+		Color opaque = new Color (1, 1, 1, 1f);
+		Color col = transparent;
+
+		float startTime = Time.time;
+		while (Time.time < startTime + aFadeInTime) {
+			yield return new WaitForEndOfFrame ();
+			col.a += Mathf.Clamp01 (0.06f);
+
+			GUI.color = col;
+			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
+			yield return null;
 		}
-		if (m_LevelName != "")
-			Application.LoadLevel(m_LevelName);
-		else
-			Application.LoadLevel(m_LevelIndex);
-		while (t>0.0f)
-		{
-			yield return new WaitForEndOfFrame();
-			t = Mathf.Clamp01(t - Time.deltaTime / aFadeInTime);
-			DrawQuad(aColor,t);
+
+		GameManager.LoadLevelNum (m_LevelIndex);
+		col.a = 1f;
+
+		startTime = Time.time;
+		while (Time.time < startTime + 0.1f) {
+			yield return new WaitForEndOfFrame ();
+			GUI.color = opaque;
+			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
+			yield return null;
 		}
+
+		startTime = Time.time;
+		while (Time.time < startTime + aFadeOutTime) {
+			yield return new WaitForEndOfFrame ();
+			col.a -= Mathf.Clamp01 (0.06f);
+			GUI.color = col;
+			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
+			yield return null;
+		}
+
 		m_Fading = false;
 	}
-	private void StartFade(float aFadeOutTime, float aFadeInTime, Color aColor)
+
+	private void StartFade (float aFadeOutTime, float aFadeInTime)
 	{
 		m_Fading = true;
-		StartCoroutine(Fade(aFadeOutTime, aFadeInTime, aColor));
+		StartCoroutine (Fade (aFadeOutTime, aFadeInTime));
 	}
-	
-	public static void LoadLevel(string aLevelName,float aFadeOutTime, float aFadeInTime, Color aColor)
+
+	public static void LoadLevel (int aLevelIndex)
 	{
-		if (Fading) return;
-		Instance.m_LevelName = aLevelName;
-		Instance.StartFade(aFadeOutTime, aFadeInTime, aColor);
-	}
-	public static void LoadLevel(int aLevelIndex,float aFadeOutTime, float aFadeInTime, Color aColor)
-	{
-		if (Fading) return;
-		Instance.m_LevelName = "";
+		if (Fading)
+			return;
 		Instance.m_LevelIndex = aLevelIndex;
-		Instance.StartFade(aFadeOutTime, aFadeInTime, aColor);
+		Instance.StartFade (0.25f, 0.25f);
 	}
 }
 

@@ -92,7 +92,8 @@ public class LevelManager : MonoBehaviour {
 			level.Find("Lock").gameObject.SetActive(!levAllowed);
 
 			int levNum = i+1;
-			button.onClick.AddListener(() => GameManager.LoadLevelNum(levNum));
+			button.onClick.AddListener(() => AutoFade.LoadLevel(levNum));
+//			button.onClick.AddListener(() => GameManager.LoadLevelNum(levNum));
 
 		}
 
