@@ -76,6 +76,7 @@ public class TinyGravity : MonoBehaviour
 		StartCoroutine(NewBurnDem(positionAt, 1f));
 
 		if (other.tag == "Player") {
+			SpringWell.CancelPull = true;
 			Invoke ("callGameEventSunFail", 2.5f);
 		}
 	}

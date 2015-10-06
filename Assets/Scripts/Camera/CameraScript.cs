@@ -37,7 +37,49 @@ public class CameraScript : MonoBehaviour
 		dampTime = 3f;
 		if (InitialDelayFollow > 0f && follow)
 			StartCoroutine (DelaySnap (InitialDelayFollow));
+
+		DrawOutline ();
 	}
+
+	void DrawOutline ()
+	{
+		LineRenderer line = gameObject.AddComponent<LineRenderer> ();
+		line.material = Resources.Load<Material>("Materials/OutsideBorder");
+		line.SetVertexCount (9);
+		float[] XX = {maxX, minX}; // n/2%2=0 = max
+		float[] YY = {maxY, minY}; // n%2. 0=max
+		float r = 5;
+		float px = maxX,py=maxY-r;
+
+		for (int i = 0; i < 9; i++) {
+//			float x = XX[((int)(i/2))%2];
+//			float y = YY[((int)((i+1)/2))%2];
+
+			float	x = XX[0];
+			float y = YY[0];
+
+
+			if (i>=3 && i<=6) x = XX[1];
+			if (i>=1 && i<=4) y = YY[1];
+//			x/=10; y/=10; //only for testing quickly
+
+			if (((int)(i/2))%2==0){
+				y = y>0?y-r:y+r;
+			}else {
+				x = x>0?x-r:x+r;
+			}
+
+			line.SetPosition (i, new Vector3 (x, y, 0f));
+			print ("i: "+i+" ,("+x+","+y+")");
+		}
+//		line.SetPosition (0, new Vector3 (maxX, maxY, 0f));
+//		line.SetPosition (1, new Vector3 (maxX, minY, 0f));
+//		line.SetPosition (2, new Vector3 (minX, minY, 0f));
+//		line.SetPosition (3, new Vector3 (minX, maxY, 0f));
+//		line.SetPosition (4, new Vector3 (maxX, maxY, 0f));
+		line.SetWidth (2f, 2f);
+	}
+
 	// Update is called once per frame
 	void LateUpdate ()
 	{
@@ -49,6 +91,7 @@ public class CameraScript : MonoBehaviour
 				destination.z=panPos.z;
 				panPos = destination;				
 			}
+			SpringWell.PullNow=isOutOfBounds(target.position, 1);
 
 			bool letPan = !GameEvents.LevelFail && !GameEvents.LevelSuccess;
 			if (letPan) {	
@@ -106,12 +149,11 @@ public class CameraScript : MonoBehaviour
 			}
 			if (!isOutOfBounds(curr, 1)){
 				panPos = curr;
+				lastPosition = Input.mousePosition;
+				offSet = snap?curr:GetComponent<Camera> ().ViewportToWorldPoint (lastPosition);
+				offSet -= target.position;
+				offSet.z = 0f;
 			}
-
-			lastPosition = Input.mousePosition;
-			offSet = snap?curr:GetComponent<Camera> ().ViewportToWorldPoint (lastPosition);
-			offSet -= target.position;
-			offSet.z = 0f;
 		}
 		
 		if (Input.GetMouseButtonUp (0)) { //Release
@@ -135,7 +177,7 @@ public class CameraScript : MonoBehaviour
 			
 			OneClick=Time.time;
 		}
-		if (CenterOnPlayer){
+		if (CenterOnPlayer && !isOutOfBounds(panPos, 1)){
 			offSet = Vector3.Lerp(offSet, Vector3.zero, 0.4f);
 			if (offSet==Vector3.zero) CenterOnPlayer=false;
 		}
@@ -265,11 +307,13 @@ public class CameraScript : MonoBehaviour
 		panPos.x = Mathf.Clamp (panPos.x, minX, maxX);
 		panPos.y = Mathf.Clamp (panPos.y, minY, maxY);
 		if (isOutOfBounds(panPos, 1)){
-
+			Vector3 targetPos = Vector3.zero;
+			targetPos.z=panPos.z;
+//			panPos = Vector3.SmoothDamp(panPos, targetPos, ref velocity, Time.smoothDeltaTime/0.10f);
 		}
 //		print(panPos);
 		//--------------abyss check------------------------
-		float lim = 1.5f;
+		float lim = 1.1f;
 		if (!GameEvents.LevelFail && isOutOfBounds(target.position, lim)) {
 			Vector3 screenPoint = GetComponent<Camera> ().WorldToViewportPoint (target.position);
 			bool offScreen = screenPoint.x < 0 || screenPoint.x > 1 || screenPoint.y < 0 || screenPoint.y > 1;
