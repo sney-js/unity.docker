@@ -141,7 +141,7 @@ public class SoundScript : MonoBehaviour
 		}
 		if (to==0f)	{
 			audio.Stop();
-		print("MUSIC STOPPED.");
+//		print("MUSIC STOPPED.");
 		}
 	}
 }

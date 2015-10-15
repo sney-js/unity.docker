@@ -294,7 +294,6 @@ public class GameEvents : MonoBehaviour
 	{
 		yield return new WaitForSeconds(invokeAfter);
 		Instance.infoText.text = msg;
-		print("GETTING HERE");
 		if (msg.Equals ("")) {
 			StartCoroutine (AnimationScript.FadeImage (
 				Instance.infoText.transform.parent.GetComponent<Image> (), 0.5f, 0f, 0f));
@@ -322,7 +321,7 @@ public class GameEvents : MonoBehaviour
 		}
 		if (dockedWith == Instance.WinWithTriggers.DockSecondary) {
 			dockedWithSecondary = true;
-			print ("DOCKEDSECOND");
+//			print ("DOCKEDSECOND");
 		}
 //		if (GameEvents.LevelFail) {
 //			dockedWith.GetComponent<HealthLoss> ().showOnSlider = true;

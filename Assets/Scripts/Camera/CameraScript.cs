@@ -70,7 +70,7 @@ public class CameraScript : MonoBehaviour
 			}
 
 			line.SetPosition (i, new Vector3 (x, y, 0f));
-			print ("i: "+i+" ,("+x+","+y+")");
+//			print ("i: "+i+" ,("+x+","+y+")");
 		}
 //		line.SetPosition (0, new Vector3 (maxX, maxY, 0f));
 //		line.SetPosition (1, new Vector3 (maxX, minY, 0f));

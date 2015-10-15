@@ -692,7 +692,7 @@ public class ButtonPresses : MonoBehaviour
 		Button scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore").GetComponent<Button> ();
 		scoreButton.interactable = visibility;
 		if (!visibility && bestTime>=sentTime){
-			print("SENT FROM 1");
+//			print("SENT FROM 1");
 			ChangeSendScoreText(true);
 		}
 	}

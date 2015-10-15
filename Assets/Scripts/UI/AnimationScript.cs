@@ -50,7 +50,6 @@ public class AnimationScript : MonoBehaviour {
 		if (to>0f) overlay.gameObject.SetActive(true);
 		while(Time.time < startTime + overTime)
 		{
-			print("Changing... info text...");
 			overlay	.color = Color.Lerp(moreAlphaC,normC, (Time.time - startTime)/overTime);
 			yield return null;
 		}
@@ -152,7 +151,7 @@ public class AnimationScript : MonoBehaviour {
 		int medalReceived = GameManager.GetMedal ();
 
 		Transform medalPanel = successScreen.FindChild("LeftGroup/MedalPanel");
-		print("RECCC:"+medalReceived);
+//		print("RECCC:"+medalReceived);
 		switch (medalReceived) {
 			case 3: medalPanel.FindChild("GOLD").gameObject.SetActive(true);break;
 			case 2: medalPanel.FindChild("SILVER").gameObject.SetActive(true);break;
