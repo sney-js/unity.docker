@@ -1,0 +1,10 @@
+{
+  "name": "spacedocker-modules",
+  "version": "10.3.1",
+  "description": "Installs the required node_nodules",
+  "author": "Snehil Bhushan <snehil.bhushan@akqa.com>",
+  "dependencies": {
+    "express": "*",
+    "fs": "*", 
+  }
+}

@@ -5,13 +5,13 @@ provider "aws" {
 }
 
 resource "aws_instance" "space-docker-web" {
-    	
+      
     connection {
-	    user = "ubuntu"
-	    key_file = "snehil-devops2.pem"
-  	}
+      user = "ubuntu"
+      key_file = "snehil-devops2.pem"
+    }
 
-  	key_name = "snehil-devops2"
+    key_name = "snehil-devops2"
     ami = "ami-47a23a30"
     instance_type = "t2.micro"
     security_groups = ["launch-wizard-6"]
@@ -19,14 +19,15 @@ resource "aws_instance" "space-docker-web" {
     
 
     provisioner "remote-exec" {
-	    inline = [
-	      "mkdir public_html",
-        "sudo apt-get --assume-yes update",
-        "sudo apt-get --assume-yes install nodejs nodejs-dev npm"
-	    ]
-  	}
+      inline = [
+        "mkdir public_html",
+        "sudo apt-get -y update",
+        "sudo apt-get -y install nodejs nodejs-dev npm",
+        "./public_html/runweb.sh"  
+      ]
+    }
 
-  	provisioner "file" {
+    provisioner "file" {
         source = "public_html/"
         destination = "/home/ubuntu/public_html"
     }
