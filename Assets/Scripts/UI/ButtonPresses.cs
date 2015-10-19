@@ -27,7 +27,7 @@ public class ButtonPresses : MonoBehaviour
 	public Sprite[] CriteriaBox1Sprites;
 	Image lightIndicator, dockIndicator;
 	private GameObject TabMenu;
-	bool StartScreenFade=false;
+	bool StartScreenFade = false;
 //	[System.Serializable]
 	public class OptionsDetails
 	{
@@ -71,10 +71,10 @@ public class ButtonPresses : MonoBehaviour
 		if (!isMainMenu) {
 //			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
-			if (StartScreenFade){
-				canvasObj.FindChild("StartScreen").gameObject.SetActive (GameManager.Run1);
+			if (StartScreenFade) {
+				canvasObj.FindChild ("StartScreen").gameObject.SetActive (GameManager.Run1);
 				if (GameManager.Run1) {
-					canvasObj.FindChild("StartScreen/LevelTitle").GetComponent<Text> ().text = 
+					canvasObj.FindChild ("StartScreen/LevelTitle").GetComponent<Text> ().text = 
 						GameManager.GetLevelName (Application.loadedLevel);
 				}
 			}
@@ -89,10 +89,40 @@ public class ButtonPresses : MonoBehaviour
 			FromOptionsLeaderboard = true;
 			initialiseCriteriaIcons (true);
 			ToggleDateRangeClicksOptions (2);
+		} else {
+			ScoreConnection.ReceiveRemoteVersion();
 		}
-
+		
 	}
 
+	public static IEnumerator WaitForVersion (WWW www, string receiving)
+	{
+		print ("GOT HERE");
+		yield return www;
+		// check for errors
+		string data = www.data;
+		bool successful = www.error == null && data != null && data != "";
+		if (receiving == "check-update") {
+			Debug.Log ("RESPONSE: " + data);
+			if (successful) {
+
+				float remoteVersion = ScoreConnection.AboutStringParseVersion(data);
+				System.DateTime date = ScoreConnection.AboutStringParseTime(data);
+
+
+				if (ScoreConnection.GetCurrentGameVersion()<remoteVersion){
+					print ("UPDATE AVAILABLE!");
+				}else{
+					print ("No Update Available");
+				}
+			} else {
+				print ("An Error occurred retrieving remote version");
+			}
+			
+
+		}
+		
+	}    
 	//--------------------------------------------------------------------------------------------------------
 
 	//WILL CRASH ON ANDROID BECAUSE IT RETURNS NULL RESOLUTIONS
@@ -260,7 +290,7 @@ public class ButtonPresses : MonoBehaviour
 		} else if (TabMenu.activeInHierarchy && !menuShowing) {
 			GameEvents.UnPauseGame ();
 		}
-		TabMenu.GetComponent<CanvasGroup>().alpha=1f;
+		TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
 		if (TabMenu.activeInHierarchy) {
 			Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
 		} else {
@@ -276,9 +306,10 @@ public class ButtonPresses : MonoBehaviour
 		float startTime = Time.time;
 
 		CanvasGroup cg = obj.GetComponent<CanvasGroup> ();
-		cg.alpha=0.99f;
+		cg.alpha = 0.99f;
 		while (Time.time < startTime + overTime) {
-			if (cg.alpha==1f) break;
+			if (cg.alpha == 1f)
+				break;
 			cg.alpha = Mathf.SmoothStep (0.99f, 0f, (Time.time - startTime) / overTime);
 			yield return null;
 		}
@@ -396,10 +427,10 @@ public class ButtonPresses : MonoBehaviour
 	void setQualityAntiAlias (bool set)
 	{
 		//0,2,4,8
-		int AA = (int) Mathf.Pow(2,(QualitySettings.GetQualityLevel()-2));
-		AA= Mathf.Clamp(AA, 2,8);
+		int AA = (int)Mathf.Pow (2, (QualitySettings.GetQualityLevel () - 2));
+		AA = Mathf.Clamp (AA, 2, 8);
 
-		QualitySettings.antiAliasing = !set?0:AA;
+		QualitySettings.antiAliasing = !set ? 0 : AA;
 //		UnityStandardAssets.ImageEffects.Antialiasing alias = 
 //			Camera.main.GetComponent<UnityStandardAssets.ImageEffects.Antialiasing> ();
 //		alias.enabled = set;
@@ -542,12 +573,12 @@ public class ButtonPresses : MonoBehaviour
 	//--------------------------------------------Cheats-----------------------------------//
 	public static void DimHealth ()
 	{
-		Instance.UI.FindChild("Health").GetComponent<CanvasGroup>().alpha=0.2f;
+		Instance.UI.FindChild ("Health").GetComponent<CanvasGroup> ().alpha = 0.2f;
 	}
 
 	public static void DimFuel ()
 	{
-		Instance.UI.FindChild("Fuel").GetComponent<CanvasGroup>().alpha=0.2f;
+		Instance.UI.FindChild ("Fuel").GetComponent<CanvasGroup> ().alpha = 0.2f;
 	}
 	//----------------------------------------------PAUSE RESUME GAME-----------------------------------
 //	public static void PauseGame(){
@@ -675,7 +706,7 @@ public class ButtonPresses : MonoBehaviour
 //		Button scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore").GetComponent<Button> ();
 //		scoreButton.interactable = false;
 //		scoreButton.transform.FindChild("Text").GetComponent<Text>().text="Time Added";
-		print("TIME SENT: "+bestTime);
+		print ("TIME SENT: " + bestTime);
 //		}else{
 //			print("AN ERROR OCCURRED");
 //		}
@@ -685,25 +716,26 @@ public class ButtonPresses : MonoBehaviour
 	public static void ToggleScoreButton ()
 	{
 		float bestTime = GameManager.GetLevelSavedTime ();
-		float sentTime = GameManager.GetLevelSavedSentTime();
+		float sentTime = GameManager.GetLevelSavedSentTime ();
 
-		print("BestTime:"+bestTime+" ,senttime:"+sentTime);
-		bool visibility = GameManager.GetLevelSavedMedal()==3 && bestTime<sentTime;
+		print ("BestTime:" + bestTime + " ,senttime:" + sentTime);
+		bool visibility = GameManager.GetLevelSavedMedal () == 3 && bestTime < sentTime;
 		Button scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore").GetComponent<Button> ();
 		scoreButton.interactable = visibility;
-		if (!visibility && bestTime>=sentTime){
+		if (!visibility && bestTime >= sentTime) {
 //			print("SENT FROM 1");
-			ChangeSendScoreText(true);
+			ChangeSendScoreText (true);
 		}
 	}
 
-	public static void ChangeSendScoreText(bool TimeAdded){
+	public static void ChangeSendScoreText (bool TimeAdded)
+	{
 		Text scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore/Text").GetComponent<Text> ();
 
-		string str = TimeAdded?"Time Added":"Try Again";
+		string str = TimeAdded ? "Time Added" : "Try Again";
 
-		scoreButton.text=str;
-		scoreButton.transform.parent.gameObject.GetComponent<Button>().interactable=!TimeAdded;
+		scoreButton.text = str;
+		scoreButton.transform.parent.gameObject.GetComponent<Button> ().interactable = !TimeAdded;
 	}
 
 
