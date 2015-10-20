@@ -95,13 +95,19 @@ public class ButtonPresses : MonoBehaviour
 		
 	}
 
+
+
 	public static IEnumerator WaitForVersion (WWW www, string receiving)
 	{
-		print ("GOT HERE");
 		yield return www;
 		// check for errors
 		string data = www.data;
 		bool successful = www.error == null && data != null && data != "";
+
+		Text vtext = Instance.optionsPanel.transform.FindChild("About/Version").GetComponent<Text>();
+		float yourVersion = ScoreConnection.GetCurrentGameVersion ();
+		vtext.text = "Version: "+yourVersion+"\r\n";
+
 		if (receiving == "check-update") {
 			Debug.Log ("RESPONSE: " + data);
 			if (successful) {
@@ -110,13 +116,17 @@ public class ButtonPresses : MonoBehaviour
 				System.DateTime date = ScoreConnection.AboutStringParseTime(data);
 
 
-				if (ScoreConnection.GetCurrentGameVersion()<remoteVersion){
+				Text updTxt = Instance.optionsPanel.transform.FindChild("About/vtest").GetComponent<Text>();
+				if (yourVersion < remoteVersion){
 					print ("UPDATE AVAILABLE!");
+
+					updTxt.text = "Updated v"+remoteVersion+" available!";
 				}else{
 					print ("No Update Available");
+					updTxt.text = "No update available!";
 				}
 			} else {
-				print ("An Error occurred retrieving remote version");
+				print ("Could not check for update!");
 			}
 			
 
@@ -570,6 +580,11 @@ public class ButtonPresses : MonoBehaviour
 		StartCoroutine (SetInactiveAfter (helptip, 1f));
 	}
 
+	public void ToggleAbout(){
+		GameObject about = Instance.optionsPanel.transform.FindChild("About").gameObject;
+		about.SetActive(!about.activeInHierarchy);
+	}
+
 	//--------------------------------------------Cheats-----------------------------------//
 	public static void DimHealth ()
 	{
@@ -706,7 +721,7 @@ public class ButtonPresses : MonoBehaviour
 //		Button scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore").GetComponent<Button> ();
 //		scoreButton.interactable = false;
 //		scoreButton.transform.FindChild("Text").GetComponent<Text>().text="Time Added";
-		print ("TIME SENT: " + bestTime);
+//		print ("TIME SENT: " + bestTime);
 //		}else{
 //			print("AN ERROR OCCURRED");
 //		}

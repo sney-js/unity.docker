@@ -68,7 +68,6 @@ public class ScoreConnection : MonoBehaviour
 		
 		WWW www = new WWW (url + "?VERSION=" + GetCurrentGameVersion ());
 		ButtonPresses.Instance.StartCoroutine (ButtonPresses.WaitForVersion (www, "check-update"));
-		print ("SNET");
 	}
 
 	public static float GetCurrentGameVersion ()
