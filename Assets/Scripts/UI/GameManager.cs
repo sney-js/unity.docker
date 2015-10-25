@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour
 		case 6:
 			return "You went into the Abyss"; 
 		case 7:
-			return "You were hit by a Geyser"; 
+			return "They got you!"; 
 		default:
 			return "FAILED!";
 		}

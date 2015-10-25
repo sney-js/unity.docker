@@ -36,8 +36,6 @@ public class GeyserGeneration : MonoBehaviour
 	{
 		startTime = Time.time;
 		Random.seed = seed;
-//		Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Asteroids/");
-//		Debug.Log(sprites.Length);
 		if (AtStart) {
 			for (; total < numberOfObjects; total++) {
 
@@ -102,7 +100,8 @@ public class GeyserGeneration : MonoBehaviour
 			Start ();
 			drawAgain = false;
 		}
-		if (SpawnMode && Time.time > startTime + PerSpawnTime && GameEvents.startCounting) {
+		if (SpawnMode && Time.time > startTime + PerSpawnTime && GameEvents.startCounting &&
+		     !GameEvents.LevelFail && !GameEvents.LevelSuccess) {
 			startTime = Time.time;
 			if (Random.value < Probability) {
 				total++;
