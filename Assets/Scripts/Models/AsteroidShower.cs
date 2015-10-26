@@ -58,7 +58,7 @@ public class AsteroidShower : MonoBehaviour
 		
 		//-------------------------------position, size, rotation-----------------------------------------------
 		Vector3 pos;
-		float xran = Random.Range (-700f, 850f);
+		float xran = Random.Range (-600f, 850f);
 		float yran = rangeXY * Random.Range(AtStart?0.4f:0.9f, 1.1f) - (xran/4f);
 		pos = new Vector3 (xran, yran,zValue);
 

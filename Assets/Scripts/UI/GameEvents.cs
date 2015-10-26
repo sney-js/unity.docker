@@ -424,10 +424,13 @@ public class GameEvents : MonoBehaviour
 	//---------------------------------------GAME SUCCESS/FAIL------------------------------------------
 	public static void Failed (int failId)
 	{
-		Debug.Log ("FAILED!!!");
-		GameEvents.LevelFail = true;
-		Instance.StartCoroutine (AnimationScript.LevelFailed (failId));
-		SoundScript.FailedMusic ();
+		if (!LevelFail){
+			Debug.Log ("FAILED!!!");
+			GameEvents.LevelFail = true;
+			Instance.StartCoroutine (AnimationScript.LevelFailed (failId));
+			SoundScript.FailedMusic ();
+
+		}
 	}
 	
 	void Success ()

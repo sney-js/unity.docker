@@ -301,11 +301,21 @@ public class ButtonPresses : MonoBehaviour
 			GameEvents.UnPauseGame ();
 		}
 		TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
+		Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
+		bool rev = anim.GetBool ("reverse");
+
+		//hide
 		if (TabMenu.activeInHierarchy) {
 			Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
-		} else {
+			if (!rev) ToggleTabLeaderboard ();
+		} 
+		//show
+		else {
 			TabMenu.SetActive (true);
+			anim.enabled=false;
+//			if (rev) ToggleTabLeaderboard ();
 		}
+
 //		menuShowing = TabMenu.activeInHierarchy;
 //		MoreOptionsPanel.gameObject.SetActive (false);
 		

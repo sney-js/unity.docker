@@ -26,7 +26,7 @@ public class CameraScript : MonoBehaviour
 	float OneClick;
 	float TimeDoubleClick = 0.5f;
 	bool CenterOnPlayer=false;
-	
+	public float sunAt = -1f;
 	void Start ()
 	{
 		if (target == null)
@@ -52,8 +52,6 @@ public class CameraScript : MonoBehaviour
 		float px = maxX,py=maxY-r;
 
 		for (int i = 0; i < 9; i++) {
-//			float x = XX[((int)(i/2))%2];
-//			float y = YY[((int)((i+1)/2))%2];
 
 			float	x = XX[0];
 			float y = YY[0];
@@ -72,11 +70,6 @@ public class CameraScript : MonoBehaviour
 			line.SetPosition (i, new Vector3 (x, y, 0f));
 //			print ("i: "+i+" ,("+x+","+y+")");
 		}
-//		line.SetPosition (0, new Vector3 (maxX, maxY, 0f));
-//		line.SetPosition (1, new Vector3 (maxX, minY, 0f));
-//		line.SetPosition (2, new Vector3 (minX, minY, 0f));
-//		line.SetPosition (3, new Vector3 (minX, maxY, 0f));
-//		line.SetPosition (4, new Vector3 (maxX, maxY, 0f));
 		line.SetWidth (2f, 2f);
 	}
 
@@ -304,7 +297,7 @@ public class CameraScript : MonoBehaviour
 	
 	void adjustViewBounds ()
 	{
-		panPos.x = Mathf.Clamp (panPos.x, minX, maxX);
+		panPos.x = Mathf.Clamp (panPos.x, sunAt!=-1?sunAt:minX, maxX);
 		panPos.y = Mathf.Clamp (panPos.y, minY, maxY);
 		if (isOutOfBounds(panPos, 1)){
 			Vector3 targetPos = Vector3.zero;
