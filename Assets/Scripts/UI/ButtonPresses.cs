@@ -82,7 +82,8 @@ public class ButtonPresses : MonoBehaviour
 			TabMenu = canvasObj.FindChild ("TabMenu").gameObject;
 			Text leveltext = TabMenu.transform.FindChild ("LeftGroup/MoreInfo/LevelText").GetComponent<Text> ();
 			leveltext.text = "Level " + Application.loadedLevel;
-			if (LevelManager.GetNextLevel () == Application.loadedLevel) {
+			print ("this level:"+Application.loadedLevel+" ,next allowed:"+LevelManager.GetNextLevel ());
+			if (LevelManager.GetNextLevel () != Application.loadedLevel +1) {
 				optionsPanel.transform.FindChild ("PrevNextGroup/Next").GetComponent<Button> ().interactable = false;
 			}
 			//options Criteria
@@ -147,6 +148,16 @@ public class ButtonPresses : MonoBehaviour
 		t_shadow = MoreOptionsPanel.transform.FindChild ("Line6/Toggle").gameObject.GetComponent<Toggle> ();
 
 		try {
+
+			//first time default:
+			bool firstTime = PlayerPrefs.GetInt ("Game_first_time") == 0 ? true : false;
+			PlayerPrefs.SetInt ("Game_first_time",1);
+			if (firstTime){
+				PlayerPrefs.SetInt ("Settings_bloom", 1);
+				PlayerPrefs.SetInt ("Settings_antialias", 1);
+				PlayerPrefs.SetInt ("Settings_qualitylevel", 5);
+			}
+			//--------------------
 			if (PlayerPrefs.HasKey ("Settings_mouseSensitivity")) {
 				QualityOptions.mouseSens = PlayerPrefs.GetFloat ("Settings_mouseSensitivity");
 			}
