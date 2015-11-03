@@ -61,36 +61,37 @@ public class AnimationScript : MonoBehaviour {
 		float overTime = 1f;
 		float FlashTime = 0.3f;
 
-		Image overlay = GameObject.Find("Canvas").transform.FindChild("GameOverImage").GetComponent<Image>();
+		CanvasGroup overlay = GameObject.Find("Canvas").transform.FindChild("GameOverImage").GetComponent<CanvasGroup>();
 		Text failText = overlay.transform.FindChild("FailText").gameObject.GetComponent<Text>();
+		failText.text = GameManager.getMsg(msgID);
+
 		float startTime = Time.time;
-		Color moreAlphaC = overlay.color;
-		Color normC = overlay.color;
-		moreAlphaC.a+=0.4f;
-		normC.a=0.2f;
+		float moreAlphaC = overlay.alpha;
+		float normC = overlay.alpha;
+		moreAlphaC+=0.5f;
+		normC=0.3f;
 
 		float myDeltaTime = Time.deltaTime; 
 		float speed = 4f;
 		while(Time.time < startTime + FlashTime)
 		{
-			overlay	.color = Color.Lerp(moreAlphaC,normC, (Time.time - startTime)/FlashTime);
+			overlay	.alpha = Mathf.Lerp(moreAlphaC,normC, (Time.time - startTime)/FlashTime);
 			yield return null;
 		}
-		failText.text = GameManager.getMsg(msgID);
-		Color transparent = new Color(1,1,1,0f);
-		failText.color = transparent;
-		while(Time.time < startTime + overTime)
-		{
-//			Time.timeScale = Mathf.Lerp(1f,0.2f,overTime);
-			Time.timeScale = Mathf.MoveTowards(Time.timeScale, 0.2f, myDeltaTime * speed);
-			failText.color = Color.Lerp(transparent, new Color(1,1,1,0.7f), 2f);
-			if (RestartCalled) {
-				Time.timeScale=1;
-				RestartCalled=false;
-				break;
-			}
-			yield return null;
-		}
+//		Color transparent = new Color(1,1,1,0f);
+//		failText.color = transparent;
+//		while(Time.time < startTime + overTime)
+//		{
+////			Time.timeScale = Mathf.Lerp(1f,0.2f,overTime);
+//			Time.timeScale = Mathf.MoveTowards(Time.timeScale, 0.2f, myDeltaTime * speed);
+//			failText.color = Color.Lerp(transparent, new Color(1,1,1,0.7f), 2f);
+//			if (RestartCalled) {
+//				Time.timeScale=1;
+//				RestartCalled=false;
+//				break;
+//			}
+//			yield return null;
+//		}
 
 	}
 
