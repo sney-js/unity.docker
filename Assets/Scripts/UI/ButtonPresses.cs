@@ -613,10 +613,7 @@ public class ButtonPresses : MonoBehaviour
 			img.sprite=tutImages[tutnums[currTut+1]];
 			currTut++;
 		}
-		Button next = Instance.canvasObj.FindChild("Tutorial/next").gameObject.GetComponent<Button>();
-		next.interactable=currTut<tutnums.Length-1;
-		Button prev = Instance.canvasObj.FindChild("Tutorial/prev").gameObject.GetComponent<Button>();
-		prev.interactable=currTut>0;
+		tutorialUpdateButtons();
 	}
 
 	public void tutorialClose(){
@@ -631,6 +628,10 @@ public class ButtonPresses : MonoBehaviour
 			img.sprite=tutImages[tutnums[currTut-1]];
 			currTut--;
 		}
+		tutorialUpdateButtons();
+	}
+
+	public void tutorialUpdateButtons(){
 		Button next = Instance.canvasObj.FindChild("Tutorial/next").gameObject.GetComponent<Button>();
 		next.interactable=currTut<tutnums.Length-1;
 		Button prev = Instance.canvasObj.FindChild("Tutorial/prev").gameObject.GetComponent<Button>();
