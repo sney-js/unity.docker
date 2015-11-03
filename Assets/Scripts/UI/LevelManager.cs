@@ -13,17 +13,17 @@ public class LevelManager : MonoBehaviour {
 //		totLevels = LevelGrid.childCount;
 		Sprite[] screens = Resources.LoadAll<Sprite>("Images/UI/ScreenshotsLevel/");
 
-		PlayerPrefs.SetInt("Level#" + 4 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 1 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 2 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 3 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 4 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 5 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 6 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 7 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 8 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 9 + "_Medal", 3);
-		PlayerPrefs.SetInt("Level#" + 10 + "_Medal",3);
+//		PlayerPrefs.SetInt("Level#" + 4 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 1 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 2 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 3 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 4 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 5 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 6 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 7 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 8 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 9 + "_Medal", 3);
+//		PlayerPrefs.SetInt("Level#" + 10 + "_Medal",3);
 
 		Color bronze = normColor(124,76,76,1);
 		Color silver = normColor(173,173,173,1);
