@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: c58bd088fba17c54fa31fb39de8ca716
-timeCreated: 1446568767
+guid: cac4349ae5dee4ed5bc55a7449fbd777
+timeCreated: 1446564520
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -48,7 +48,7 @@ TextureImporter:
   rGBM: 0
   compressionQuality: 0
   allowsAlphaSplitting: 0
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -68,7 +68,7 @@ TextureImporter:
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_1
       rect:
@@ -78,47 +78,47 @@ TextureImporter:
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_2
       rect:
         serializedVersion: 2
-        x: 629
+        x: 640
         y: 0
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_3
       rect:
         serializedVersion: 2
-        x: 940
+        x: 960
         y: 0
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_4
       rect:
         serializedVersion: 2
-        x: 1271
+        x: 1280
         y: 0
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_5
       rect:
         serializedVersion: 2
-        x: 1609
+        x: 1600
         y: 0
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_6
       rect:
@@ -128,27 +128,27 @@ TextureImporter:
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_7
       rect:
         serializedVersion: 2
-        x: 2257
+        x: 2240
         y: 0
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_8
       rect:
         serializedVersion: 2
-        x: 2580
+        x: 2560
         y: 0
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: helpTip_9
       rect:
@@ -158,7 +158,7 @@ TextureImporter:
         width: 320
         height: 628
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 

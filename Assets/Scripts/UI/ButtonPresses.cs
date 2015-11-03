@@ -28,6 +28,11 @@ public class ButtonPresses : MonoBehaviour
 	Image lightIndicator, dockIndicator;
 	private GameObject TabMenu;
 	bool StartScreenFade = false;
+
+	Sprite[] tutImages;
+	int currTut = 0;
+	int[] tutnums;
+
 //	[System.Serializable]
 	public class OptionsDetails
 	{
@@ -68,8 +73,10 @@ public class ButtonPresses : MonoBehaviour
 
 		initSettings ();
 
-		if (!isMainMenu) {
-//			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();
+		if (isMainMenu) {
+			ScoreConnection.ReceiveRemoteVersion();
+		} else {
+//			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();			
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
 			if (StartScreenFade) {
 				canvasObj.FindChild ("StartScreen").gameObject.SetActive (GameManager.Run1);
@@ -78,7 +85,7 @@ public class ButtonPresses : MonoBehaviour
 						GameManager.GetLevelName (Application.loadedLevel);
 				}
 			}
-
+			
 			TabMenu = canvasObj.FindChild ("TabMenu").gameObject;
 			Text leveltext = TabMenu.transform.FindChild ("LeftGroup/MoreInfo/LevelText").GetComponent<Text> ();
 			leveltext.text = "Level " + Application.loadedLevel;
@@ -90,8 +97,9 @@ public class ButtonPresses : MonoBehaviour
 			FromOptionsLeaderboard = true;
 			initialiseCriteriaIcons (true);
 			ToggleDateRangeClicksOptions (2);
-		} else {
-			ScoreConnection.ReceiveRemoteVersion();
+			if (Application.loadedLevel==1){
+				initTutorial();
+			}
 		}
 		
 	}
@@ -570,6 +578,7 @@ public class ButtonPresses : MonoBehaviour
 		lv.GetComponent<Animator> ().Play ("LevelSelectionExit");
 	}
 
+	//---------------------------------------------------------------------------------------------
 	public void ShowHelpTips ()
 	{
 //		GameObject lv = GameObject.Find("Canvas").transform.FindChild("HelpTip").gameObject;
@@ -583,6 +592,51 @@ public class ButtonPresses : MonoBehaviour
 		menuShowing = true;
 
 	}
+
+	public void initTutorial(){
+		int[] tuts = {0,1,2,6, 7, 5, 4, 3, 8};
+		tutnums=tuts;
+
+		tutImages = Resources.LoadAll<Sprite> ("Images/UI/helpTip");
+		print (tutImages.Length);
+		GameObject tut = Instance.canvasObj.FindChild("Tutorial").gameObject;
+		tut.SetActive(true);
+		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
+		currTut=0;
+		img.sprite = tutImages[currTut];
+	}
+
+	public void tutorialNext(){
+
+		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
+		if (currTut<tutnums.Length-1){
+			img.sprite=tutImages[tutnums[currTut+1]];
+			currTut++;
+		}
+		Button next = Instance.canvasObj.FindChild("Tutorial/next").gameObject.GetComponent<Button>();
+		next.interactable=currTut<tutnums.Length-1;
+		Button prev = Instance.canvasObj.FindChild("Tutorial/prev").gameObject.GetComponent<Button>();
+		prev.interactable=currTut>0;
+	}
+
+	public void tutorialClose(){
+		GameObject tut = Instance.canvasObj.FindChild("Tutorial").gameObject;
+		tut.SetActive(false);
+	}
+
+	public void tutorialPrev(){
+
+		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
+		if (currTut>0){
+			img.sprite=tutImages[tutnums[currTut-1]];
+			currTut--;
+		}
+		Button next = Instance.canvasObj.FindChild("Tutorial/next").gameObject.GetComponent<Button>();
+		next.interactable=currTut<tutnums.Length-1;
+		Button prev = Instance.canvasObj.FindChild("Tutorial/prev").gameObject.GetComponent<Button>();
+		prev.interactable=currTut>0;
+	}
+	//---------------------------------------------------------------------------------------------
 
 	IEnumerator SetInactiveAfter (GameObject obj, float time)
 	{
@@ -794,4 +848,5 @@ public class ButtonPresses : MonoBehaviour
 //		anim.speed=anim.speed==1?-1:1;
 //		anim.Play("SlideLeft");
 	}
+
 }
