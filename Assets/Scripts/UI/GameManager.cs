@@ -182,7 +182,19 @@ public class GameManager : MonoBehaviour
 		return medal;
 	}
 
+	public static string getNoSubmitInfo(){
+		float bestTime = GameManager.GetLevelSavedTime ();
+		float sentTime = GameManager.GetLevelSavedSentTime ();
 
+		if (GetMedal()<3) {
+			return "You must get a Gold medal first";
+		}
+		else if (bestTime >= sentTime) {
+			return "You've already sent your best time";
+		}else{
+			return "";
+		}
+	}
 
 	public static void SaveCriteriaData(){
 		//bronze would be if docked

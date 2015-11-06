@@ -89,7 +89,7 @@ public class ButtonPresses : MonoBehaviour
 			TabMenu = canvasObj.FindChild ("TabMenu").gameObject;
 			Text leveltext = TabMenu.transform.FindChild ("LeftGroup/MoreInfo/LevelText").GetComponent<Text> ();
 			leveltext.text = "Level " + Application.loadedLevel;
-			print ("this level:"+Application.loadedLevel+" ,next allowed:"+LevelManager.GetNextLevel ());
+//			print ("this level:"+Application.loadedLevel+" ,next allowed:"+LevelManager.GetNextLevel ());
 			if (LevelManager.GetNextLevel () != Application.loadedLevel +1) {
 				optionsPanel.transform.FindChild ("PrevNextGroup/Next").GetComponent<Button> ().interactable = false;
 			}
@@ -594,11 +594,11 @@ public class ButtonPresses : MonoBehaviour
 	}
 
 	public void initTutorial(){
-		int[] tuts = {0,1,2,6, 7, 5, 4, 3, 8};
+		int[] tuts = {0,1,2,6, 7, 5, 4, 3, -1};
 		tutnums=tuts;
 
 		tutImages = Resources.LoadAll<Sprite> ("Images/UI/helpTip");
-		print (tutImages.Length);
+//		print (tutImages.Length);
 		GameObject tut = Instance.canvasObj.FindChild("Tutorial").gameObject;
 		tut.SetActive(true);
 		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
@@ -610,7 +610,14 @@ public class ButtonPresses : MonoBehaviour
 
 		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
 		if (currTut<tutnums.Length-1){
-			img.sprite=tutImages[tutnums[currTut+1]];
+			if (currTut==tutnums.Length-2){
+				img.color = new Color(0.06f,0.06f,0.06f,0.85f);
+				img.transform.FindChild("text_1").gameObject.SetActive(true);
+				img.transform.FindChild("text_2").gameObject.SetActive(true);
+				img.sprite=null;
+			}else{
+				img.sprite=tutImages[tutnums[currTut+1]];
+			}
 			currTut++;
 		}
 		tutorialUpdateButtons();
@@ -622,9 +629,13 @@ public class ButtonPresses : MonoBehaviour
 	}
 
 	public void tutorialPrev(){
-
 		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
 		if (currTut>0){
+			if (currTut==tutnums.Length-1){
+				img.color=new Color(1,1,1,0.85f);
+				img.transform.FindChild("text_1").gameObject.SetActive(false);
+				img.transform.FindChild("text_2").gameObject.SetActive(false);
+			}
 			img.sprite=tutImages[tutnums[currTut-1]];
 			currTut--;
 		}
@@ -788,7 +799,7 @@ public class ButtonPresses : MonoBehaviour
 		Text inp = Instance.successObjTarget.transform.FindChild ("ConfirmSend/Panel/InputField/Text").GetComponent<Text> ();
 		string name = inp.text;
 		if (string.IsNullOrEmpty (inp.text)) {
-			print ("not valid");
+//			print ("not valid");
 			name = "coolperson";
 		}
 		ScoreConnection.AddScore (name, bestTime);
@@ -809,14 +820,21 @@ public class ButtonPresses : MonoBehaviour
 		float bestTime = GameManager.GetLevelSavedTime ();
 		float sentTime = GameManager.GetLevelSavedSentTime ();
 
-		print ("BestTime:" + bestTime + " ,senttime:" + sentTime);
-		bool visibility = GameManager.GetLevelSavedMedal () == 3 && bestTime < sentTime;
+//		print ("BestTime:" + bestTime + " ,senttime:" + sentTime);
+		bool visibile = GameManager.GetLevelSavedMedal () == 3 && bestTime < sentTime;
 		Button scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore").GetComponent<Button> ();
-		scoreButton.interactable = visibility;
-		if (!visibility && bestTime >= sentTime) {
-//			print("SENT FROM 1");
-			ChangeSendScoreText (true);
+		Text info = Instance.successObjTarget.transform.FindChild ("SendScore/DisabledInfo").GetComponent<Text> ();
+		scoreButton.interactable = visibile;
+		if (visibile){
+			info.text="";
+		}else{
+			info.text=GameManager.getNoSubmitInfo();
 		}
+		if (!visibile && bestTime >= sentTime && sentTime>0) {
+			ChangeSendScoreText (true);
+		}else{
+		}
+//		tootlitSubmit.isDisabled=vi
 	}
 
 	public static void ChangeSendScoreText (bool TimeAdded)
