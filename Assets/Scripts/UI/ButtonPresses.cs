@@ -267,38 +267,32 @@ public class ButtonPresses : MonoBehaviour
 		if (!GameEvents.StopListeningKeys) {
 			if (!NoPause && Input.GetKeyDown (KeyCode.Escape)) {
 				if (Application.loadedLevel > 0) {
-					GameObject[] dialogs = {ShortCutDialog, MoreOptionsPanel,
+					GameObject[] dialogs = {TabMenu,ShortCutDialog, MoreOptionsPanel,
 						optionsPanel, helptip};
 					bool wasActive = false;
-					for (int i = 0; i < dialogs.Length; i++) {
-						if (dialogs [i].activeInHierarchy) {
+					foreach (var di in dialogs) {
+						if (di.activeInHierarchy) {
 							wasActive = true;
-//							dialogs[i].SetActive(false);
-							switch (i) {
-							case 0:
-								hideShortcutDialog ();
-								break;
-							case 1:
-								hideMoreSettings ();
-								break;
-							case 2:
-								ToggleActionPanel ();
-								break;
-							case 3:
-								HideHelpTips ();
-								break;
-							}
 
+							if (di == TabMenu)
+								ToggleTabPanel ();
+							else if (di == ShortCutDialog)
+								hideShortcutDialog ();
+							else if (di == MoreOptionsPanel)
+								hideMoreSettings ();
+							else if (di == optionsPanel)
+								ToggleActionPanel ();
+							else if (di == helptip)
+								HideHelpTips ();
 							break;
 						}
 					}
-					if (!wasActive)
+					if (!wasActive){
 						ToggleActionPanel ();
-//					hideMoreSettings ();
-//					if (ShortCutDialog.activeInHierarchy) {
-//						hideShortcutDialog ();
-//					}
-//					showActionPanel ();
+						menuShowing = true;
+					}else{
+						menuShowing = false;
+					}
 				} else {
 					if (MoreOptionsPanel.activeInHierarchy) {
 						hideMoreSettingsOnly ();
@@ -309,13 +303,13 @@ public class ButtonPresses : MonoBehaviour
 				}
 			}
 			if (Input.GetKeyDown (KeyCode.T)) {
-				if (!helptip.activeInHierarchy)
+				if (!menuShowing && !helptip.activeInHierarchy)
 					ShowHelpTips ();
 				else
 					HideHelpTips ();
 			}
 			if (Input.GetKeyDown (KeyCode.Tab)) {
-				showTabPanel ();
+				ToggleTabPanel ();
 			}
 		}
 	}
@@ -324,29 +318,16 @@ public class ButtonPresses : MonoBehaviour
 	{
 
 
-		menuShowing = optionsPanel.activeInHierarchy;
-
-//		MoreOptionsPanel.gameObject.SetActive (false);
-
 		if (!menuShowing) {
 			Animator anim = optionsPanel.GetComponent<Animator> ();
 			anim.enabled = true;
 			anim.SetBool ("isExiting", false);
 			anim.Rebind ();
-
-
 			Button resume = Instance.optionsPanel.transform.FindChild ("OptionsBox/Resume").GetComponent<Button> ();
 			resume.Select ();
-
-		} else {
-			Animator anim = optionsPanel.GetComponent<Animator> ();
-			anim.enabled = true;
-			anim.SetBool ("isExiting", true);
-			menuShowing = false;
-//			StartCoroutine (SetInactiveAfter (optionsPanel, 1f));
-
 		}
 		optionsPanel.SetActive (!optionsPanel.activeInHierarchy);
+		menuShowing = optionsPanel.activeInHierarchy;
 		if (Time.timeScale != 0) {
 			GameEvents.PauseGame ();
 		} else if (!menuShowing && !TabMenu.activeInHierarchy) {
@@ -354,34 +335,34 @@ public class ButtonPresses : MonoBehaviour
 		}
 	}
 
-	public void showTabPanel ()
+	public void ToggleTabPanel ()
 	{
-		
-		if (Time.timeScale != 0) {
-			GameEvents.PauseGame ();
-		} else if (TabMenu.activeInHierarchy && !menuShowing) {
-			GameEvents.UnPauseGame ();
-		}
-		TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
-		Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
-		bool rev = anim.GetBool ("reverse");
+		if (!menuShowing) {
+				if (Time.timeScale != 0) {
+					GameEvents.PauseGame ();
+				} else if (TabMenu.activeInHierarchy) {
+					GameEvents.UnPauseGame ();
+				}
+				TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
+				Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
+				bool rev = anim.GetBool ("reverse");
 
-		//hide
-		if (TabMenu.activeInHierarchy) {
-			Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
-			if (!rev)
-				ToggleTabLeaderboard ();
-		} 
-		//show
-		else {
-			TabMenu.SetActive (true);
-			anim.enabled = false;
-//			if (rev) ToggleTabLeaderboard ();
-		}
+				//hide
+				if (TabMenu.activeInHierarchy) {
+					Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
+					if (!rev)
+						ToggleTabLeaderboard ();
+				} 
+			//show
+			else {
+					TabMenu.SetActive (true);
+					anim.enabled = false;
+	//			if (rev) ToggleTabLeaderboard ();
+				}
 
-//		menuShowing = TabMenu.activeInHierarchy;
-//		MoreOptionsPanel.gameObject.SetActive (false);
-		
+	//		menuShowing = TabMenu.activeInHierarchy;
+	//		MoreOptionsPanel.gameObject.SetActive (false);
+		}
 	}
 
 	IEnumerator FadePanel (GameObject obj, float overTime)
@@ -422,6 +403,9 @@ public class ButtonPresses : MonoBehaviour
 	public void showMoreSettings ()
 	{
 		MoreOptionsPanel.SetActive (true);
+		Animator anim = MoreOptionsPanel.GetComponent<Animator> ();
+		anim.enabled = true;
+
 		ResetToPrevSettings (OptionsSaved);
 	}
 
@@ -598,7 +582,10 @@ public class ButtonPresses : MonoBehaviour
 	//-----------------------------------------------SHORTCUT WINDOW-----------------------------------------------
 	public void showShortcutDialog ()
 	{
+
 		ShortCutDialog.SetActive (true);
+		Animator anim = ShortCutDialog.GetComponent<Animator> ();
+		anim.enabled = true;
 	}
 
 	public void hideShortcutDialog ()
@@ -708,12 +695,12 @@ public class ButtonPresses : MonoBehaviour
 	public void HideHelpTips ()
 	{
 
-		helptip.SetActive (true);
-		Animator anim = helptip.GetComponent<Animator> ();
-		anim.enabled = true;
-		anim.SetBool ("isExiting", true);
+		helptip.SetActive (false);
 		menuShowing = false;
-		StartCoroutine (SetInactiveAfter (helptip, 1f));
+//		Animator anim = helptip.GetComponent<Animator> ();
+//		anim.enabled = true;
+//		anim.SetBool ("isExiting", true);
+//		StartCoroutine (SetInactiveAfter (helptip, 1f));
 	}
 
 	public void ToggleAbout ()
