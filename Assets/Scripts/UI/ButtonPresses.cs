@@ -28,7 +28,6 @@ public class ButtonPresses : MonoBehaviour
 	Image lightIndicator, dockIndicator;
 	private GameObject TabMenu;
 	bool StartScreenFade = false;
-
 	Sprite[] tutImages;
 	int currTut = 0;
 	int[] tutnums;
@@ -74,7 +73,7 @@ public class ButtonPresses : MonoBehaviour
 		initSettings ();
 
 		if (isMainMenu) {
-			ScoreConnection.ReceiveRemoteVersion();
+			ScoreConnection.ReceiveRemoteVersion ();
 		} else {
 //			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();			
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
@@ -90,21 +89,19 @@ public class ButtonPresses : MonoBehaviour
 			Text leveltext = TabMenu.transform.FindChild ("LeftGroup/MoreInfo/LevelText").GetComponent<Text> ();
 			leveltext.text = "Level " + Application.loadedLevel;
 //			print ("this level:"+Application.loadedLevel+" ,next allowed:"+LevelManager.GetNextLevel ());
-			if (LevelManager.GetNextLevel () != Application.loadedLevel +1) {
+			if (LevelManager.GetNextLevel () != Application.loadedLevel + 1) {
 				optionsPanel.transform.FindChild ("PrevNextGroup/Next").GetComponent<Button> ().interactable = false;
 			}
 			//options Criteria
 			FromOptionsLeaderboard = true;
 			initialiseCriteriaIcons (true);
 			ToggleDateRangeClicksOptions (2);
-			if (Application.loadedLevel==1){
-				initTutorial();
+			if (Application.loadedLevel == 1) {
+				initTutorial ();
 			}
 		}
 		
 	}
-
-
 
 	public static IEnumerator WaitForVersion (WWW www, string receiving)
 	{
@@ -113,24 +110,24 @@ public class ButtonPresses : MonoBehaviour
 		string data = www.data;
 		bool successful = www.error == null && data != null && data != "";
 
-		Text vtext = Instance.optionsPanel.transform.FindChild("About/Version").GetComponent<Text>();
+		Text vtext = Instance.optionsPanel.transform.FindChild ("About/Version").GetComponent<Text> ();
 		float yourVersion = ScoreConnection.GetCurrentGameVersion ();
-		vtext.text = "Version: "+yourVersion+"\r\n";
+		vtext.text = "Version: " + yourVersion + "\r\n";
 
 		if (receiving == "check-update") {
 			Debug.Log ("RESPONSE: " + data);
 			if (successful) {
 
-				float remoteVersion = ScoreConnection.AboutStringParseVersion(data);
-				System.DateTime date = ScoreConnection.AboutStringParseTime(data);
+				float remoteVersion = ScoreConnection.AboutStringParseVersion (data);
+				System.DateTime date = ScoreConnection.AboutStringParseTime (data);
 
 
-				Text updTxt = Instance.optionsPanel.transform.FindChild("About/vtest").GetComponent<Text>();
-				if (yourVersion < remoteVersion){
+				Text updTxt = Instance.optionsPanel.transform.FindChild ("About/vtest").GetComponent<Text> ();
+				if (yourVersion < remoteVersion) {
 					print ("UPDATE AVAILABLE!");
 
-					updTxt.text = "Updated v"+remoteVersion+" available!";
-				}else{
+					updTxt.text = "Updated v" + remoteVersion + " available!";
+				} else {
 					print ("No Update Available");
 					updTxt.text = "No update available!";
 				}
@@ -159,8 +156,8 @@ public class ButtonPresses : MonoBehaviour
 
 			//first time default:
 			bool firstTime = PlayerPrefs.GetInt ("Game_first_time") == 0 ? true : false;
-			PlayerPrefs.SetInt ("Game_first_time",1);
-			if (firstTime){
+			PlayerPrefs.SetInt ("Game_first_time", 1);
+			if (firstTime) {
 				PlayerPrefs.SetInt ("Settings_bloom", 1);
 				PlayerPrefs.SetInt ("Settings_antialias", 1);
 				PlayerPrefs.SetInt ("Settings_qualitylevel", 5);
@@ -270,12 +267,38 @@ public class ButtonPresses : MonoBehaviour
 		if (!GameEvents.StopListeningKeys) {
 			if (!NoPause && Input.GetKeyDown (KeyCode.Escape)) {
 				if (Application.loadedLevel > 0) {
+					GameObject[] dialogs = {ShortCutDialog, MoreOptionsPanel,
+						optionsPanel, helptip};
+					bool wasActive = false;
+					for (int i = 0; i < dialogs.Length; i++) {
+						if (dialogs [i].activeInHierarchy) {
+							wasActive = true;
+//							dialogs[i].SetActive(false);
+							switch (i) {
+							case 0:
+								hideShortcutDialog ();
+								break;
+							case 1:
+								hideMoreSettings ();
+								break;
+							case 2:
+								ToggleActionPanel ();
+								break;
+							case 3:
+								HideHelpTips ();
+								break;
+							}
 
-					hideMoreSettings ();
-					if (ShortCutDialog.activeInHierarchy) {
-						hideShortcutDialog ();
+							break;
+						}
 					}
-					showActionPanel ();
+					if (!wasActive)
+						ToggleActionPanel ();
+//					hideMoreSettings ();
+//					if (ShortCutDialog.activeInHierarchy) {
+//						hideShortcutDialog ();
+//					}
+//					showActionPanel ();
 				} else {
 					if (MoreOptionsPanel.activeInHierarchy) {
 						hideMoreSettingsOnly ();
@@ -297,20 +320,40 @@ public class ButtonPresses : MonoBehaviour
 		}
 	}
 
-	public void showActionPanel ()
+	public void ToggleActionPanel ()
 	{
 
-		if (Time.timeScale != 0) {
-			GameEvents.PauseGame ();
-		} else if (menuShowing && !TabMenu.activeInHierarchy) {
-			GameEvents.UnPauseGame ();
+
+		menuShowing = optionsPanel.activeInHierarchy;
+
+//		MoreOptionsPanel.gameObject.SetActive (false);
+
+		if (!menuShowing) {
+			Animator anim = optionsPanel.GetComponent<Animator> ();
+			anim.enabled = true;
+			anim.SetBool ("isExiting", false);
+			anim.Rebind ();
+
+
+			Button resume = Instance.optionsPanel.transform.FindChild ("OptionsBox/Resume").GetComponent<Button> ();
+			resume.Select ();
+
+		} else {
+			Animator anim = optionsPanel.GetComponent<Animator> ();
+			anim.enabled = true;
+			anim.SetBool ("isExiting", true);
+			menuShowing = false;
+//			StartCoroutine (SetInactiveAfter (optionsPanel, 1f));
+
 		}
 		optionsPanel.SetActive (!optionsPanel.activeInHierarchy);
-		menuShowing = optionsPanel.activeInHierarchy;
-		MoreOptionsPanel.gameObject.SetActive (false);
-
+		if (Time.timeScale != 0) {
+			GameEvents.PauseGame ();
+		} else if (!menuShowing && !TabMenu.activeInHierarchy) {
+			GameEvents.UnPauseGame ();
+		}
 	}
-	
+
 	public void showTabPanel ()
 	{
 		
@@ -326,12 +369,13 @@ public class ButtonPresses : MonoBehaviour
 		//hide
 		if (TabMenu.activeInHierarchy) {
 			Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
-			if (!rev) ToggleTabLeaderboard ();
+			if (!rev)
+				ToggleTabLeaderboard ();
 		} 
 		//show
 		else {
 			TabMenu.SetActive (true);
-			anim.enabled=false;
+			anim.enabled = false;
 //			if (rev) ToggleTabLeaderboard ();
 		}
 
@@ -593,60 +637,65 @@ public class ButtonPresses : MonoBehaviour
 
 	}
 
-	public void initTutorial(){
+	public void initTutorial ()
+	{
 		int[] tuts = {0,1,2,6, 7, 5, 4, 3, -1};
-		tutnums=tuts;
+		tutnums = tuts;
 
 		tutImages = Resources.LoadAll<Sprite> ("Images/UI/helpTip");
 //		print (tutImages.Length);
-		GameObject tut = Instance.canvasObj.FindChild("Tutorial").gameObject;
-		tut.SetActive(true);
-		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
-		currTut=0;
-		img.sprite = tutImages[currTut];
+		GameObject tut = Instance.canvasObj.FindChild ("Tutorial").gameObject;
+		tut.SetActive (true);
+		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
+		currTut = 0;
+		img.sprite = tutImages [currTut];
 	}
 
-	public void tutorialNext(){
+	public void tutorialNext ()
+	{
 
-		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
-		if (currTut<tutnums.Length-1){
-			if (currTut==tutnums.Length-2){
-				img.color = new Color(0.06f,0.06f,0.06f,0.85f);
-				img.transform.FindChild("text_1").gameObject.SetActive(true);
-				img.transform.FindChild("text_2").gameObject.SetActive(true);
-				img.sprite=null;
-			}else{
-				img.sprite=tutImages[tutnums[currTut+1]];
+		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
+		if (currTut < tutnums.Length - 1) {
+			if (currTut == tutnums.Length - 2) {
+				img.color = new Color (0.06f, 0.06f, 0.06f, 0.85f);
+				img.transform.FindChild ("text_1").gameObject.SetActive (true);
+				img.transform.FindChild ("text_2").gameObject.SetActive (true);
+				img.sprite = null;
+			} else {
+				img.sprite = tutImages [tutnums [currTut + 1]];
 			}
 			currTut++;
 		}
-		tutorialUpdateButtons();
+		tutorialUpdateButtons ();
 	}
 
-	public void tutorialClose(){
-		GameObject tut = Instance.canvasObj.FindChild("Tutorial").gameObject;
-		tut.SetActive(false);
+	public void tutorialClose ()
+	{
+		GameObject tut = Instance.canvasObj.FindChild ("Tutorial").gameObject;
+		tut.SetActive (false);
 	}
 
-	public void tutorialPrev(){
-		Image img = Instance.canvasObj.FindChild("Tutorial/image").gameObject.GetComponent<Image>();
-		if (currTut>0){
-			if (currTut==tutnums.Length-1){
-				img.color=new Color(1,1,1,0.85f);
-				img.transform.FindChild("text_1").gameObject.SetActive(false);
-				img.transform.FindChild("text_2").gameObject.SetActive(false);
+	public void tutorialPrev ()
+	{
+		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
+		if (currTut > 0) {
+			if (currTut == tutnums.Length - 1) {
+				img.color = new Color (1, 1, 1, 0.85f);
+				img.transform.FindChild ("text_1").gameObject.SetActive (false);
+				img.transform.FindChild ("text_2").gameObject.SetActive (false);
 			}
-			img.sprite=tutImages[tutnums[currTut-1]];
+			img.sprite = tutImages [tutnums [currTut - 1]];
 			currTut--;
 		}
-		tutorialUpdateButtons();
+		tutorialUpdateButtons ();
 	}
 
-	public void tutorialUpdateButtons(){
-		Button next = Instance.canvasObj.FindChild("Tutorial/next").gameObject.GetComponent<Button>();
-		next.interactable=currTut<tutnums.Length-1;
-		Button prev = Instance.canvasObj.FindChild("Tutorial/prev").gameObject.GetComponent<Button>();
-		prev.interactable=currTut>0;
+	public void tutorialUpdateButtons ()
+	{
+		Button next = Instance.canvasObj.FindChild ("Tutorial/next").gameObject.GetComponent<Button> ();
+		next.interactable = currTut < tutnums.Length - 1;
+		Button prev = Instance.canvasObj.FindChild ("Tutorial/prev").gameObject.GetComponent<Button> ();
+		prev.interactable = currTut > 0;
 	}
 	//---------------------------------------------------------------------------------------------
 
@@ -667,9 +716,10 @@ public class ButtonPresses : MonoBehaviour
 		StartCoroutine (SetInactiveAfter (helptip, 1f));
 	}
 
-	public void ToggleAbout(){
-		GameObject about = Instance.optionsPanel.transform.FindChild("About").gameObject;
-		about.SetActive(!about.activeInHierarchy);
+	public void ToggleAbout ()
+	{
+		GameObject about = Instance.optionsPanel.transform.FindChild ("About").gameObject;
+		about.SetActive (!about.activeInHierarchy);
 	}
 
 	//--------------------------------------------Cheats-----------------------------------//
@@ -825,14 +875,14 @@ public class ButtonPresses : MonoBehaviour
 		Button scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore").GetComponent<Button> ();
 		Text info = Instance.successObjTarget.transform.FindChild ("SendScore/DisabledInfo").GetComponent<Text> ();
 		scoreButton.interactable = visibile;
-		if (visibile){
-			info.text="";
-		}else{
-			info.text=GameManager.getNoSubmitInfo();
+		if (visibile) {
+			info.text = "";
+		} else {
+			info.text = GameManager.getNoSubmitInfo ();
 		}
-		if (!visibile && bestTime >= sentTime && sentTime>0) {
+		if (!visibile && bestTime >= sentTime && sentTime > 0) {
 			ChangeSendScoreText (true);
-		}else{
+		} else {
 		}
 //		tootlitSubmit.isDisabled=vi
 	}
