@@ -74,6 +74,8 @@ public class ButtonPresses : MonoBehaviour
 
 		if (isMainMenu) {
 			ScoreConnection.ReceiveRemoteVersion ();
+			Button start = Instance.canvasObj.transform.FindChild ("MainMenu/Start").GetComponent<Button> ();
+			start.Select ();
 		} else {
 //			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();			
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();

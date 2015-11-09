@@ -92,6 +92,9 @@ public class LevelManager : MonoBehaviour {
 
 			Button button = level.FindChild("Button").gameObject.GetComponent<Button>();
 			button.interactable = levAllowed;
+			Navigation nav = Navigation.defaultNavigation;
+			nav.mode = Navigation.Mode.None;
+			button.navigation = nav;
 
 			level.Find("Lock").gameObject.SetActive(!levAllowed);
 
@@ -100,6 +103,8 @@ public class LevelManager : MonoBehaviour {
 //			button.onClick.AddListener(() => GameManager.LoadLevelNum(levNum));
 
 		}
+
+
 
 	}
 
@@ -174,6 +179,9 @@ public class LevelManager : MonoBehaviour {
 				level.Find("Button").gameObject.GetComponent<Button>().interactable=true;
 				level.Find("Lock").gameObject.SetActive(false);
 			}
+		}
+		if (Input.GetKeyUp(KeyCode.Alpha1)){
+				AutoFade.LoadLevel(1);
 		}
 	}
 }
