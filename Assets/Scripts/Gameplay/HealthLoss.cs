@@ -9,7 +9,7 @@ public class HealthLoss : MonoBehaviour
 	// Use this for initialization
 
 	private Slider healthSlider;
-	private float durability = 10f;
+	private float durability = 18f;
 	private int healthBars = 3;
 
 //	bool flash = true;
@@ -51,7 +51,7 @@ public class HealthLoss : MonoBehaviour
 		
 		var vFinal = rOther.mass * other.relativeVelocity / (rMy.mass + rOther.mass);
 		var impulse = vFinal * rMy.mass;
-		print ("col:"+impulse);
+//		print ("col:"+impulse);
 		if (DockAreaTrigger.inDockArea && impulse.magnitude < 3f) {} 
 		else if (loseHealth) {
 			ReduceHealth(impulse.magnitude);
@@ -65,10 +65,11 @@ public class HealthLoss : MonoBehaviour
 		float ratio = durability/healthBars +0.01f;
 		float reduceBy = ratio*((int) (amount/ratio))+ratio;
 		Debug.Log ("Health [" + gameObject.name + "] = " + amount+ ":NORM: "+reduceBy);
-		if (showOnSlider && amount>0.8f &&
+		if (showOnSlider && //amount>0.8f &&
 		    !GameEvents.LevelFail && !GameEvents.LevelSuccess) {
 			
-			health -= reduceBy;
+//			health -= reduceBy;
+			health -= amount;
 			healthSlider.value = health;
 
 			if (gameObject.name == "Player") {

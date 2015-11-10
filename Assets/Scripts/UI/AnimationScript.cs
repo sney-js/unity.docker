@@ -78,20 +78,18 @@ public class AnimationScript : MonoBehaviour {
 			overlay	.alpha = Mathf.Lerp(moreAlphaC,normC, (Time.time - startTime)/FlashTime);
 			yield return null;
 		}
-//		Color transparent = new Color(1,1,1,0f);
-//		failText.color = transparent;
-//		while(Time.time < startTime + overTime)
-//		{
-////			Time.timeScale = Mathf.Lerp(1f,0.2f,overTime);
-//			Time.timeScale = Mathf.MoveTowards(Time.timeScale, 0.2f, myDeltaTime * speed);
-//			failText.color = Color.Lerp(transparent, new Color(1,1,1,0.7f), 2f);
-//			if (RestartCalled) {
-//				Time.timeScale=1;
-//				RestartCalled=false;
-//				break;
-//			}
-//			yield return null;
-//		}
+
+
+		float sliderTime = 2f;
+		Slider slider = overlay.transform.FindChild ("Slider").gameObject.GetComponent<Slider> ();
+		slider.value = 0;
+		startTime = Time.time;
+		while(Time.time < startTime + sliderTime)
+		{
+			slider.value = Mathf.Lerp(0,1, (Time.time - startTime)/sliderTime);
+			yield return null;
+		}
+		GameEvents.RestartLevel ();
 
 	}
 
