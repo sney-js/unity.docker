@@ -1,4 +1,3 @@
-
 ----------------------------------------------
 
 WWWWW~     WWWW    ?WW:   W  W   WWWWW  WWWWWW  
@@ -23,17 +22,17 @@ Contact:	 nova.contactme@gmail.com
 ------------------------------------------------
 HOW TO RUN THE GAME?
 ------------------------------------------------
-	Windows:
-	- Simply run Docker.exe within the folder to run the game in a standalone window/fullscreen.  
-	Mac:
-	- Simply run Docker app within the folder to run the game in a standalone window/fullscreen.
-	(Make sure that the resolution is appropriate)
+Windows:
+- Simply run Docker.exe within the folder to run the game in a standalone window/fullscreen.  
+Mac:
+- Simply run Docker app within the folder to run the game in a standalone window/fullscreen.
+(Make sure that the resolution is appropriate)
 
 ------------------------------------------------
 WISH TO THANK THE DEVELOPER?
 ------------------------------------------------
-	Please buy the game on a price you think is appropriate from ITCH.IO:
-	http://aneilator.itch.io/docker
+Please buy the game on a price you think is appropriate from ITCH.IO:
+http://aneilator.itch.io/docker
 
 ------------------------------------------------
 LICENSE:
