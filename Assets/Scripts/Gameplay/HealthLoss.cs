@@ -64,7 +64,7 @@ public class HealthLoss : MonoBehaviour
 
 		float ratio = durability/healthBars +0.01f;
 		float reduceBy = ratio*((int) (amount/ratio))+ratio;
-		Debug.Log ("Health [" + gameObject.name + "] = " + amount+ ":NORM: "+reduceBy);
+//		Debug.Log ("Health [" + gameObject.name + "] = " + amount+ ":NORM: "+reduceBy);
 		if (showOnSlider && //amount>0.8f &&
 		    !GameEvents.LevelFail && !GameEvents.LevelSuccess) {
 			

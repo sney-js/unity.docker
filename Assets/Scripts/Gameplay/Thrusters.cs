@@ -101,7 +101,7 @@ public class Thrusters
 				fadeStart = true;
 //			Debug.Log("STARTED");
 			}
-			float maxVol = Mathf.Clamp01 (amount / maxAmount);
+			float maxVol = Mathf.Clamp01 (amount*getDistanceVolume() / maxAmount);
 //		Debug.Log("maxVol="+maxVol+",curr="+tt_sound.volume);
 
 			if (fadeStart) {
@@ -118,6 +118,14 @@ public class Thrusters
 				tt_sound.volume = maxVol;
 			}
 		}
+
+	}
+
+	float getDistanceVolume(){
+		float camD = Camera.main.transform.position.z;
+		float x = Mathf.Pow(-camD/400f, 2f);
+		x = Mathf.Clamp01(x);
+		return 1-x;
 
 	}
 
