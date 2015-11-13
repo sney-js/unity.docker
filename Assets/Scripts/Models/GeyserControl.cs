@@ -14,7 +14,8 @@ public class GeyserControl : MonoBehaviour {
 
 	void OnTriggerStay2D (Collider2D other){
 //		print("Collider found: "+other.name+"pos:"+other.gameObject.transform.localPosition.z);
-		if (other.gameObject.tag=="Geyser" && other.gameObject.transform.localPosition.z <=-2400){
+		if (other.gameObject.tag=="Geyser" && other.gameObject.transform.localPosition.z <=-2400 &&
+		    !GameEvents.LevelFail && !GameEvents.LevelSuccess){
 //			print("ENTER");
 			if (!expelled){
 				print("Expelled!");

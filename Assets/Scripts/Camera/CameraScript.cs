@@ -27,6 +27,7 @@ public class CameraScript : MonoBehaviour
 	float TimeDoubleClick = 0.5f;
 	bool CenterOnPlayer=false;
 	public float sunAt = -1f;
+
 	void Start ()
 	{
 		if (target == null)
@@ -39,6 +40,22 @@ public class CameraScript : MonoBehaviour
 			StartCoroutine (DelaySnap (InitialDelayFollow));
 
 		DrawOutline ();
+		StartCoroutine(DelayMusic());
+	}
+
+	IEnumerator DelayMusic ()
+	{
+		AudioSource aud = gameObject.GetComponent<AudioSource>();
+		float max  = aud.volume;
+		aud.volume=0;
+		yield return new WaitForSeconds (2f);
+		float startTime = Time.time;
+		float overTime = 4f;
+		while(Time.time < startTime + overTime)
+		{
+			aud.volume = Mathf.Lerp(0,max, (Time.time - startTime)/overTime);
+			yield return null;
+		}
 	}
 
 	void DrawOutline ()
