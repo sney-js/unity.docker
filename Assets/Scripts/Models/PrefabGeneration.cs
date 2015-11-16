@@ -18,6 +18,8 @@ public class PrefabGeneration : MonoBehaviour
 
 	public float rangeXY = 100;
 	public float zValue = 0f;
+	[Range(1,5)] 
+	public float zNoise = 1f;
 
 	public bool InCircle = false;
 	public bool PerfectCircle = false;
@@ -63,7 +65,7 @@ public class PrefabGeneration : MonoBehaviour
 		//-------------------------------position, size, rotation-----------------------------------------------
 		Vector3 pos;
 		if (!InCircle) {
-			pos = new Vector3 (Random.Range (-rangeXY, rangeXY), Random.Range (-rangeXY, rangeXY), zValue);
+			pos = new Vector3 (Random.Range (-rangeXY, rangeXY), Random.Range (-rangeXY, rangeXY), zValue*Random.Range(1f,zNoise));
 		} else {
 			if (PerfectCircle) {
 				float pointNum = (total * 1.0f) / numberOfObjects;

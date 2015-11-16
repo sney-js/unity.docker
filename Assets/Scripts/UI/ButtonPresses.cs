@@ -751,8 +751,13 @@ public class ButtonPresses : MonoBehaviour
 
 	public void LoadLevel (bool IsNext)
 	{
-		if (IsNext)
-			GameEvents.LevelNext ();
+		if (IsNext){
+//			if (Application.loadedLevel == Application.levelCount-1){
+//				GameObject.Find("Level").GetComponent<Animator>().enabled=true;
+//			}else{
+				GameEvents.LevelNext ();
+//			}
+		}
 		else 
 			GameEvents.LevelPrev ();
 	}

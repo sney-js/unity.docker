@@ -437,13 +437,24 @@ public class GameEvents : MonoBehaviour
 	{
 		//medals : 0:none 1:bronze 2:silver 3:gold
 //		Debug.Log ("SUCCESS!!!");
-		LevelSuccess = true;
-		StopListeningKeys = true;
+//		if (!LevelSuccess){
+			LevelSuccess = true;
+			StopListeningKeys = true;
 
-		Moves.allowMoving = false;
+			Moves.allowMoving = false;
 		ButtonPresses.Success ();
-		SoundScript.SuccessMusic ();
+		if (Application.loadedLevel == Application.levelCount-1){
+			GameObject.Find("Level").GetComponent<Animator>().enabled=true;
+			StartCoroutine( SuccessAnimation(15f));
+		}else{
+			StartCoroutine(SuccessAnimation(0f));
+		}
+	}
 
+	IEnumerator SuccessAnimation(float time){
+		yield return new WaitForSeconds(time);
+		SoundScript.SuccessMusic ();
+		
 		//retrieve as much data
 		AnimationScript.LevelSuccess (this);
 		//saved!
