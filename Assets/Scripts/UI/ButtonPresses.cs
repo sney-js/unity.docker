@@ -32,6 +32,7 @@ public class ButtonPresses : MonoBehaviour
 	int currTut = 0;
 	int[] tutnums;
 
+
 //	[System.Serializable]
 	public class OptionsDetails
 	{
@@ -47,16 +48,18 @@ public class ButtonPresses : MonoBehaviour
 		Instance = this;
 		QualityOptions = new OptionsDetails ();
 		new ScoreConnection ();
+
+		canvasObj = GameObject.Find ("Canvas").transform;
 		if (!isMainMenu) {
-			Instance.lightIndicator = GameObject.Find ("Canvas/UI/Other/LightIndicator/Image").gameObject.GetComponent<Image> ();
-			Instance.dockIndicator = GameObject.Find ("Canvas/UI/Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
+			Instance.lightIndicator = canvasObj.FindChild ("UI/Other/LightIndicator/Image").gameObject.GetComponent<Image> ();
+			Instance.dockIndicator = canvasObj.FindChild ("UI/Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
 		}
 	}
 
 	// Use this for initialization
 	void Start ()
 	{
-		canvasObj = GameObject.Find ("Canvas").transform;
+
 		menuShowing = optionsPanel.activeInHierarchy;
 
 		MoreOptionsPanel = optionsPanel.transform.Find ("MoreOptions").gameObject;
@@ -77,6 +80,7 @@ public class ButtonPresses : MonoBehaviour
 			Button start = Instance.canvasObj.transform.FindChild ("MainMenu/Start").GetComponent<Button> ();
 			start.Select ();
 		} else {
+
 //			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();			
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
 			if (StartScreenFade) {
