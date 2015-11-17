@@ -129,9 +129,7 @@ public class LevelManager : MonoBehaviour {
 
 		int lev = Application.loadedLevel;
 		int tot = Application.levelCount-1;
-		if (lev == tot - 2 && HasSilver) {
-			return lev + 1;
-		}
+		if (lev == tot - 2 && HasSilver) return lev + 1;
 		else if (lev==tot-2 && !HasSilver) return 0;
 		else if (lev==tot-1 && HasGold) return lev+1;
 		else if (lev==tot-1 && !HasGold) return 0;

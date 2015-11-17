@@ -66,7 +66,7 @@ public class ButtonPresses : MonoBehaviour
 		ShortCutDialog = optionsPanel.transform.FindChild ("ShortcutDialog").gameObject;
 		UI = canvasObj.FindChild ("UI").transform;
 		successObjTarget = canvasObj.FindChild ("GameSuccessImage/OnlineScoreDisplay/Panel");
-	
+		
 		//-----------icons-------------------------
 		helptip = canvasObj.FindChild ("HelpTip").gameObject;
 		if (Application.loadedLevel == 1 && FlagHelpTip && GameManager.Run1) {          
@@ -105,6 +105,12 @@ public class ButtonPresses : MonoBehaviour
 			if (Application.loadedLevel == 1) {
 				initTutorial ();
 			}
+
+			//-------sucess menus
+			int lev = Application.loadedLevel;
+			if (lev==1) canvasObj.FindChild ("GameSuccessImage/TopBar/PrevLevel").gameObject.GetComponent<Button>().interactable=false;
+			else if (lev==Application.levelCount-1) 
+				canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.GetComponent<Button>().interactable=false;
 		}
 		
 	}
@@ -756,11 +762,7 @@ public class ButtonPresses : MonoBehaviour
 	public void LoadLevel (bool IsNext)
 	{
 		if (IsNext){
-//			if (Application.loadedLevel == Application.levelCount-1){
-//				GameObject.Find("Level").GetComponent<Animator>().enabled=true;
-//			}else{
 				GameEvents.LevelNext ();
-//			}
 		}
 		else 
 			GameEvents.LevelPrev ();
@@ -881,6 +883,10 @@ public class ButtonPresses : MonoBehaviour
 		if (!visibile && bestTime >= sentTime && sentTime > 0) {
 			ChangeSendScoreText (true);
 		} else {
+		}
+		if (LevelManager.GetNextLevel ()!=Application.loadedLevel+1) {
+			Instance.canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.
+				GetComponent<Button>().interactable=false;
 		}
 //		tootlitSubmit.isDisabled=vi
 	}
