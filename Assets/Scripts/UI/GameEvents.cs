@@ -97,8 +97,8 @@ public class GameEvents : MonoBehaviour
 		if (!noWinLose) {
 //		print ("Success: " + GameEvents.LevelSuccess);
 			GameFeaturesChecks ();
+			checkForFail ();
 			if (!LevelSuccess && !LevelFail) {
-				checkForFail ();
 				if (startCounting) {
 					if (LoseWithTriggers.hasCountdown) {
 						timeTaken -= Time.deltaTime;
@@ -157,9 +157,9 @@ public class GameEvents : MonoBehaviour
 				player.GetComponent<Moves> ().unlimitedFuel = true;
 				ButtonPresses.DimFuel ();
 				ButtonPresses.DimHealth ();
-				Camera.main.GetComponent<CameraScript>().FollowsBounds=false;
+				Camera.main.GetComponent<CameraScript> ().FollowsBounds = false;
 				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
-				StartCoroutine( AnimationScript.FlashScreen(flash,1f));
+				StartCoroutine (AnimationScript.FlashScreen (flash, 1f));
 			}
 		}
 
@@ -239,52 +239,55 @@ public class GameEvents : MonoBehaviour
 	//------------------------------------------FAIL CHECKS--------------------------------------------
 	void checkForFail ()
 	{
-		bool failed = false;
-		//|| FuelReading <= 0
-		if (LoseWithTriggers.noHealth && HealthReading <= 0) {
-			Moves.allowMoving = false;
-			failed = true;
-			failMsgID = 1;
-		} else if (LoseWithTriggers.hasCountdown && timeTaken <= 0) {
-			failed = true;
-			failMsgID = 2;
+		if (!LevelFail && !LevelSuccess) {
+			bool failed = false;
+			//|| FuelReading <= 0
+			if (LoseWithTriggers.noHealth && HealthReading <= 0) {
+				Moves.allowMoving = false;
+				failed = true;
+				failMsgID = 1;
+			} else if (LoseWithTriggers.hasCountdown && timeTaken <= 0) {
+				failed = true;
+				failMsgID = 2;
+			}
+			if (failed) {
+				Failed (failMsgID);
+				return;
+			}
 		}
-		if (failed) {
-			Failed (failMsgID);
-			return;
-		}
-
 		//------------------------win params----------------------------------
-		bool success = false;
-		if (WinWithTriggers.dockSuccess && dockedWithTarget) {
-			success = true;
-		}
-		if (WinWithTriggers.JustWinNow) {
-			WinWithTriggers.JustWinNow = false;
-			Success ();
-		}
-		//--------------------------no success but docked-------------------
-		if (!LevelFail && !LevelSuccess && dockedWithTarget) { 
-			if (Score < WinWithTriggers.MustScore) {
-				success = false;
-				if (!infoMsgSet) {
-					StartCoroutine(setInfoText ("You must score at least " + WinWithTriggers.MustScore, 0f));	  
+		if (!LevelSuccess) {
+			bool success = false;
+			if (WinWithTriggers.dockSuccess && dockedWithTarget) {
+				success = true;
+			}
+			if (WinWithTriggers.JustWinNow) {
+				WinWithTriggers.JustWinNow = false;
+				Success ();
+			}
+			//--------------------------no success but docked-------------------
+			if (!dockedWithTarget) { 
+				if (Score < WinWithTriggers.MustScore) {
+					success = false;
+					if (!infoMsgSet) {
+						StartCoroutine (setInfoText ("You must score at least " + WinWithTriggers.MustScore, 0f));	  
+					}
+				}
+				if (cheated) {
+					success = false;
+					if (!infoMsgSet) {
+						StartCoroutine (setInfoText ("You used cheats!", 0f));	
+						StartCoroutine (setInfoText ("", 2f));	
+
+					}
 				}
 			}
-			if (cheated) {
-				success = false;
-				if (!infoMsgSet) {
-					StartCoroutine( setInfoText ("You used cheats!", 0f));	
-					StartCoroutine( setInfoText ("", 2f));	
-
-				}
+			if (success) {
+				Success ();
 			}
 		}
 
 		//--------------------------------------------Call Success-----------------------------------//
-		if (success) {
-			Success ();
-		}
 
 	}
 	/**
@@ -292,7 +295,7 @@ public class GameEvents : MonoBehaviour
 	 * */
 	IEnumerator setInfoText (string msg, float invokeAfter)
 	{
-		yield return new WaitForSeconds(invokeAfter);
+		yield return new WaitForSeconds (invokeAfter);
 		Instance.infoText.text = msg;
 		if (msg.Equals ("")) {
 			StartCoroutine (AnimationScript.FadeImage (
@@ -345,7 +348,7 @@ public class GameEvents : MonoBehaviour
 		dockedWithTarget = false;
 //		dockedWithSecondary=false;
 		Instance.infoMsgSet = false;
-		Instance.StartCoroutine(Instance.setInfoText ("", 0f));
+		Instance.StartCoroutine (Instance.setInfoText ("", 0f));
 		if (GameEvents.LevelFail) {
 //			undockedWith.GetComponent<HealthLoss> ().showOnSlider = false;
 
@@ -424,7 +427,7 @@ public class GameEvents : MonoBehaviour
 	//---------------------------------------GAME SUCCESS/FAIL------------------------------------------
 	public static void Failed (int failId)
 	{
-		if (!LevelFail){
+		if (!LevelFail) {
 			Debug.Log ("FAILED!!!");
 			GameEvents.LevelFail = true;
 			Instance.StartCoroutine (AnimationScript.LevelFailed (failId));
@@ -438,21 +441,22 @@ public class GameEvents : MonoBehaviour
 		//medals : 0:none 1:bronze 2:silver 3:gold
 //		Debug.Log ("SUCCESS!!!");
 //		if (!LevelSuccess){
-			LevelSuccess = true;
-			StopListeningKeys = true;
+		LevelSuccess = true;
+		StopListeningKeys = true;
 
-			Moves.allowMoving = false;
+		Moves.allowMoving = false;
 		ButtonPresses.Success ();
-		if (Application.loadedLevel == Application.levelCount-1){
-			GameObject.Find("Level").GetComponent<Animator>().enabled=true;
-			StartCoroutine( SuccessAnimation(15f));
-		}else{
-			StartCoroutine(SuccessAnimation(0f));
+		if (Application.loadedLevel == Application.levelCount - 1) {
+			GameObject.Find ("Level").GetComponent<Animator> ().enabled = true;
+			StartCoroutine (SuccessAnimation (15f));
+		} else {
+			StartCoroutine (SuccessAnimation (0f));
 		}
 	}
 
-	IEnumerator SuccessAnimation(float time){
-		yield return new WaitForSeconds(time);
+	IEnumerator SuccessAnimation (float time)
+	{
+		yield return new WaitForSeconds (time);
 		SoundScript.SuccessMusic ();
 		
 		//retrieve as much data

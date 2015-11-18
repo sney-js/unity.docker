@@ -23,6 +23,9 @@ public class Moves : MonoBehaviour
 	private float fuelGuage;
 	private float initialMass;
 
+	[Range(1,2)]
+	public int navType = 1;
+
 	//------------------------------------------------Editor Classes----------------------------------------
 
 	[System.Serializable]
@@ -75,6 +78,7 @@ public class Moves : MonoBehaviour
 		if (Input.GetKey (KeyCode.LeftControl) || Input.GetKey (KeyCode.LeftAlt)) {
 			amount = Burner.BurnerLess;
 		}
+		amount = getThrusterAmount(amount);
 		//-----------------------------------------------------------------------------
 		if (fuelGuage > 0 && allowMoving) {
 			gameObject.GetComponent<Rigidbody2D> ().mass = initialMass + ((fuelGuage - initialFuel) / fuelDensity);
@@ -83,9 +87,66 @@ public class Moves : MonoBehaviour
 			navigate (amount);
 		}
 	}
-	
+
+	void navigateAlternate (float amount)
+	{
+		/*
+		 * Input.GetAxis("Vertical") > 0 // gets forward
+			Input.GetAxis("Vertical") < 0 // gets backward
+			Input.GetAxis("Horizontal") > 0 // gets right
+			Input.GetAxis("Horizontal") < 0 // gets left
+			*/
+		float lim = speed*30f;
+		float delta = amount / 30;
+		rotTotal = Mathf.Clamp (rotTotal, -5f, 5f);
+		Vector3 position = body.transform.position;
+		if (Input.GetKey (KeyCode.A)) {
+			body.velocity=Vector2.MoveTowards(body.velocity, new Vector2(-lim,0), speed*amount*Time.deltaTime);
+//			ThrustDirectionNormalise(amount,-1f);
+		}
+		
+		if (Input.GetKey (KeyCode.W)) {
+			body.velocity=Vector2.MoveTowards(body.velocity, new Vector2(0,lim), speed*amount*Time.deltaTime);
+//			ThrustDirectionNormalise(amount,-1f);
+		}
+		
+		if (Input.GetKey (KeyCode.D)) {
+			body.velocity=Vector2.MoveTowards(body.velocity, new Vector2(lim,0), speed*amount*Time.deltaTime);
+//			ThrustDirectionNormalise(amount,-1f);
+		}
+		
+		if (Input.GetKey (KeyCode.S)) {
+			body.velocity=Vector2.MoveTowards(body.velocity, new Vector2(0,-lim), speed*amount*Time.deltaTime);
+//			ThrustDirectionNormalise(amount,-1f);
+		}
+		//  rotation-------------------------------------------------------
+		
+		if (Input.GetKey (KeyCode.E)) {
+			body.AddTorque (-rotSpeed * amount);
+			ThrusterAt(5, amount);
+		} 
+		if (Input.GetKey (KeyCode.Q)) {
+			body.AddTorque (rotSpeed * amount);
+			ThrusterAt(4, amount);
+		}
+		//-------------------------------------------------------------------
+		if (Input.GetKey(KeyCode.X)){
+			Stabilize(amount);
+		}
+		if (HeldMoveKeys()) {
+			GameEvents.startCounting = true;
+		}
+
+		;
+	}
+
 	void navigate (float amount)
 	{
+		if (navType==2){
+			navigateAlternate(amount);
+			return;
+		}
+
 		/*
 		 * Input.GetAxis("Vertical") > 0 // gets forward
 			Input.GetAxis("Vertical") < 0 // gets backward
@@ -143,6 +204,15 @@ public class Moves : MonoBehaviour
 		}
 	}
 
+	float getThrusterAmount(float amount){
+		float am = amount;
+		float sp = body.velocity.magnitude;
+		if (sp>am) am = sp*0.5f;
+		am = Mathf.Clamp(am,0,4f);
+//		print("am: "+am +" ,sp: "+sp);
+		return am;
+	}
+
 	public static bool HeldMoveKeys(){
 
 		return Input.GetKey (KeyCode.Q) || Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.E)
@@ -158,11 +228,16 @@ public class Moves : MonoBehaviour
 		if (body.angularVelocity>0) ThrusterAt(5, amount);
 		else if (body.angularVelocity<0) ThrusterAt(4, amount);
 
+		ThrustDirectionNormalise(amount,1);
+	}
+
+	void ThrustDirectionNormalise(float amount, float inv){
 		Vector2 vl = body.velocity;
 		float rt = body.transform.eulerAngles.z;
-//		VelocityThrusterDirection(body.transform.eulerAngles.z, body.velocity, amount);
+		//		VelocityThrusterDirection(body.transform.eulerAngles.z, body.velocity, amount);
 		
-		Vector2 norm = RotateV2(vl, -rt);
+		Vector2 norm = RotateV2(vl, inv==-1f?rt:-rt);
+
 		float maxAmountX = amount, maxAmountY = amount;
 		if (Mathf.Abs(norm.x)<=Mathf.Abs(norm.y)) maxAmountX=Mathf.Abs(norm.x)/Mathf.Abs(norm.y)*amount;
 		else maxAmountY=Mathf.Abs(norm.y)/Mathf.Abs(norm.x)*amount;

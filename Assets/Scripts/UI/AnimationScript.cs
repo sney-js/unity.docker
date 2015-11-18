@@ -87,9 +87,15 @@ public class AnimationScript : MonoBehaviour {
 		while(Time.time < startTime + sliderTime)
 		{
 			slider.value = Mathf.Lerp(0,1, (Time.time - startTime)/sliderTime);
+			if (GameEvents.LevelSuccess){
+				break;
+			}
 			yield return null;
 		}
-		GameEvents.RestartLevel ();
+		yield return null;
+		if (!GameEvents.LevelSuccess){
+			GameEvents.RestartLevel ();
+		}
 
 	}
 
