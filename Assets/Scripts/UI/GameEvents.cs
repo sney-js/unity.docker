@@ -158,8 +158,8 @@ public class GameEvents : MonoBehaviour
 				ButtonPresses.DimFuel ();
 				ButtonPresses.DimHealth ();
 				Camera.main.GetComponent<CameraScript> ().FollowsBounds = false;
-				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
-				StartCoroutine (AnimationScript.FlashScreen (flash, 1f));
+//				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
+				StartCoroutine (AnimationScript.FlashScreen (null, 1f, 0, "God mode active"));
 			}
 		}
 
@@ -266,7 +266,7 @@ public class GameEvents : MonoBehaviour
 				Success ();
 			}
 			//--------------------------no success but docked-------------------
-			if (!dockedWithTarget) { 
+			if (dockedWithTarget) { 
 				if (Score < WinWithTriggers.MustScore) {
 					success = false;
 					if (!infoMsgSet) {
@@ -276,7 +276,7 @@ public class GameEvents : MonoBehaviour
 				if (cheated) {
 					success = false;
 					if (!infoMsgSet) {
-						StartCoroutine (setInfoText ("You used cheats!", 0f));	
+						StartCoroutine (setInfoText ("You are in God Mode!", 0f));	
 						StartCoroutine (setInfoText ("", 2f));	
 
 					}
@@ -446,12 +446,12 @@ public class GameEvents : MonoBehaviour
 
 		Moves.allowMoving = false;
 		ButtonPresses.Success ();
-		if (Application.loadedLevel == Application.levelCount - 1) {
-			GameObject.Find ("Level").GetComponent<Animator> ().enabled = true;
-			StartCoroutine (SuccessAnimation (15f));
-		} else {
+//		if (Application.loadedLevel == Application.levelCount - 1) {
+//			GameObject.Find ("Level").GetComponent<Animator> ().enabled = true;
+//			StartCoroutine (SuccessAnimation (15f));
+//		} else {
 			StartCoroutine (SuccessAnimation (0f));
-		}
+//		}
 	}
 
 	IEnumerator SuccessAnimation (float time)

@@ -1,44 +1,52 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Collectibles : MonoBehaviour {
 
 	private bool callOnce;
 	public AudioClip CollectSound;
-//	public GameObject[] collectedBy;
-//	private int arrSize =0 ;
-	// Use this for initialization
+	private Text scoretext;
 	void Start () {
 		callOnce=true;
-//		arrSize = collectedBy.Length;
+		scoretext = GameObject.Find("Canvas").transform.FindChild("UI/Score").GetComponent<Text>();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
 	void OnTriggerEnter2D(Collider2D other){
 		bool found=false;
-//		Debug.Log(other.tag);
-//		for (int i = 0; i < arrSize; i++) {
-//			if (collectedBy[i]==other){
-//				found = true;
-//				break;
-//			}
-//		}
 		if (other.tag.Equals("Player") && !GameEvents.docked)found=true;
-//		print ("found="+found);
 		if (found & callOnce){
 			GameEvents.Score++;
-//			AudioClip deltaPitch = CollectSounds[0].
+//			StartCoroutine( AnimationScript.FlashScreen(null, 1f, 1, null));
 			SoundScript.PlayOnce(CollectSound, true);
 			transform.FindChild("Particles").GetComponent<ParticleSystem>().Stop();
 			Invoke("destroyGroup", 0.7f);
 			found=false;
 			callOnce=false;
+			StartCoroutine(animateScore());
 		}
 
+	}
+
+	IEnumerator animateScore(){
+		float max = 75f;
+		float min = 65f;
+		yield return new WaitForEndOfFrame();
+		float startTime = Time.time;
+		float overTime = 0.1f;
+		while(Time.time < startTime + overTime)
+		{
+			scoretext.fontSize = (int) Mathf.Lerp(min, max,(Time.time - startTime)/overTime );
+			yield return null;
+		}
+
+		startTime = Time.time;
+		overTime = 0.3f;
+		while(Time.time < startTime + overTime)
+		{
+			scoretext.fontSize = (int) Mathf.Lerp(max, min,(Time.time - startTime)/overTime );
+			yield return null;
+		}
 	}
 
 	void destroyGroup(){

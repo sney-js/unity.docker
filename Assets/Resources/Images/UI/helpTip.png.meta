@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: c58bd088fba17c54fa31fb39de8ca716
-timeCreated: 1446568767
+timeCreated: 1447943545
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -143,7 +143,7 @@ TextureImporter:
     - name: helpTip_8
       rect:
         serializedVersion: 2
-        x: 2580
+        x: 2534
         y: 0
         width: 320
         height: 628

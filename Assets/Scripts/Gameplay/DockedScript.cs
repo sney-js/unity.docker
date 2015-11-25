@@ -15,10 +15,13 @@ public class DockedScript : MonoBehaviour
 	private static bool undockedCalled;
 	public bool IsTarget=true;
 
+	GameObject dockIcon;
+
 	void Start ()
 	{
 //		dockIndicator = GameObject.Find ("Canvas/UI/Other/DockIndicator").gameObject.GetComponent<Image> ();
 		playerMain = GameObject.Find ("Player").gameObject;
+		dockIcon = GameObject.Find ("Canvas").transform.FindChild ("UI/Other/DockIndicator").gameObject;
 //		indDefColor = dockIndicator.color;
 		undockedCalled=false;
 //		Debug.Log("Name: "+MoverObject.name);
@@ -125,6 +128,9 @@ public class DockedScript : MonoBehaviour
 			if (gameObject.tag=="Shield"){
 				playerMain.gameObject.GetComponent<HealthLoss>().loseHealth=false;
 			}
+			StartCoroutine(AnimationScript.FlashScreen(null, 1.5f, 3, null));
+
+			StartCoroutine(AnimationScript.NudgeUI(dockIcon, 0.5f, 1.4f));
 			GameEvents.Docked (MoverObject, IsTarget);
 		}
 	}

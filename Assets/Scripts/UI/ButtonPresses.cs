@@ -31,6 +31,7 @@ public class ButtonPresses : MonoBehaviour
 	Sprite[] tutImages;
 	int currTut = 0;
 	int[] tutnums;
+	public bool GoToMainMenuNow=false;
 
 
 //	[System.Serializable]
@@ -109,8 +110,8 @@ public class ButtonPresses : MonoBehaviour
 			//-------sucess menus
 			int lev = Application.loadedLevel;
 			if (lev==1) canvasObj.FindChild ("GameSuccessImage/TopBar/PrevLevel").gameObject.GetComponent<Button>().interactable=false;
-			else if (lev==Application.levelCount-1) 
-				canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.GetComponent<Button>().interactable=false;
+//			else if (lev==Application.levelCount-1) 
+//				canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.GetComponent<Button>().interactable=false;
 		}
 		
 	}
@@ -323,6 +324,10 @@ public class ButtonPresses : MonoBehaviour
 			if (Input.GetKeyDown (KeyCode.Tab)) {
 				ToggleTabPanel ();
 			}
+		}
+		if (GoToMainMenuNow){
+			GoToMainMenuNow=false;
+			MainMenu();
 		}
 	}
 
@@ -638,7 +643,7 @@ public class ButtonPresses : MonoBehaviour
 
 	public void initTutorial ()
 	{
-		int[] tuts = {0,1,2,6, 7, 5, 4, 3, -1};
+		int[] tuts = {0,1,2,6, 7, 5, 4, 8, 3};
 		tutnums = tuts;
 
 		tutImages = Resources.LoadAll<Sprite> ("Images/UI/helpTip");
@@ -648,22 +653,26 @@ public class ButtonPresses : MonoBehaviour
 		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
 		currTut = 0;
 		img.sprite = tutImages [currTut];
+		Instance.canvasObj.FindChild ("Tutorial/num").gameObject.GetComponent<Text> ().text = 
+			(currTut+1).ToString()+"/"+tutnums.Length;
 	}
 
 	public void tutorialNext ()
 	{
 
 		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
-		if (currTut < tutnums.Length - 1) {
-			if (currTut == tutnums.Length - 2) {
-				img.color = new Color (0.06f, 0.06f, 0.06f, 0.85f);
-				img.transform.FindChild ("text_1").gameObject.SetActive (true);
-				img.transform.FindChild ("text_2").gameObject.SetActive (true);
-				img.sprite = null;
-			} else {
+		if (currTut < tutnums.Length) {
+//			if (currTut == tutnums.Length - 2) {
+//				img.color = new Color (0.06f, 0.06f, 0.06f, 0.85f);
+//				img.transform.FindChild ("text_1").gameObject.SetActive (true);
+//				img.transform.FindChild ("text_2").gameObject.SetActive (true);
+//				img.sprite = null;
+//			} else {
 				img.sprite = tutImages [tutnums [currTut + 1]];
-			}
+//			}
 			currTut++;
+			Instance.canvasObj.FindChild ("Tutorial/num").gameObject.GetComponent<Text> ().text = 
+				(currTut+1).ToString()+"/"+tutnums.Length;
 		}
 		tutorialUpdateButtons ();
 	}
@@ -678,13 +687,15 @@ public class ButtonPresses : MonoBehaviour
 	{
 		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
 		if (currTut > 0) {
-			if (currTut == tutnums.Length - 1) {
-				img.color = new Color (1, 1, 1, 0.85f);
-				img.transform.FindChild ("text_1").gameObject.SetActive (false);
-				img.transform.FindChild ("text_2").gameObject.SetActive (false);
-			}
+//			if (currTut == tutnums.Length - 1) {
+//				img.color = new Color (1, 1, 1, 0.85f);
+//				img.transform.FindChild ("text_1").gameObject.SetActive (false);
+//				img.transform.FindChild ("text_2").gameObject.SetActive (false);
+//			}
 			img.sprite = tutImages [tutnums [currTut - 1]];
 			currTut--;
+			Instance.canvasObj.FindChild ("Tutorial/num").gameObject.GetComponent<Text> ().text = 
+				(currTut+1).ToString()+"/"+tutnums.Length;
 		}
 		tutorialUpdateButtons ();
 	}
@@ -762,7 +773,14 @@ public class ButtonPresses : MonoBehaviour
 	public void LoadLevel (bool IsNext)
 	{
 		if (IsNext){
+			if (Application.loadedLevel==Application.levelCount-1){
+				Instance.StartCoroutine(AnimationScript.FadeOutPanel(
+					Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup>(), 2f));
+				GameObject.Find ("Level").GetComponent<Animator> ().enabled = true;
+
+			} else{
 				GameEvents.LevelNext ();
+			}
 		}
 		else 
 			GameEvents.LevelPrev ();
@@ -888,6 +906,11 @@ public class ButtonPresses : MonoBehaviour
 			Instance.canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.
 				GetComponent<Button>().interactable=false;
 		}
+		if (Application.loadedLevel==1){
+			GameObject tut = Instance.canvasObj.FindChild ("Tutorial").gameObject;
+			tut.SetActive (false);
+		}
+
 //		tootlitSubmit.isDisabled=vi
 	}
 

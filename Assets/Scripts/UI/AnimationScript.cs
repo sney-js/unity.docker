@@ -10,18 +10,69 @@ public class AnimationScript : MonoBehaviour {
 	public static Transform myCanvas;
 	public static float BestTime;
 
+	public static IEnumerator FadeOutPanel (CanvasGroup overlay, float overTime)
+	{
+		Animator anim = overlay.gameObject.GetComponent<Animator>();
+		anim.Stop();
+		float startTime = Time.time;
+		while(Time.time < startTime + overTime)
+		{
+			overlay	.alpha = Mathf.Lerp(overlay.alpha,0, (Time.time - startTime)/overTime);
+			yield return null;
+		}
+		overlay.interactable=false;
+		overlay.blocksRaycasts=false;
+	}
 
-	public static IEnumerator FlashScreen (Image overlay, float overTime)
+	public static IEnumerator FlashScreen (Image overlay, float overTime, int color, string str)
 	{
 		if (overlay==null) overlay = GameObject.Find("Canvas/DamageImage").gameObject.GetComponent<Image>();
-		float startTime = Time.time;
-		Color moreAlphaC = overlay.color;
-		Color normC = overlay.color;
+		Text info = overlay.transform.FindChild("Text").GetComponent<Text>();
+		info.text=str==null?"":str;
+
+		Color col = new Color32(255,63,90, 0);
+		if (color==1) col = new Color32(255,83,150, 0);
+		if (color==2) col = new Color32(55,253,250, 0);
+		if (color==3) col = new Color32(255,216,255, 0);
+
+		Color moreAlphaC = col, normC = col;
 		moreAlphaC.a+=0.2f;
 		normC.a=0f;
+
+		Color textC = info.color, textCAlpha = info.color;
+		textC.a = 0.6f;
+		textCAlpha.a=0;
+
+		float startTime = Time.time;
 		while(Time.time < startTime + overTime)
 		{
 			overlay	.color = Color.Lerp(moreAlphaC,normC, (Time.time - startTime)/overTime);
+			info.color = Color.Lerp(textC, textCAlpha,(Time.time - startTime)/overTime );
+			yield return null;
+		}
+	}
+
+	public static IEnumerator NudgeUI (GameObject obj,float endTime, float scaleFactor)
+	{
+		float max = 75f;
+		float min = 65f;
+		yield return new WaitForEndOfFrame();
+		float startTime = Time.time;
+		float overTime = 0.1f;
+		Vector3 defScale = obj.transform.localScale;
+		Vector3 scaleTo = defScale*scaleFactor;
+
+		while(Time.time < startTime + overTime)
+		{
+			obj.transform.localScale = Vector3.Lerp(defScale, scaleTo,(Time.time - startTime)/overTime );
+			yield return null;
+		}
+		print("Scale set"+obj.transform.localScale);
+		startTime = Time.time;
+//		endTime = 0.3f;
+		while(Time.time < startTime + overTime)
+		{
+			obj.transform.localScale = Vector3.Lerp(scaleTo, defScale,(Time.time - startTime)/overTime );
 			yield return null;
 		}
 	}

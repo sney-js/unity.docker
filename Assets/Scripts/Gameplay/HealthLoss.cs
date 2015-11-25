@@ -75,7 +75,7 @@ public class HealthLoss : MonoBehaviour
 			if (gameObject.name == "Player") {
 				GameEvents.HealthReading = healthSlider.value;
 			}
-			StartCoroutine( AnimationScript.FlashScreen(DamageOverlay,0.5f));
+			StartCoroutine( AnimationScript.FlashScreen(null,0.5f, 0, null));
 //			StartCoroutine(CameraShaker.Instance.MyShake(amount, Mathf.Pow(amount, 1f/3f)));
 			float norm = Mathf.Abs (Mathf.Log(amount*2f)*2f);
 			norm = norm/3f;

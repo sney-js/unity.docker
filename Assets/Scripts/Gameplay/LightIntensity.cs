@@ -51,7 +51,7 @@ public class LightIntensity : MonoBehaviour {
 	void ToggleHeadlight(){
 		toggleCalled=false;
 		float intensity = lightObj.intensity+delta;
-		print("dd");
+//		print("dd");
 		Color nosecol = NoseLight.color;
 		nosecol.r+=0.3f;
 		nosecol.g+=0.3f;

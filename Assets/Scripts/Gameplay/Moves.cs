@@ -26,6 +26,8 @@ public class Moves : MonoBehaviour
 	[Range(1,2)]
 	public int navType = 1;
 
+	private bool stabilizeOn;
+
 	//------------------------------------------------Editor Classes----------------------------------------
 
 	[System.Serializable]
@@ -61,6 +63,7 @@ public class Moves : MonoBehaviour
 		SetFuelLevel ();
 		initialMass = gameObject.GetComponent<Rigidbody2D> ().mass;
 		initialMass += (initialFuel / fuelDensity);
+		stabilizeOn=true;
 
 	}
 
@@ -196,20 +199,28 @@ public class Moves : MonoBehaviour
 			ThrusterAt(4, amount);
 		}
 		//-------------------------------------------------------------------
-		if (Input.GetKey(KeyCode.X)){
-			Stabilize(amount);
+		if (Input.GetKeyUp(KeyCode.X)){
+//			Stabilize(amount);
+			stabilizeOn = !stabilizeOn;
+
+			StartCoroutine (AnimationScript.FlashScreen(null, 1.5f, 2, "Stabilisation "+(stabilizeOn?"On":"Off")));
 		}
 		if (HeldMoveKeys()) {
 			GameEvents.startCounting = true;
+		}
+		else if (stabilizeOn && (body.velocity!=Vector2.zero || body.angularVelocity!=0f)){
+//			print ("Stabilising...");
+			Stabilize(amount*0.7f);
 		}
 	}
 
 	float getThrusterAmount(float amount){
 		float am = amount;
-		float sp = body.velocity.magnitude;
-		if (sp>am) am = sp*0.5f;
-		am = Mathf.Clamp(am,0,4f);
+//		float sp = body.velocity.magnitude;
+//		am = Mathf.Clamp(sp,0.1f,2f);
+//		if (sp>am) am = sp*0.5f;
 //		print("am: "+am +" ,sp: "+sp);
+		am = 2f;
 		return am;
 	}
 
@@ -220,15 +231,30 @@ public class Moves : MonoBehaviour
 			|| Input.GetKey (KeyCode.X)	;
 	}
 
+	void StabilizeRotation(float amount){
+		if (fuelGuage >0 && body.angularVelocity!=0){
+			reduceFuel(amount);
+			body.angularVelocity=Mathf.MoveTowards(body.angularVelocity, 0f, 3f*rotSpeed*amount*Time.deltaTime);
+			
+			if (body.angularVelocity>0) ThrusterAt(5, amount);
+			else if (body.angularVelocity<0) ThrusterAt(4, amount);
+			
+			ThrustDirectionNormalise(amount,1);
+		}
+	}
+
+
 	void Stabilize(float amount){
-		if (body.velocity!=Vector2.zero || body.angularVelocity!=0) reduceFuel(amount);
-		body.velocity=Vector2.MoveTowards(body.velocity, Vector2.zero, speed*amount*Time.deltaTime);
-		body.angularVelocity=Mathf.MoveTowards(body.angularVelocity, 0f, rotSpeed*speed*amount*Time.deltaTime);
+		if (fuelGuage >0){
+			if (body.velocity!=Vector2.zero || body.angularVelocity!=0) reduceFuel(amount*0.5f);
+			body.velocity=Vector2.MoveTowards(body.velocity, Vector2.zero, speed*amount*Time.deltaTime);
+			body.angularVelocity=Mathf.MoveTowards(body.angularVelocity, 0f, 3f*rotSpeed*amount*Time.deltaTime);
 
-		if (body.angularVelocity>0) ThrusterAt(5, amount);
-		else if (body.angularVelocity<0) ThrusterAt(4, amount);
+			if (body.angularVelocity>0) ThrusterAt(5, amount);
+			else if (body.angularVelocity<0) ThrusterAt(4, amount);
 
-		ThrustDirectionNormalise(amount,1);
+			ThrustDirectionNormalise(amount,1);
+		}
 	}
 
 	void ThrustDirectionNormalise(float amount, float inv){
@@ -239,8 +265,8 @@ public class Moves : MonoBehaviour
 		Vector2 norm = RotateV2(vl, inv==-1f?rt:-rt);
 
 		float maxAmountX = amount, maxAmountY = amount;
-		if (Mathf.Abs(norm.x)<=Mathf.Abs(norm.y)) maxAmountX=Mathf.Abs(norm.x)/Mathf.Abs(norm.y)*amount;
-		else maxAmountY=Mathf.Abs(norm.y)/Mathf.Abs(norm.x)*amount;
+		if (Mathf.Abs(norm.x) <= Mathf.Abs(norm.y)) maxAmountX = Mathf.Abs(norm.x)/Mathf.Abs(norm.y)*amount;
+		else maxAmountY = Mathf.Abs(norm.y)/Mathf.Abs(norm.x)*amount;
 		if (norm.x>0 && norm.y!=0) ThrusterAt(3, maxAmountX);
 		if (norm.x<0 && norm.y!=0) ThrusterAt(1, maxAmountX);
 		if (norm.y>0 && norm.x!=0) ThrusterAt(2, maxAmountY);
