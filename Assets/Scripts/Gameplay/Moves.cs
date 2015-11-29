@@ -63,7 +63,7 @@ public class Moves : MonoBehaviour
 		SetFuelLevel ();
 		initialMass = gameObject.GetComponent<Rigidbody2D> ().mass;
 		initialMass += (initialFuel / fuelDensity);
-		stabilizeOn=true;
+		stabilizeOn=Application.loadedLevel==1?true:false;
 
 	}
 

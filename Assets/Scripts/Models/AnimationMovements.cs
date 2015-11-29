@@ -19,9 +19,9 @@ public class AnimationMovements : MonoBehaviour
 	{
 //		print ("force:" + force + " ,rotLeft:" + rotLeft);
 		body = GetComponent<Rigidbody2D> ();
-//		if (RunTime==0)AddForce();
-//		else StartCoroutine(PhysicMovement());
-		StartCoroutine (PhysicMovement ());
+		if (RunTime==0)AddForce();
+		else StartCoroutine(PhysicMovement());
+//		StartCoroutine (PhysicMovement ());
 
 	}
 
@@ -56,18 +56,12 @@ public class AnimationMovements : MonoBehaviour
 		case 3:
 			body.AddForceAtPosition (-body.transform.right * (force), position);
 			break;
-		case 4:
-			body.AddTorque (-force);
-			break;
-		case 5:
-			body.AddTorque (-force);
-			break;
 		}
 	
 		if (rotLeft)
-			body.AddTorque (-force);
+			body.angularVelocity =-force;
 		if (rotRight)
-			body.AddTorque (force);
+			body.angularVelocity =force;
 	}
 
 

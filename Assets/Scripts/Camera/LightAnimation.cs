@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class LightAnimation : MonoBehaviour {
@@ -11,21 +11,15 @@ public class LightAnimation : MonoBehaviour {
 	
 	// Update is called once per frame
 	IEnumerator FadeIn () {
-		bool ended=false, started=false;
+		while (!GameEvents.startCounting) {
+			yield return new WaitForEndOfFrame();
+		}
+
+		Light lit = GetComponent<Light>();
 		float startTime = Time.time;
-		while (!ended){
-			Light lit = GetComponent<Light>();
-			if (GameEvents.startCounting){
-				if (!started) {
-					startTime = Time.time;
-					started=true;
-				}
-				lit.intensity = Mathf.SmoothStep(0f, 1f, (Time.time - startTime) / 5f);
-			}
-			if (lit.intensity>=1f){
-				ended=true;
-				break;
-			}
+		while(Time.time < startTime + 5f)
+		{
+			lit.intensity = Mathf.SmoothStep(0f, 1f, (Time.time - startTime) / 5f);
 			yield return null;
 		}
 	}
