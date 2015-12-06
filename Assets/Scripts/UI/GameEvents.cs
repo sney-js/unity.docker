@@ -142,7 +142,7 @@ public class GameEvents : MonoBehaviour
 	void GameFeaturesChecks ()
 	{
 
-//		if (!StopListeningKeys)	SimulateSpeedCheck ();
+		if (!StopListeningKeys)	SimulateSpeedCheck ();
 
 		if (Input.GetKeyDown (KeyCode.Space) && !StopListeningKeysMain) {
 			RestartLevel ();
