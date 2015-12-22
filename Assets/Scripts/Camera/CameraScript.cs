@@ -12,20 +12,17 @@ public class CameraScript : MonoBehaviour
 	public float InitialDelayFollow = 0f;
 	public bool FollowsBounds = true;
 	public float minX = -1000f, maxX = 1000f, minY = -1000f, maxY = 1000f;
-	
-	
 	private Vector3 velocity = Vector3.zero;
 	private bool snap = true;
 	private Vector3 offSet;
 	private Vector3 lastPosition;
-
 	private static Vector3 panPos;
 	private bool keyWorking;
 	bool PanStarted;
 	private float mouseSens2 = 875f;
 	float OneClick;
 	float TimeDoubleClick = 0.5f;
-	bool CenterOnPlayer=false;
+	bool CenterOnPlayer = false;
 	public float sunAt = -1f;
 
 	void Start ()
@@ -39,55 +36,75 @@ public class CameraScript : MonoBehaviour
 		if (InitialDelayFollow > 0f && follow)
 			StartCoroutine (DelaySnap (InitialDelayFollow));
 
-		DrawOutline ();
-		StartCoroutine(DelayMusic());
+		DrawOutline (false);
+		StartCoroutine (DelayMusic ());
 	}
 
 	IEnumerator DelayMusic ()
 	{
-		AudioSource aud = gameObject.GetComponent<AudioSource>();
-		float max  = aud.volume;
-		aud.volume=0;
+		AudioSource aud = gameObject.GetComponent<AudioSource> ();
+		float max = aud.volume;
+		aud.volume = 0;
 		yield return new WaitForSeconds (2f);
 		float startTime = Time.time;
 		float overTime = 4f;
-		while(Time.time < startTime + overTime)
-		{
-			aud.volume = Mathf.Lerp(0,max, (Time.time - startTime)/overTime);
+		while (Time.time < startTime + overTime) {
+			aud.volume = Mathf.Lerp (0, max, (Time.time - startTime) / overTime);
 			yield return null;
 		}
 	}
 
-	void DrawOutline ()
+	public void DrawOutline (bool inCircle)
 	{
-		LineRenderer line = gameObject.AddComponent<LineRenderer> ();
-		line.material = Resources.Load<Material>("Materials/OutsideBorder");
-		line.SetVertexCount (9);
-		float[] XX = {maxX, minX}; // n/2%2=0 = max
-		float[] YY = {maxY, minY}; // n%2. 0=max
-		float r = 5;
-		float px = maxX,py=maxY-r;
+		LineRenderer line = gameObject.GetComponent<LineRenderer> ();
+		if (line == null)
+			line = gameObject.AddComponent<LineRenderer> ();
+		line.material = Resources.Load<Material> ("Materials/OutsideBorder");
 
-		for (int i = 0; i < 9; i++) {
+		if (inCircle) {
+			int total = 50;
+			line.SetVertexCount (total);
+			for (int i = 0; i < total; i++) {
 
-			float	x = XX[0];
-			float y = YY[0];
+				float pointNum = (i * 1.0f) / total;
+			
+				//angle along the unit circle for placing points
+				float angle = pointNum * Mathf.PI * 2;
+			
+				float x = Mathf.Sin (angle) * maxX;
+				float y = Mathf.Cos (angle) * maxY;
+				line.SetPosition (i, new Vector3 (x, y, 0f));
+			}
+		} else {
+			line.SetVertexCount (9);
+			float[] XX = {maxX, minX}; // n/2%2=0 = max
+			float[] YY = {maxY, minY}; // n%2. 0=max
+			float r = 5;
+			float px = maxX, py = maxY - r;
+
+			for (int i = 0; i < 9; i++) {
+
+				float x = XX [0];
+				float y = YY [0];
 
 
-			if (i>=3 && i<=6) x = XX[1];
-			if (i>=1 && i<=4) y = YY[1];
+				if (i >= 3 && i <= 6)
+					x = XX [1];
+				if (i >= 1 && i <= 4)
+					y = YY [1];
 //			x/=10; y/=10; //only for testing quickly
 
-			if (((int)(i/2))%2==0){
-				y = y>0?y-r:y+r;
-			}else {
-				x = x>0?x-r:x+r;
-			}
+				if (((int)(i / 2)) % 2 == 0) {
+					y = y > 0 ? y - r : y + r;
+				} else {
+					x = x > 0 ? x - r : x + r;
+				}
 
-			line.SetPosition (i, new Vector3 (x, y, 0f));
+				line.SetPosition (i, new Vector3 (x, y, 0f));
 //			print ("i: "+i+" ,("+x+","+y+")");
+			}
+			line.SetWidth (2f, 2f);
 		}
-		line.SetWidth (2f, 2f);
 	}
 
 	// Update is called once per frame
@@ -98,15 +115,16 @@ public class CameraScript : MonoBehaviour
 		if (!ButtonPresses.menuShowing) {
 			if (snap & follow) {
 				Vector3 destination = target.position + offSet;
-				destination.z=panPos.z;
+				destination.z = panPos.z;
 				panPos = destination;				
 			}
-			SpringWell.PullNow=isOutOfBounds(target.position, 1);
+			SpringWell.PullNow = isOutOfBounds (target.position, 1);
 
 			bool letPan = !GameEvents.LevelFail && !GameEvents.LevelSuccess;
 			if (letPan) {	
 				KeyFreePan ();
-				if (!keyWorking) MouseDrag ();
+				if (!keyWorking)
+					MouseDrag ();
 			}
 		}
 		if (FollowsBounds) {
@@ -123,10 +141,10 @@ public class CameraScript : MonoBehaviour
 		yield return new WaitForSeconds (delay);
 		follow = true;
 		float tempDamp = dampTime;
-		dampTime=10f;
+		dampTime = 10f;
 //		print ("Delay over. Follow true: "+follow);
-		yield return new WaitForSeconds(1f);
-		dampTime=tempDamp;
+		yield return new WaitForSeconds (1f);
+		dampTime = tempDamp;
 	}
 	
 	void MouseDrag ()
@@ -144,7 +162,7 @@ public class CameraScript : MonoBehaviour
 		
 		if (Input.GetMouseButton (0)) { //HOLD
 			PanStarted = true;
-			snap=!Input.GetKey(KeyCode.LeftAlt);
+			snap = !Input.GetKey (KeyCode.LeftAlt);
 
 			float senseThresh = mouseSens2;//(!snap && Time.timeScale!=0)?0.33f*mouseSens2:mouseSens2;
 
@@ -153,14 +171,14 @@ public class CameraScript : MonoBehaviour
 			delta.x *= panPos.z * mouseSensitivity / senseThresh;
 			delta.y *= panPos.z * mouseSensitivity / senseThresh;
 
-			Vector3 curr = new Vector3(panPos.x+delta.x, panPos.y+delta.y, panPos.z);
-			if (Time.timeScale==0){
+			Vector3 curr = new Vector3 (panPos.x + delta.x, panPos.y + delta.y, panPos.z);
+			if (Time.timeScale == 0) {
 				transform.position = curr;
 			}
-			if (!isOutOfBounds(curr, 1)){
+			if (!isOutOfBounds (curr, 1)) {
 				panPos = curr;
 				lastPosition = Input.mousePosition;
-				offSet = snap?curr:GetComponent<Camera> ().ViewportToWorldPoint (lastPosition);
+				offSet = snap ? curr : GetComponent<Camera> ().ViewportToWorldPoint (lastPosition);
 				offSet -= target.position;
 				offSet.z = 0f;
 			}
@@ -179,17 +197,18 @@ public class CameraScript : MonoBehaviour
 		if (Input.GetMouseButtonUp (1)) { //RIGHT CLICK
 
 //			offSet = Vector3.zero;
-			CenterOnPlayer=true;
+			CenterOnPlayer = true;
 			snap = true;
-			if ((Time.time-OneClick)<TimeDoubleClick) {
-				StartCoroutine( FixAngle());
+			if ((Time.time - OneClick) < TimeDoubleClick) {
+				StartCoroutine (FixAngle ());
 			}
 			
-			OneClick=Time.time;
+			OneClick = Time.time;
 		}
-		if (CenterOnPlayer && !isOutOfBounds(panPos, 1)){
-			offSet = Vector3.Lerp(offSet, Vector3.zero, 0.4f);
-			if (offSet==Vector3.zero) CenterOnPlayer=false;
+		if (CenterOnPlayer && !isOutOfBounds (panPos, 1)) {
+			offSet = Vector3.Lerp (offSet, Vector3.zero, 0.4f);
+			if (offSet == Vector3.zero)
+				CenterOnPlayer = false;
 		}
 		//--------------------------------------------Rotate-----------------------------------//
 		if (Input.GetMouseButton (2)) {
@@ -198,18 +217,16 @@ public class CameraScript : MonoBehaviour
 
 	}
 	
-
-	
 	void KeyFreePan ()
 	{
 		
-		keyWorking=false;
+		keyWorking = false;
 		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.LeftArrow) || 
-		    Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.DownArrow)) {
+			Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.DownArrow)) {
 			
 			keyWorking = true;
 			//-------------------------zoom-------------------------
-			if (Input.GetKey (KeyCode.RightControl) || Input.GetKey(KeyCode.RightCommand)) {
+			if (Input.GetKey (KeyCode.RightControl) || Input.GetKey (KeyCode.RightCommand)) {
 				if (Input.GetKey (KeyCode.UpArrow)) {
 					SetZoom (0.5f, true);
 				} else if (Input.GetKey (KeyCode.DownArrow)) {
@@ -240,14 +257,14 @@ public class CameraScript : MonoBehaviour
 				curr = Moves.RotateV2 (curr, transform.eulerAngles.z);
 				curr.z = panPos.z;
 				//-------------------------transform now------------------------
-				if (!isOutOfBounds(curr, 1)){
+				if (!isOutOfBounds (curr, 1)) {
 					panPos = curr;
 				}
 
 				lastPosition = panPos;
 				offSet = panPos - target.position;
 				offSet.z = 0f;
-				if (Time.timeScale==0){
+				if (Time.timeScale == 0) {
 					transform.position = curr;
 				}
 				
@@ -256,30 +273,29 @@ public class CameraScript : MonoBehaviour
 		
 		//------------------------------Center to nose-------------------------------
 		if (Input.GetKeyUp (KeyCode.C)) {
-			CenterOnPlayer=true;
+			CenterOnPlayer = true;
 			snap = true;
-			if (Time.time-OneClick<TimeDoubleClick) {
-				StartCoroutine( FixAngle());
+			if (Time.time - OneClick < TimeDoubleClick) {
+				StartCoroutine (FixAngle ());
 			}			
-			OneClick=Time.time;
+			OneClick = Time.time;
 		}
 		
 	}
 
-
 	void SetZoom (float direction, bool isKey)
 	{
 		float zoomamount = panPos.z;
-		float mouseAmnt = Time.timeScale==0?1.5f:2.5f;
+		float mouseAmnt = Time.timeScale == 0 ? 1.5f : 2.5f;
 		if (direction < 0)
 			zoomamount *= isKey ? 1.15f : mouseAmnt;
 		else if (direction > 0)
 			zoomamount /= isKey ? 1.15f : mouseAmnt;
 		zoomamount = Mathf.Clamp (zoomamount, maxZoomOut, -15f);
 
-		if (Time.timeScale==0){
-			float zoomLerped = Mathf.Lerp(transform.position.z, zoomamount, 0.5f);
-			transform.position = new Vector3(transform.position.x,transform.position.y,zoomLerped);
+		if (Time.timeScale == 0) {
+			float zoomLerped = Mathf.Lerp (transform.position.z, zoomamount, 0.5f);
+			transform.position = new Vector3 (transform.position.x, transform.position.y, zoomLerped);
 		}
 		panPos.z = zoomamount;
 	}
@@ -292,7 +308,7 @@ public class CameraScript : MonoBehaviour
 		float startTime = Time.time;
 		while (Time.time < startTime + 1f) {
 			Vector3 rot = transform.eulerAngles;
-			if (Mathf.Approximately(rot.x ,0f) && Mathf.Approximately(rot.y ,0f) && Mathf.Approximately(rot.z ,0f)) {
+			if (Mathf.Approximately (rot.x, 0f) && Mathf.Approximately (rot.y, 0f) && Mathf.Approximately (rot.z, 0f)) {
 				rot.x = 0f;
 				rot.y = 0f;
 				rot.z = 0f;
@@ -300,9 +316,9 @@ public class CameraScript : MonoBehaviour
 			}
 			print ("rotating reset");
 
-			rot.x = Mathf.LerpAngle (rot.x, 0f, (Time.time-OneClick)/1f);
-			rot.y = Mathf.LerpAngle (rot.y, 0f, (Time.time-OneClick)/1f);
-			rot.z = Mathf.LerpAngle (rot.z, 0f, (Time.time-OneClick)/1f);
+			rot.x = Mathf.LerpAngle (rot.x, 0f, (Time.time - OneClick) / 1f);
+			rot.y = Mathf.LerpAngle (rot.y, 0f, (Time.time - OneClick) / 1f);
+			rot.z = Mathf.LerpAngle (rot.z, 0f, (Time.time - OneClick) / 1f);
 			
 			transform.eulerAngles = rot;
 			
@@ -314,17 +330,17 @@ public class CameraScript : MonoBehaviour
 	
 	void adjustViewBounds ()
 	{
-		panPos.x = Mathf.Clamp (panPos.x, sunAt!=-1?sunAt:minX, maxX);
+		panPos.x = Mathf.Clamp (panPos.x, sunAt != -1 ? sunAt : minX, maxX);
 		panPos.y = Mathf.Clamp (panPos.y, minY, maxY);
-		if (isOutOfBounds(panPos, 1)){
+		if (isOutOfBounds (panPos, 1)) {
 			Vector3 targetPos = Vector3.zero;
-			targetPos.z=panPos.z;
+			targetPos.z = panPos.z;
 //			panPos = Vector3.SmoothDamp(panPos, targetPos, ref velocity, Time.smoothDeltaTime/0.10f);
 		}
 //		print(panPos);
 		//--------------abyss check------------------------
 		float lim = 1.1f;
-		if (!GameEvents.LevelFail && isOutOfBounds(target.position, lim)) {
+		if (!GameEvents.LevelFail && isOutOfBounds (target.position, lim)) {
 			Vector3 screenPoint = GetComponent<Camera> ().WorldToViewportPoint (target.position);
 			bool offScreen = screenPoint.x < 0 || screenPoint.x > 1 || screenPoint.y < 0 || screenPoint.y > 1;
 			if (offScreen)
@@ -333,7 +349,8 @@ public class CameraScript : MonoBehaviour
 		}
 	}
 
-	bool isOutOfBounds(Vector3 pos, float lim){
+	bool isOutOfBounds (Vector3 pos, float lim)
+	{
 		return FollowsBounds && (pos.x > maxX * lim || pos.y > maxY * lim || pos.x < minX * lim || pos.y < minY * lim);
 	}
 
@@ -343,10 +360,10 @@ public class CameraScript : MonoBehaviour
 		float startTime = Time.time;
 		bool stop = false;
 		while (Time.time < startTime + overTime) {
-			dampTime=10f;
+			dampTime = 10f;
 		
-			if (PanStarted || snap){
-				stop=true;
+			if (PanStarted || snap) {
+				stop = true;
 				break;
 			}
 //			if (Mathf.Approximately(pX,0f) && Mathf.Approximately(pY, 0f)) {
@@ -365,9 +382,9 @@ public class CameraScript : MonoBehaviour
 			yield return null;
 		}
 	
-		print("CAME OUT");
-		if (!PanStarted){
-			dampTime=3f;
+		print ("CAME OUT");
+		if (!PanStarted) {
+			dampTime = 3f;
 			snap = true;
 		}
 	}

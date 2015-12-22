@@ -31,8 +31,12 @@ public class ButtonPresses : MonoBehaviour
 	Sprite[] tutImages;
 	int currTut = 0;
 	int[] tutnums;
-	public bool GoToMainMenuNow=false;
+	public bool GoToMainMenuNow = false;
+	GameObject tut;
 
+	GameObject player;
+
+	public static bool inTutorial;
 
 //	[System.Serializable]
 	public class OptionsDetails
@@ -60,14 +64,14 @@ public class ButtonPresses : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-
+		inTutorial  = false;
 		menuShowing = optionsPanel.activeInHierarchy;
 
 		MoreOptionsPanel = optionsPanel.transform.Find ("MoreOptions").gameObject;
 		ShortCutDialog = optionsPanel.transform.FindChild ("ShortcutDialog").gameObject;
 		UI = canvasObj.FindChild ("UI").transform;
 		successObjTarget = canvasObj.FindChild ("GameSuccessImage/OnlineScoreDisplay/Panel");
-		
+		player = GameObject.Find ("Player").gameObject;
 		//-----------icons-------------------------
 		helptip = canvasObj.FindChild ("HelpTip").gameObject;
 		if (Application.loadedLevel == 1 && FlagHelpTip && GameManager.Run1) {          
@@ -109,7 +113,8 @@ public class ButtonPresses : MonoBehaviour
 
 			//-------sucess menus
 			int lev = Application.loadedLevel;
-			if (lev==1) canvasObj.FindChild ("GameSuccessImage/TopBar/PrevLevel").gameObject.GetComponent<Button>().interactable=false;
+			if (lev == 1)
+				canvasObj.FindChild ("GameSuccessImage/TopBar/PrevLevel").gameObject.GetComponent<Button> ().interactable = false;
 //			else if (lev==Application.levelCount-1) 
 //				canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.GetComponent<Button>().interactable=false;
 		}
@@ -300,10 +305,10 @@ public class ButtonPresses : MonoBehaviour
 							break;
 						}
 					}
-					if (!wasActive){
+					if (!wasActive) {
 						ToggleActionPanel ();
 						menuShowing = true;
-					}else{
+					} else {
 						menuShowing = false;
 					}
 				} else {
@@ -325,9 +330,9 @@ public class ButtonPresses : MonoBehaviour
 				ToggleTabPanel ();
 			}
 		}
-		if (GoToMainMenuNow){
-			GoToMainMenuNow=false;
-			MainMenu();
+		if (GoToMainMenuNow) {
+			GoToMainMenuNow = false;
+			MainMenu ();
 		}
 	}
 
@@ -355,30 +360,30 @@ public class ButtonPresses : MonoBehaviour
 	public void ToggleTabPanel ()
 	{
 		if (!menuShowing) {
-				if (Time.timeScale != 0) {
-					GameEvents.PauseGame ();
-				} else if (TabMenu.activeInHierarchy) {
-					GameEvents.UnPauseGame ();
-				}
-				TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
-				Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
-				bool rev = anim.GetBool ("reverse");
+			if (Time.timeScale != 0) {
+				GameEvents.PauseGame ();
+			} else if (TabMenu.activeInHierarchy) {
+				GameEvents.UnPauseGame ();
+			}
+			TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
+			Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
+			bool rev = anim.GetBool ("reverse");
 
-				//hide
-				if (TabMenu.activeInHierarchy) {
-					Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
-					if (!rev)
-						ToggleTabLeaderboard ();
-				} 
+			//hide
+			if (TabMenu.activeInHierarchy) {
+				Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
+				if (!rev)
+					ToggleTabLeaderboard ();
+			} 
 			//show
 			else {
-					TabMenu.SetActive (true);
-					anim.enabled = false;
-	//			if (rev) ToggleTabLeaderboard ();
-				}
+				TabMenu.SetActive (true);
+				anim.enabled = false;
+				//			if (rev) ToggleTabLeaderboard ();
+			}
 
-	//		menuShowing = TabMenu.activeInHierarchy;
-	//		MoreOptionsPanel.gameObject.SetActive (false);
+			//		menuShowing = TabMenu.activeInHierarchy;
+			//		MoreOptionsPanel.gameObject.SetActive (false);
 		}
 	}
 
@@ -643,49 +648,237 @@ public class ButtonPresses : MonoBehaviour
 
 	public void initTutorial ()
 	{
+		inTutorial = true;
+
+		/*
+		Instance.canvasObj.FindChild ("Tutorial0").gameObject.SetActive (true);
 		int[] tuts = {0,1,2,6, 7, 5, 4, 8, 3};
 		tutnums = tuts;
 
 		tutImages = Resources.LoadAll<Sprite> ("Images/UI/helpTip");
-//		print (tutImages.Length);
-		GameObject tut = Instance.canvasObj.FindChild ("Tutorial").gameObject;
+		tut = Instance.canvasObj.FindChild ("Tutorial0/Tutorial").gameObject;
 		tut.SetActive (true);
-		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
+		Image img = tut.transform.FindChild ("image").gameObject.GetComponent<Image> ();
 		currTut = 0;
 		img.sprite = tutImages [currTut];
-		Instance.canvasObj.FindChild ("Tutorial/num").gameObject.GetComponent<Text> ().text = 
-			(currTut+1).ToString()+"/"+tutnums.Length;
+		tut.transform.FindChild ("num").gameObject.GetComponent<Text> ().text = 
+			(currTut + 1).ToString () + "/" + tutnums.Length;
+		*/
+
+		StartCoroutine (TutorialController ());
+	}
+
+	void SetUpTutorial ()
+	{
+		float size = 100f;
+		CameraScript cameraScript = Camera.main.GetComponent<CameraScript> ();
+		cameraScript.minX = -size;
+		cameraScript.minY = -size;
+		cameraScript.maxX = size;
+		cameraScript.maxY = size;
+		cameraScript.DrawOutline (false);
+
+		GameObject.Find("CenterPuller").GetComponent<SpringJoint2D>().frequency = 0.14f;
+		GameObject parent = GameObject.Find("AsteroidGroup");
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabPos(parent, 1.5f, 0.5f));
+
+		GameObject satellite = GameObject.Find("Satellite").gameObject;
+		Collider2D[] colliders = satellite.GetComponentsInChildren<Collider2D>();
+		print(colliders.Length);
+		foreach (Collider2D col in colliders) col.enabled = false;
+		Vector3 newPos = satellite.transform.position;
+		newPos.z = 300f;
+
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(satellite, newPos, 0.3f, 0.3f));
+
+		Vector3 newPosPlayer = player.transform.position;
+		newPosPlayer.y -= 90f;
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(player, newPosPlayer, 1f, 0.6f));
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabRotation(player, new Vector3(0f,0f,90f), 1f, 0.6f));
+	}
+
+	
+
+	IEnumerator TutorialController ()
+	{
+		yield return new WaitForSeconds (2f);
+		const float ttime = 0.7f;
+		SetUpTutorial();
+		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
+		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
+		objective.text = "Hold W to accelerate forwards";
+		//----------1
+//		GameEvents.PlayerFuelUnlimited(true);
+//		DimFuel(true);
+		//----------1
+		float startTime = 0;
+		while (!GameEvents.LevelFail) {
+			if (Input.GetKey (KeyCode.W)) {
+				if (startTime == 0)
+					startTime = Time.time;
+			}
+			if (startTime > 0 && Time.time - startTime > 1f)
+				break;
+			yield return new WaitForEndOfFrame ();
+		}
+		//-----------2
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let Go", ttime));
+		yield return new WaitForSeconds (4f);
+//		/*
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold S to accelerate backwards", ttime));
+		startTime = 0;
+		while (!GameEvents.LevelFail) {
+			if (Input.GetKey (KeyCode.S)) {
+				if (startTime == 0)
+					startTime = Time.time;
+			}
+			if (startTime > 0 && Time.time - startTime > 1f)
+				break;
+			yield return new WaitForEndOfFrame ();
+		}
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let Go", ttime));
+		yield return new WaitForSeconds (4f);
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold A to accelerate left\n and D to accelerate right", ttime));
+		yield return new WaitForSeconds (8f);
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Going good. Now lets learn to rotate...", ttime));
+		yield return new WaitForSeconds (3f);
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold Q to rotate left", ttime));
+		startTime = 0;
+		while (!GameEvents.LevelFail) {
+			if (Input.GetKey (KeyCode.Q)) {
+				if (startTime == 0)
+					startTime = Time.time;
+			}
+			if (startTime > 0 && Time.time - startTime > 2f)
+				break;
+			yield return new WaitForEndOfFrame ();
+		}
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold E to rotate right", ttime));
+		startTime = 0;
+		while (!GameEvents.LevelFail) {
+			if (Input.GetKey (KeyCode.E)) {
+				if (startTime == 0)
+					startTime = Time.time;
+			}
+			if (startTime > 0 && Time.time - startTime > 2f)
+				break;
+			yield return new WaitForEndOfFrame ();
+		}
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "You're a natural!", ttime));
+		yield return new WaitForSeconds (2f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "That's all from maneuvering!", ttime));
+		yield return new WaitForSeconds (3f);
+
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "" +
+			"Click and Drag mouse to pan camera around\n" +
+			"Use mouse scroll to zoom in and out\n\n" +
+			"When you are ready to proceed, press ENTER.", ttime));
+		startTime = 0;
+		while (!GameEvents.LevelFail) {
+			if (Input.GetKey (KeyCode.Return)) {
+				if (startTime == 0)
+					startTime = Time.time;
+			}
+			if (startTime > 0 && Time.time - startTime > 0.2f)
+				break;
+			yield return new WaitForEndOfFrame ();
+		}
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Great!", ttime));
+		yield return new WaitForSeconds (2f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now, let's see if you can...\n" +
+			"Collect at least 4 red orbs\n" +
+			"\n" +
+			"(Use the maneuvering keys to move around)", ttime));
+
+		Vector3 newPosPlayer = player.transform.position;
+		newPosPlayer.x = 0f;
+		newPosPlayer.y = 0f;
+		Vector3 angle = new Vector3(0f,0f,90f);
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(player, newPosPlayer, 1.5f, 0.8f));
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabRotation(player, angle, 1.5f, 0.8f));
+
+		while (!GameEvents.LevelFail && GameEvents.Score<4) {
+			yield return new WaitForEndOfFrame ();
+		}
+		//--------------
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Impressive!", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "and finally...", ttime));
+		yield return new WaitForSeconds (3f);
+
+		//-----------SATELLITE
+//		*/
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, 
+		    "Your aim in each level is to dock with the satellite Bono...\n" +
+//			"Bono loves you a lot and doesn't want to stay away from you...\n" +
+			"To dock with Bono, advance ahead until your nose is within its docking area.\n", ttime));
+		//------
+		Vector3 newPosPlayer2 = player.transform.position;
+		newPosPlayer2.x = 0f;
+		newPosPlayer2.y = -30f;
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(player, newPosPlayer2, 1.5f, 1.5f));
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabRotation(player, new Vector3(0f,0f,90f), 1.5f, 1.5f));
+
+		yield return new WaitForSeconds(3f);
+		GameObject satellite = GameObject.Find("Satellite").gameObject;
+		Collider2D[] colliders = satellite.GetComponentsInChildren<Collider2D>();
+		foreach (Collider2D col in colliders) col.enabled = true;
+		Vector3 newPos = satellite.transform.position;
+		newPos.z = 0f;
+		
+		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(satellite, newPos, 0.6f, 0f));
+
+		//-----------3
+		while (!GameEvents.LevelFail && !GameEvents.docked) {
+			yield return new WaitForEndOfFrame ();
+		}
+		//-----------3
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Congratulations. You have finished your training...", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "If you'd like to play around more, You can press F to undock\n"+
+		                                                     "If you feel ready, press ENTER to end this tutorial and begin your journey!", ttime));
+
+		while (!GameEvents.LevelFail && !Input.GetKey (KeyCode.Return)) {
+			yield return new WaitForEndOfFrame ();
+		}
+
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Brilliant!", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Time to test your skills...", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Here we go!", ttime));
+//		yield return new WaitForSeconds (5f);
+//		GameEvents.PlayerFuelUnlimited(false);
+//		DimFuel(false);
 	}
 
 	public void tutorialNext ()
 	{
-
-		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
+		Image img = tut.transform.FindChild ("image").gameObject.GetComponent<Image> ();
 		if (currTut < tutnums.Length) {
-//			if (currTut == tutnums.Length - 2) {
-//				img.color = new Color (0.06f, 0.06f, 0.06f, 0.85f);
-//				img.transform.FindChild ("text_1").gameObject.SetActive (true);
-//				img.transform.FindChild ("text_2").gameObject.SetActive (true);
-//				img.sprite = null;
-//			} else {
-				img.sprite = tutImages [tutnums [currTut + 1]];
-//			}
+			img.sprite = tutImages [tutnums [currTut + 1]];
 			currTut++;
-			Instance.canvasObj.FindChild ("Tutorial/num").gameObject.GetComponent<Text> ().text = 
-				(currTut+1).ToString()+"/"+tutnums.Length;
+			tut.transform.FindChild ("num").gameObject.GetComponent<Text> ().text = 
+				(currTut + 1).ToString () + "/" + tutnums.Length;
 		}
 		tutorialUpdateButtons ();
 	}
 
 	public void tutorialClose ()
 	{
-		GameObject tut = Instance.canvasObj.FindChild ("Tutorial").gameObject;
 		tut.SetActive (false);
 	}
 
 	public void tutorialPrev ()
 	{
-		Image img = Instance.canvasObj.FindChild ("Tutorial/image").gameObject.GetComponent<Image> ();
+		Image img = tut.transform.FindChild ("image").gameObject.GetComponent<Image> ();
 		if (currTut > 0) {
 //			if (currTut == tutnums.Length - 1) {
 //				img.color = new Color (1, 1, 1, 0.85f);
@@ -694,17 +887,17 @@ public class ButtonPresses : MonoBehaviour
 //			}
 			img.sprite = tutImages [tutnums [currTut - 1]];
 			currTut--;
-			Instance.canvasObj.FindChild ("Tutorial/num").gameObject.GetComponent<Text> ().text = 
-				(currTut+1).ToString()+"/"+tutnums.Length;
+			tut.transform.FindChild ("num").gameObject.GetComponent<Text> ().text = 
+				(currTut + 1).ToString () + "/" + tutnums.Length;
 		}
 		tutorialUpdateButtons ();
 	}
 
 	public void tutorialUpdateButtons ()
 	{
-		Button next = Instance.canvasObj.FindChild ("Tutorial/next").gameObject.GetComponent<Button> ();
+		Button next = tut.transform.FindChild ("next").gameObject.GetComponent<Button> ();
 		next.interactable = currTut < tutnums.Length - 1;
-		Button prev = Instance.canvasObj.FindChild ("Tutorial/prev").gameObject.GetComponent<Button> ();
+		Button prev = tut.transform.FindChild ("prev").gameObject.GetComponent<Button> ();
 		prev.interactable = currTut > 0;
 	}
 	//---------------------------------------------------------------------------------------------
@@ -733,14 +926,15 @@ public class ButtonPresses : MonoBehaviour
 	}
 
 	//--------------------------------------------Cheats-----------------------------------//
-	public static void DimHealth ()
+	public static void DimHealth (bool dim)
 	{
-		Instance.UI.FindChild ("Health").GetComponent<CanvasGroup> ().alpha = 0.2f;
+
+		Instance.UI.FindChild ("Health").GetComponent<CanvasGroup> ().alpha = dim?0.2f:1f;
 	}
 
-	public static void DimFuel ()
+	public static void DimFuel (bool dim)
 	{
-		Instance.UI.FindChild ("Fuel").GetComponent<CanvasGroup> ().alpha = 0.2f;
+		Instance.UI.FindChild ("Fuel").GetComponent<CanvasGroup> ().alpha = dim?0.2f:1f;
 	}
 	//----------------------------------------------PAUSE RESUME GAME-----------------------------------
 //	public static void PauseGame(){
@@ -772,17 +966,16 @@ public class ButtonPresses : MonoBehaviour
 
 	public void LoadLevel (bool IsNext)
 	{
-		if (IsNext){
-			if (Application.loadedLevel==Application.levelCount-1){
-				Instance.StartCoroutine(AnimationScript.FadeOutPanel(
-					Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup>(), 2f));
+		if (IsNext) {
+			if (Application.loadedLevel == Application.levelCount - 1) {
+				Instance.StartCoroutine (AnimationScript.FadeOutPanel (
+					Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> (), 2f));
 				GameObject.Find ("Level").GetComponent<Animator> ().enabled = true;
 
-			} else{
+			} else {
 				GameEvents.LevelNext ();
 			}
-		}
-		else 
+		} else 
 			GameEvents.LevelPrev ();
 	}
 
@@ -902,14 +1095,13 @@ public class ButtonPresses : MonoBehaviour
 			ChangeSendScoreText (true);
 		} else {
 		}
-		if (LevelManager.GetNextLevel ()!=Application.loadedLevel+1) {
+		if (LevelManager.GetNextLevel () != Application.loadedLevel + 1) {
 			Instance.canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.
-				GetComponent<Button>().interactable=false;
+				GetComponent<Button> ().interactable = false;
 		}
-		if (Application.loadedLevel==1){
-			GameObject tut = Instance.canvasObj.FindChild ("Tutorial").gameObject;
-			tut.SetActive (false);
-		}
+		GameObject tutmain = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
+		tutmain.SetActive (Application.loadedLevel == 1);
+		print (tutmain.activeInHierarchy);
 
 //		tootlitSubmit.isDisabled=vi
 	}

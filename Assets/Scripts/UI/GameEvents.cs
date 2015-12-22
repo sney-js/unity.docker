@@ -142,27 +142,47 @@ public class GameEvents : MonoBehaviour
 	void GameFeaturesChecks ()
 	{
 
-		if (!StopListeningKeys)	SimulateSpeedCheck ();
+		if (!StopListeningKeys)
+			SimulateSpeedCheck ();
 
 		if (Input.GetKeyDown (KeyCode.Space) && !StopListeningKeysMain) {
 			RestartLevel ();
 		}
 
-		if (Input.GetKey (KeyCode.LeftControl) && Input.GetKey (KeyCode.LeftShift)
-//		    && (Input.GetKey(KeyCode.LeftAlt))
-		    ) {
-			if (Input.GetKeyDown (KeyCode.K)) {
-				cheated = true;
-				LoseWithTriggers.noHealth = false;
-				player.GetComponent<Moves> ().unlimitedFuel = true;
-				ButtonPresses.DimFuel ();
-				ButtonPresses.DimHealth ();
-				Camera.main.GetComponent<CameraScript> ().FollowsBounds = false;
-//				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
-				StartCoroutine (AnimationScript.FlashScreen (null, 1f, 0, "God mode active"));
-			}
+		if (Input.GetKey (KeyCode.LeftControl) && Input.GetKey (KeyCode.LeftShift) && Input.GetKeyDown (KeyCode.K)) {
+			GameEvents.CheatOn (true);
 		}
 
+	}
+
+	public static void PlayerFuelUnlimited(bool isUnlimited){
+		Instance.player.GetComponent<Moves> ().unlimitedFuel = isUnlimited;
+	}
+
+	public static void CheatOn (bool indicate)
+	{
+		Instance.cheated = true;
+		Instance.LoseWithTriggers.noHealth = false;
+		Instance.player.GetComponent<Moves> ().unlimitedFuel = true;
+		ButtonPresses.DimFuel (true);
+		ButtonPresses.DimHealth (true);
+		Camera.main.GetComponent<CameraScript> ().FollowsBounds = false;
+		//				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
+		if (indicate)
+		Instance.StartCoroutine (AnimationScript.FlashScreen (null, 1f, 0, "God mode active"));
+	}
+
+	public static void CheatOff (bool indicate)
+	{
+		Instance.cheated = false;
+		Instance.LoseWithTriggers.noHealth = true;
+		Instance.player.GetComponent<Moves> ().unlimitedFuel = false;
+		ButtonPresses.DimFuel (false);
+		ButtonPresses.DimHealth (false);
+		Camera.main.GetComponent<CameraScript> ().FollowsBounds = true;
+		//				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
+		if (indicate)
+			Instance.StartCoroutine (AnimationScript.FlashScreen (null, 1f, 0, "God mode active"));
 	}
 
 	//--------------------------------------------------------------------------------------------------
@@ -267,13 +287,17 @@ public class GameEvents : MonoBehaviour
 			}
 			//--------------------------no success but docked-------------------
 			if (dockedWithTarget) { 
-				if (Score < WinWithTriggers.MustScore) {
+				if (ButtonPresses.inTutorial){
+					success=false;
+					StartCoroutine (setInfoText ("Docked!", 0.5f));	  
+				}
+				else if (Score < WinWithTriggers.MustScore) {
 					success = false;
 					if (!infoMsgSet) {
 						StartCoroutine (setInfoText ("You must score at least " + WinWithTriggers.MustScore, 0f));	  
 					}
 				}
-				if (cheated) {
+				else if (cheated) {
 					success = false;
 					if (!infoMsgSet) {
 						StartCoroutine (setInfoText ("You are in God Mode!", 0f));	
@@ -450,7 +474,7 @@ public class GameEvents : MonoBehaviour
 //			GameObject.Find ("Level").GetComponent<Animator> ().enabled = true;
 //			StartCoroutine (SuccessAnimation (15f));
 //		} else {
-			StartCoroutine (SuccessAnimation (0f));
+		StartCoroutine (SuccessAnimation (0f));
 //		}
 	}
 

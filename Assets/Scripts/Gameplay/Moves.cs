@@ -245,7 +245,7 @@ public class Moves : MonoBehaviour
 
 
 	void Stabilize(float amount){
-		if (fuelGuage >0){
+		if (fuelGuage >0 || unlimitedFuel){
 			if (body.velocity!=Vector2.zero || body.angularVelocity!=0) reduceFuel(amount*0.5f);
 			body.velocity=Vector2.MoveTowards(body.velocity, Vector2.zero, speed*amount*Time.deltaTime);
 			body.angularVelocity=Mathf.MoveTowards(body.angularVelocity, 0f, 3f*rotSpeed*amount*Time.deltaTime);
