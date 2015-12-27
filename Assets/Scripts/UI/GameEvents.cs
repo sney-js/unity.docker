@@ -166,7 +166,7 @@ public class GameEvents : MonoBehaviour
 		Instance.player.GetComponent<Moves> ().unlimitedFuel = true;
 		ButtonPresses.DimFuel (true);
 		ButtonPresses.DimHealth (true);
-		Camera.main.GetComponent<CameraScript> ().FollowsBounds = false;
+//		Camera.main.GetComponent<CameraScript> ().FollowsBounds = false;
 		//				Image flash = Instance.infoText.transform.parent.GetComponent<Image> ();
 		if (indicate)
 		Instance.StartCoroutine (AnimationScript.FlashScreen (null, 1f, 0, "God mode active"));
@@ -289,7 +289,9 @@ public class GameEvents : MonoBehaviour
 			if (dockedWithTarget) { 
 				if (ButtonPresses.inTutorial){
 					success=false;
-					StartCoroutine (setInfoText ("Docked!", 0.5f));	  
+					if (!infoMsgSet) {
+						StartCoroutine (setInfoText ("        Docked!", 0.5f));	  
+					}
 				}
 				else if (Score < WinWithTriggers.MustScore) {
 					success = false;

@@ -22,7 +22,6 @@ public class ButtonPresses : MonoBehaviour
 	public bool FlagHelpTip = false;
 	private Transform successObjTarget;
 	private Transform canvasObj;
-	//-------------------------icons-----------------
 	public Sprite[] headlights;
 	public Sprite[] CriteriaBox1Sprites;
 	Image lightIndicator, dockIndicator;
@@ -33,10 +32,9 @@ public class ButtonPresses : MonoBehaviour
 	int[] tutnums;
 	public bool GoToMainMenuNow = false;
 	GameObject tut;
-
 	GameObject player;
-
 	public static bool inTutorial;
+	public static bool FromOptionsLeaderboard = false;
 
 //	[System.Serializable]
 	public class OptionsDetails
@@ -47,6 +45,9 @@ public class ButtonPresses : MonoBehaviour
 		public float mouseSens = 0.5f;
 	}
 
+
+
+	#region Mono Behaviour
 
 	void Awake ()
 	{
@@ -64,7 +65,7 @@ public class ButtonPresses : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		inTutorial  = false;
+		inTutorial = false;
 		menuShowing = optionsPanel.activeInHierarchy;
 
 		MoreOptionsPanel = optionsPanel.transform.Find ("MoreOptions").gameObject;
@@ -107,9 +108,7 @@ public class ButtonPresses : MonoBehaviour
 			FromOptionsLeaderboard = true;
 			initialiseCriteriaIcons (true);
 			ToggleDateRangeClicksOptions (2);
-			if (Application.loadedLevel == 1) {
-				initTutorial ();
-			}
+			canvasObj.FindChild ("Tutorial0").gameObject.SetActive ((Application.loadedLevel == 1));
 
 			//-------sucess menus
 			int lev = Application.loadedLevel;
@@ -120,6 +119,66 @@ public class ButtonPresses : MonoBehaviour
 		}
 		
 	}
+
+	void Update ()
+	{
+		if (!GameEvents.StopListeningKeys) {
+			if (!NoPause && Input.GetKeyDown (KeyCode.Escape)) {
+				if (Application.loadedLevel > 0) {
+					GameObject[] dialogs = {TabMenu,ShortCutDialog, MoreOptionsPanel,
+						optionsPanel, helptip};
+					bool wasActive = false;
+					foreach (var di in dialogs) {
+						if (di.activeInHierarchy) {
+							wasActive = true;
+							
+							if (di == TabMenu)
+								ToggleTabPanel ();
+							else if (di == ShortCutDialog)
+								hideShortcutDialog ();
+							else if (di == MoreOptionsPanel)
+								hideMoreSettings ();
+							else if (di == optionsPanel)
+								ToggleActionPanel ();
+							else if (di == helptip)
+								HideHelpTips ();
+							break;
+						}
+					}
+					if (!wasActive) {
+						ToggleActionPanel ();
+						menuShowing = true;
+					} else {
+						menuShowing = false;
+					}
+				} else {
+					if (MoreOptionsPanel.activeInHierarchy) {
+						hideMoreSettingsOnly ();
+					} else {
+						showMoreSettingsOnly ();
+					}
+					
+				}
+			}
+			if (Input.GetKeyDown (KeyCode.T)) {
+				if (!menuShowing && !helptip.activeInHierarchy)
+					ShowHelpTips ();
+				else
+					HideHelpTips ();
+			}
+			if (Input.GetKeyDown (KeyCode.Tab)) {
+				ToggleTabPanel ();
+			}
+		}
+		if (GoToMainMenuNow) {
+			GoToMainMenuNow = false;
+			MainMenu ();
+		}
+	}
+
+	#endregion
+
+	#region Main Menu
 
 	public static IEnumerator WaitForVersion (WWW www, string receiving)
 	{
@@ -156,211 +215,35 @@ public class ButtonPresses : MonoBehaviour
 
 		}
 		
-	}    
+	}    //---------------------------------------------------------------------------------
+	public void showLevelSelection ()
+	{
+		GameObject lv = canvasObj.FindChild ("LevelSelection").gameObject;
+		lv.SetActive (true);
+		lv.GetComponent<Animator> ().Play ("LevelSelectionEnter");
+		lv.GetComponent<Animator> ().Rebind ();
+
+	}
+
+	public void hideLevelSelection ()
+	{
+		GameObject lv = canvasObj.FindChild ("LevelSelection").gameObject;
+		lv.SetActive (true);
+		lv.GetComponent<Animator> ().Play ("LevelSelectionExit");
+	}
+
 	//--------------------------------------------------------------------------------------------------------
+	#endregion
 
-	//WILL CRASH ON ANDROID BECAUSE IT RETURNS NULL RESOLUTIONS
-	void initSettings ()
-	{
-
-		t_mouse = MoreOptionsPanel.transform.FindChild ("Line1/Slider").gameObject.GetComponent<Slider> ();
-		QualityText = MoreOptionsPanel.transform.FindChild ("Line2/Switcher/QualityText").gameObject.GetComponent<Text> ();
-		t_antialias = MoreOptionsPanel.transform.FindChild ("Line3/Toggle").gameObject.GetComponent<Toggle> ();
-		t_bloom = MoreOptionsPanel.transform.FindChild ("Line4/Toggle").gameObject.GetComponent<Toggle> ();
-		t_grain = MoreOptionsPanel.transform.FindChild ("Line5/Toggle").gameObject.GetComponent<Toggle> ();
-		t_shadow = MoreOptionsPanel.transform.FindChild ("Line6/Toggle").gameObject.GetComponent<Toggle> ();
-
-		try {
-
-			//first time default:
-			bool firstTime = PlayerPrefs.GetInt ("Game_first_time") == 0 ? true : false;
-			PlayerPrefs.SetInt ("Game_first_time", 1);
-			if (firstTime) {
-				PlayerPrefs.SetInt ("Settings_bloom", 1);
-				PlayerPrefs.SetInt ("Settings_antialias", 1);
-				PlayerPrefs.SetInt ("Settings_qualitylevel", 5);
-			}
-			//--------------------
-			if (PlayerPrefs.HasKey ("Settings_mouseSensitivity")) {
-				QualityOptions.mouseSens = PlayerPrefs.GetFloat ("Settings_mouseSensitivity");
-			}
-			if (PlayerPrefs.HasKey ("Settings_qualitylevel")) {
-				QualityOptions.qualityLevel = PlayerPrefs.GetInt ("Settings_qualitylevel");
-			}
-			QualityOptions.antialiasing = PlayerPrefs.GetInt ("Settings_antialias") == 1 ? true : false;
-			QualityOptions.bloom = PlayerPrefs.GetInt ("Settings_bloom") == 1 ? true : false;
-			QualityOptions.grain = PlayerPrefs.GetInt ("Settings_grain") == 1 ? true : false;
-			QualityOptions.showShadow = PlayerPrefs.GetInt ("Settings_shadow") == 1 ? true : false;
-
-//			PrintSettings ("INIT");
-
-		} catch (System.Exception ex) { //ignore catch for now
-			print ("ERROR occurred retrieving settings");
-		} finally {
-
-			//-----------
-			ResetToPrevSettings (QualityOptions);
-			saveSettings ();
-			ApplyMoreSettings (true);
-
-		}
-
-
-
-		//FINAL
-//		saveCurrSettings ();
-	}
-
-	public static void initialiseCriteriaIcons (bool isOptions)
-	{
-		Color orange = new Color32 (255, 251, 94, 255);
-		int winScore = GameEvents.GetWinCriteriaScore ();
-		int winFuel = GameEvents.GetWinCriteriaFuel ();
-		float timeWin = GameEvents.GetWinCriteriaTime ();
-
-		Transform cgroup;
-		if (isOptions)
-			cgroup = Instance.canvasObj.transform.FindChild ("TabMenu/LeftGroup/CriteriaGroup").transform;
-		else
-			cgroup = Instance.canvasObj.FindChild ("GameSuccessImage/LeftGroup/CriteriaGroup").transform;
-
-		string[] crinames = GameEvents.GetCriteriasNames ();
-
-		//box0:
-		if (GameManager.GetLevelSavedDocked ()) {
-			cgroup.FindChild ("Box0/Icon").GetComponent<Image> ().color = orange;
-		}
-		//box1:
-		string box1Text = "OK";
-		int box1spriteNum = 0;
-		if (GameManager.ArrayContains (crinames, "SCORE")) {
-			box1Text = winScore.ToString ();
-			box1spriteNum = 0;
-			if (GameManager.GetLevelSavedScore () >= winScore) {
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
-			}
-		}
-		if (GameManager.ArrayContains (crinames, "FUEL")) {
-			box1Text = winFuel.ToString ();
-			box1spriteNum = 3;
-			if (GameManager.GetLevelSavedFuel ()) {
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
-			}
-		}
-		if (GameManager.ArrayContains (crinames, "NODOCK")) {
-			box1Text = "Avoid";
-			box1spriteNum = 1;
-			if (GameManager.GetLevelSavedNoDock ())
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
-		}
-		if (GameManager.ArrayContains (crinames, "HEALTH")) {
-			box1Text = "No Damage";
-			box1spriteNum = 2;
-			if (GameManager.GetLevelSavedHealth ())
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
-		}
-		cgroup.FindChild ("Box1/Text").GetComponent<Text> ().text = box1Text;
-		cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().sprite = Instance.CriteriaBox1Sprites [box1spriteNum];
-
-		//box2:
-		if (GameManager.ArrayContains (crinames, "TIME")) {
-			if (GameManager.GetLevelSavedTime () <= timeWin) {
-				cgroup.FindChild ("Box2/Icon").GetComponent<Image> ().color = orange;
-			}
-			cgroup.FindChild ("Box2/Text").GetComponent<Text> ().text = timeWin.ToString () + "s";
-		}
-
-		if (isOptions) {
-			float BestTime = GameManager.GetLevelSavedTime ();
-			Text bestTime = Instance.canvasObj.transform.FindChild ("TabMenu/LeftGroup/MoreInfo/TimeGroup/Result").GetComponent<Text> ();
-			bestTime.text = BestTime == float.PositiveInfinity ? "N/A" : BestTime.ToString ("0.000") + " s";
-		}
-
-	}
-	//-----------------------------------------------------------------------------------------------
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		if (!GameEvents.StopListeningKeys) {
-			if (!NoPause && Input.GetKeyDown (KeyCode.Escape)) {
-				if (Application.loadedLevel > 0) {
-					GameObject[] dialogs = {TabMenu,ShortCutDialog, MoreOptionsPanel,
-						optionsPanel, helptip};
-					bool wasActive = false;
-					foreach (var di in dialogs) {
-						if (di.activeInHierarchy) {
-							wasActive = true;
-
-							if (di == TabMenu)
-								ToggleTabPanel ();
-							else if (di == ShortCutDialog)
-								hideShortcutDialog ();
-							else if (di == MoreOptionsPanel)
-								hideMoreSettings ();
-							else if (di == optionsPanel)
-								ToggleActionPanel ();
-							else if (di == helptip)
-								HideHelpTips ();
-							break;
-						}
-					}
-					if (!wasActive) {
-						ToggleActionPanel ();
-						menuShowing = true;
-					} else {
-						menuShowing = false;
-					}
-				} else {
-					if (MoreOptionsPanel.activeInHierarchy) {
-						hideMoreSettingsOnly ();
-					} else {
-						showMoreSettingsOnly ();
-					}
-
-				}
-			}
-			if (Input.GetKeyDown (KeyCode.T)) {
-				if (!menuShowing && !helptip.activeInHierarchy)
-					ShowHelpTips ();
-				else
-					HideHelpTips ();
-			}
-			if (Input.GetKeyDown (KeyCode.Tab)) {
-				ToggleTabPanel ();
-			}
-		}
-		if (GoToMainMenuNow) {
-			GoToMainMenuNow = false;
-			MainMenu ();
-		}
-	}
-
-	public void ToggleActionPanel ()
-	{
-
-
-		if (!menuShowing) {
-			Animator anim = optionsPanel.GetComponent<Animator> ();
-			anim.enabled = true;
-			anim.SetBool ("isExiting", false);
-			anim.Rebind ();
-			Button resume = Instance.optionsPanel.transform.FindChild ("OptionsBox/Resume").GetComponent<Button> ();
-			resume.Select ();
-		}
-		optionsPanel.SetActive (!optionsPanel.activeInHierarchy);
-		menuShowing = optionsPanel.activeInHierarchy;
-		if (Time.timeScale != 0) {
-			GameEvents.PauseGame ();
-		} else if (!menuShowing && !TabMenu.activeInHierarchy) {
-			GameEvents.UnPauseGame ();
-		}
-	}
+	#region Tab Menu
 
 	public void ToggleTabPanel ()
 	{
 		if (!menuShowing) {
-			if (Time.timeScale != 0) {
+			if (inTutorial){
+				ToggleTabLeaderboard ();
+			}
+			else if (Time.timeScale != 0) {
 				GameEvents.PauseGame ();
 			} else if (TabMenu.activeInHierarchy) {
 				GameEvents.UnPauseGame ();
@@ -371,7 +254,7 @@ public class ButtonPresses : MonoBehaviour
 
 			//hide
 			if (TabMenu.activeInHierarchy) {
-				Instance.StartCoroutine (Instance.FadePanel (TabMenu, 0.1f));
+				Instance.StartCoroutine (AnimationScript.FadePanel (TabMenu, 0.1f));
 				if (!rev)
 					ToggleTabLeaderboard ();
 			} 
@@ -387,39 +270,29 @@ public class ButtonPresses : MonoBehaviour
 		}
 	}
 
-	IEnumerator FadePanel (GameObject obj, float overTime)
-	{
-		float startTime = Time.time;
+	#endregion 
 
-		CanvasGroup cg = obj.GetComponent<CanvasGroup> ();
-		cg.alpha = 0.99f;
-		while (Time.time < startTime + overTime) {
-			if (cg.alpha == 1f)
-				break;
-			cg.alpha = Mathf.SmoothStep (0.99f, 0f, (Time.time - startTime) / overTime);
-			yield return null;
+	#region Game Dialogs
+
+	public void ToggleActionPanel ()
+	{
+		
+		
+		if (!menuShowing) {
+			Animator anim = optionsPanel.GetComponent<Animator> ();
+			anim.enabled = true;
+			anim.SetBool ("isExiting", false);
+			anim.Rebind ();
+			Button resume = Instance.optionsPanel.transform.FindChild ("OptionsBox/Resume").GetComponent<Button> ();
+			resume.Select ();
 		}
-		obj.SetActive (false);
-	}
-
-	private void saveSettings ()
-	{
-		OptionsSaved = QualityOptions;
-	}
-
-	private void ResetToPrevSettings (OptionsDetails option)
-	{
-		QualityOptions = option;
-
-		t_mouse.value = QualityOptions.mouseSens;
-
-		QualityText.text = getQualityText (QualityOptions.qualityLevel);
-		t_qualityLevel = QualityOptions.qualityLevel;
-	
-		t_antialias.isOn = QualityOptions.antialiasing;
-		t_bloom.isOn = QualityOptions.bloom;
-		t_grain.isOn = QualityOptions.grain;
-		t_shadow.isOn = QualityOptions.showShadow;
+		optionsPanel.SetActive (!optionsPanel.activeInHierarchy);
+		menuShowing = optionsPanel.activeInHierarchy;
+		if (Time.timeScale != 0) {
+			GameEvents.PauseGame ();
+		} else if (!menuShowing && !TabMenu.activeInHierarchy) {
+			GameEvents.UnPauseGame ();
+		}
 	}
 
 	public void showMoreSettings ()
@@ -460,6 +333,119 @@ public class ButtonPresses : MonoBehaviour
 		}
 //		saveSettings();
 //		print(MoreOptionsPanel);//.enabled=false;
+	}
+
+	public void showShortcutDialog ()
+	{
+		
+		ShortCutDialog.SetActive (true);
+		Animator anim = ShortCutDialog.GetComponent<Animator> ();
+		anim.enabled = true;
+	}
+	
+	public void hideShortcutDialog ()
+	{
+		ShortCutDialog.SetActive (false);
+	}
+	
+	public void ShowHelpTips ()
+	{
+		//		GameObject lv = GameObject.Find("Canvas").transform.FindChild("HelpTip").gameObject;
+		
+		helptip.SetActive (true);
+		Animator anim = helptip.GetComponent<Animator> ();
+		anim.enabled = true;
+		anim.SetBool ("isExiting", false);
+		anim.Rebind ();
+		
+		menuShowing = true;
+		
+	}
+
+	public void HideHelpTips ()
+	{
+		
+		helptip.SetActive (false);
+		menuShowing = false;
+		//		Animator anim = helptip.GetComponent<Animator> ();
+		//		anim.enabled = true;
+		//		anim.SetBool ("isExiting", true);
+		//		StartCoroutine (SetInactiveAfter (helptip, 1f));
+	}
+	
+	public void ToggleAbout ()
+	{
+		GameObject about = Instance.optionsPanel.transform.FindChild ("About").gameObject;
+		about.SetActive (!about.activeInHierarchy);
+	}
+	#endregion
+
+	#region settings prefs
+
+	void initSettings ()
+	{
+		
+		t_mouse = MoreOptionsPanel.transform.FindChild ("Line1/Slider").gameObject.GetComponent<Slider> ();
+		QualityText = MoreOptionsPanel.transform.FindChild ("Line2/Switcher/QualityText").gameObject.GetComponent<Text> ();
+		t_antialias = MoreOptionsPanel.transform.FindChild ("Line3/Toggle").gameObject.GetComponent<Toggle> ();
+		t_bloom = MoreOptionsPanel.transform.FindChild ("Line4/Toggle").gameObject.GetComponent<Toggle> ();
+		t_grain = MoreOptionsPanel.transform.FindChild ("Line5/Toggle").gameObject.GetComponent<Toggle> ();
+		t_shadow = MoreOptionsPanel.transform.FindChild ("Line6/Toggle").gameObject.GetComponent<Toggle> ();
+		
+		try {
+			
+			//first time default:
+			bool firstTime = PlayerPrefs.GetInt ("Game_first_time") == 0 ? true : false;
+			PlayerPrefs.SetInt ("Game_first_time", 1);
+			if (firstTime) {
+				PlayerPrefs.SetInt ("Settings_bloom", 1);
+				PlayerPrefs.SetInt ("Settings_antialias", 1);
+				PlayerPrefs.SetInt ("Settings_qualitylevel", 5);
+			}
+			//--------------------
+			if (PlayerPrefs.HasKey ("Settings_mouseSensitivity")) {
+				QualityOptions.mouseSens = PlayerPrefs.GetFloat ("Settings_mouseSensitivity");
+			}
+			if (PlayerPrefs.HasKey ("Settings_qualitylevel")) {
+				QualityOptions.qualityLevel = PlayerPrefs.GetInt ("Settings_qualitylevel");
+			}
+			QualityOptions.antialiasing = PlayerPrefs.GetInt ("Settings_antialias") == 1 ? true : false;
+			QualityOptions.bloom = PlayerPrefs.GetInt ("Settings_bloom") == 1 ? true : false;
+			QualityOptions.grain = PlayerPrefs.GetInt ("Settings_grain") == 1 ? true : false;
+			QualityOptions.showShadow = PlayerPrefs.GetInt ("Settings_shadow") == 1 ? true : false;
+			
+			//			PrintSettings ("INIT");
+			
+		} catch (System.Exception ex) { //ignore catch for now
+			print ("ERROR occurred retrieving settings");
+		} finally {
+			
+			//-----------
+			ResetToPrevSettings (QualityOptions);
+			saveSettings ();
+			ApplyMoreSettings (true);
+			
+		}
+	}
+	
+	private void saveSettings ()
+	{
+		OptionsSaved = QualityOptions;
+	}
+	
+	private void ResetToPrevSettings (OptionsDetails option)
+	{
+		QualityOptions = option;
+		
+		t_mouse.value = QualityOptions.mouseSens;
+		
+		QualityText.text = getQualityText (QualityOptions.qualityLevel);
+		t_qualityLevel = QualityOptions.qualityLevel;
+		
+		t_antialias.isOn = QualityOptions.antialiasing;
+		t_bloom.isOn = QualityOptions.bloom;
+		t_grain.isOn = QualityOptions.grain;
+		t_shadow.isOn = QualityOptions.showShadow;
 	}
 
 	public void ApplyMoreSettings (bool isForInitialisation)
@@ -600,51 +586,10 @@ public class ButtonPresses : MonoBehaviour
 		}
 		QualityText.text = getQualityText (t_qualityLevel);
 	}
-	
-	//-----------------------------------------------SHORTCUT WINDOW-----------------------------------------------
-	public void showShortcutDialog ()
-	{
 
-		ShortCutDialog.SetActive (true);
-		Animator anim = ShortCutDialog.GetComponent<Animator> ();
-		anim.enabled = true;
-	}
+	#endregion
 
-	public void hideShortcutDialog ()
-	{
-		ShortCutDialog.SetActive (false);
-	}
-	//---------------------------------------------------------------------------------
-	public void showLevelSelection ()
-	{
-		GameObject lv = canvasObj.FindChild ("LevelSelection").gameObject;
-		lv.SetActive (true);
-		lv.GetComponent<Animator> ().Play ("LevelSelectionEnter");
-		lv.GetComponent<Animator> ().Rebind ();
-
-	}
-
-	public void hideLevelSelection ()
-	{
-		GameObject lv = canvasObj.FindChild ("LevelSelection").gameObject;
-		lv.SetActive (true);
-		lv.GetComponent<Animator> ().Play ("LevelSelectionExit");
-	}
-
-	//---------------------------------------------------------------------------------------------
-	public void ShowHelpTips ()
-	{
-//		GameObject lv = GameObject.Find("Canvas").transform.FindChild("HelpTip").gameObject;
-
-		helptip.SetActive (true);
-		Animator anim = helptip.GetComponent<Animator> ();
-		anim.enabled = true;
-		anim.SetBool ("isExiting", false);
-		anim.Rebind ();
-
-		menuShowing = true;
-
-	}
+	#region tutorial
 
 	public void initTutorial ()
 	{
@@ -668,6 +613,22 @@ public class ButtonPresses : MonoBehaviour
 		StartCoroutine (TutorialController ());
 	}
 
+
+	public void AcceptTutorial ()
+	{
+		Transform tut0 = Instance.canvasObj.transform.FindChild ("Tutorial0");
+		tut0.FindChild ("Dialog").gameObject.SetActive (false);
+		initTutorial ();
+
+	}
+
+	public void RejectTutorial ()
+	{
+		GameObject tut0 = Instance.canvasObj.transform.FindChild ("Tutorial0").gameObject;
+		tut0.SetActive (false);
+
+	}
+
 	void SetUpTutorial ()
 	{
 		float size = 100f;
@@ -678,33 +639,45 @@ public class ButtonPresses : MonoBehaviour
 		cameraScript.maxY = size;
 		cameraScript.DrawOutline (false);
 
-		GameObject.Find("CenterPuller").GetComponent<SpringJoint2D>().frequency = 0.14f;
-		GameObject parent = GameObject.Find("AsteroidGroup");
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabPos(parent, 1.5f, 0.5f));
+		float dl = 0.3f;
+		Vector3 newCamPos = Camera.main.transform.position;
+		newCamPos.z = -600f;
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (Camera.main.gameObject, newCamPos, 0.6f, dl));
 
-		GameObject satellite = GameObject.Find("Satellite").gameObject;
-		Collider2D[] colliders = satellite.GetComponentsInChildren<Collider2D>();
-		print(colliders.Length);
-		foreach (Collider2D col in colliders) col.enabled = false;
+		GameObject.Find ("CenterPuller").GetComponent<SpringJoint2D> ().frequency = 0.14f;
+		GameObject parent = GameObject.Find ("AsteroidGroup");
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabPos (parent, 1.5f, 0.8f, dl += 0.7f));
+
+		GameObject satellite = GameObject.Find ("Satellite").gameObject;
+		Collider2D[] colliders = satellite.GetComponentsInChildren<Collider2D> ();
+		foreach (Collider2D col in colliders)
+			col.enabled = false;
 		Vector3 newPos = satellite.transform.position;
 		newPos.z = 300f;
 
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(satellite, newPos, 0.3f, 0.3f));
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (satellite, newPos, 0.6f, dl += 0.2f));
 
 		Vector3 newPosPlayer = player.transform.position;
-		newPosPlayer.y -= 90f;
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(player, newPosPlayer, 1f, 0.6f));
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabRotation(player, new Vector3(0f,0f,90f), 1f, 0.6f));
-	}
+		newPosPlayer.x = 0f;
+		newPosPlayer.y = -50f;
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (player, newPosPlayer, 1.3f, dl += 0.5f));
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabRotation (player, new Vector3 (0f, 0f, 90f), 1.3f, dl));
+		GameEvents.CheatOn (false);
 
-	
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabZ (Camera.main.gameObject, -150f, 3f, dl += 1.5f));
+	}
 
 	IEnumerator TutorialController ()
 	{
-		yield return new WaitForSeconds (2f);
 		const float ttime = 0.7f;
-		SetUpTutorial();
+		SetUpTutorial ();
+
+		yield return new WaitForSeconds (5f);
 		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
+		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
+
+		yield return new WaitForSeconds (1f);
 		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
 		objective.text = "Hold W to accelerate forwards";
 		//----------1
@@ -723,7 +696,7 @@ public class ButtonPresses : MonoBehaviour
 		}
 		//-----------2
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let Go", ttime));
-		yield return new WaitForSeconds (4f);
+		yield return new WaitForSeconds (2.5f);
 //		/*
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold S to accelerate backwards", ttime));
@@ -738,10 +711,10 @@ public class ButtonPresses : MonoBehaviour
 			yield return new WaitForEndOfFrame ();
 		}
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let Go", ttime));
-		yield return new WaitForSeconds (4f);
+		yield return new WaitForSeconds (2.5f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold A to accelerate left\n and D to accelerate right", ttime));
-		yield return new WaitForSeconds (8f);
+		yield return new WaitForSeconds (5f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Going good. Now lets learn to rotate...", ttime));
 		yield return new WaitForSeconds (3f);
@@ -800,9 +773,9 @@ public class ButtonPresses : MonoBehaviour
 		Vector3 newPosPlayer = player.transform.position;
 		newPosPlayer.x = 0f;
 		newPosPlayer.y = 0f;
-		Vector3 angle = new Vector3(0f,0f,90f);
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(player, newPosPlayer, 1.5f, 0.8f));
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabRotation(player, angle, 1.5f, 0.8f));
+		Vector3 angle = new Vector3 (0f, 0f, 90f);
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (player, newPosPlayer, 1.5f, 0.8f));
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabRotation (player, angle, 1.5f, 0.8f));
 
 		while (!GameEvents.LevelFail && GameEvents.Score<4) {
 			yield return new WaitForEndOfFrame ();
@@ -810,40 +783,69 @@ public class ButtonPresses : MonoBehaviour
 		//--------------
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Impressive!", ttime));
 		yield return new WaitForSeconds (3f);
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "and finally...", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "One more thing...", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Stabilisers assist beginners by automatically bringing them down to a stop\n" +
+			"For best experience, the stabilisers are turned off by default for future levels\n\n" +
+			"Press X to disable/enable stabilisers\n", ttime));
+		while (!Input.GetKey (KeyCode.X))
+			yield return new WaitForEndOfFrame ();
+		//----------kk
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now you can move around freely. Try it!\n\nPress Enter when you are ready to proceed", ttime));
+		while (!Input.GetKey (KeyCode.Return))
+			yield return new WaitForEndOfFrame ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now a bit about other game options...", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with your satellite...\n" +
+			"Press TAB to see Level objectives and leaderboard", ttime));
+		while (!Input.GetKey (KeyCode.Tab))
+			yield return new WaitForEndOfFrame ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
+			"1. Dock\n2. Score 10 (Collect orbs)\n3. Dock in less than 15 seconds\n\n" +
+			"If you complete all 3 objectives, you get a gold medal\n" + 
+			"When you have a gold medal, you can add your best time on the online leaderboard (right)\n\n" +
+			"Press ENTER to proceed", ttime));
+		while (!Input.GetKey (KeyCode.Return))
+			yield return new WaitForEndOfFrame ();
+		ToggleTabPanel ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "That's it for now...", ttime));
+		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let's Dock...", ttime));
 		yield return new WaitForSeconds (3f);
 
 		//-----------SATELLITE
 //		*/
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, 
-		    "Your aim in each level is to dock with the satellite Bono...\n" +
-//			"Bono loves you a lot and doesn't want to stay away from you...\n" +
-			"To dock with Bono, advance ahead until your nose is within its docking area.\n", ttime));
+			"To dock with the satellite, advance ahead until your nose is within its docking area.\n", ttime));
 		//------
 		Vector3 newPosPlayer2 = player.transform.position;
 		newPosPlayer2.x = 0f;
 		newPosPlayer2.y = -30f;
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(player, newPosPlayer2, 1.5f, 1.5f));
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabRotation(player, new Vector3(0f,0f,90f), 1.5f, 1.5f));
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (player, newPosPlayer2, 1.5f, 1.5f));
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabRotation (player, new Vector3 (0f, 0f, 90f), 1.5f, 1.5f));
 
-		yield return new WaitForSeconds(3f);
-		GameObject satellite = GameObject.Find("Satellite").gameObject;
-		Collider2D[] colliders = satellite.GetComponentsInChildren<Collider2D>();
-		foreach (Collider2D col in colliders) col.enabled = true;
+		yield return new WaitForSeconds (3f);
+		GameObject satellite = GameObject.Find ("Satellite").gameObject;
+		Collider2D[] colliders = satellite.GetComponentsInChildren<Collider2D> ();
+		foreach (Collider2D col in colliders)
+			col.enabled = true;
 		Vector3 newPos = satellite.transform.position;
 		newPos.z = 0f;
 		
-		Instance.StartCoroutine(AnimationScript.AnimatePrefabXYZ(satellite, newPos, 0.6f, 0f));
+		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (satellite, newPos, 0.6f, 0f));
 
 		//-----------3
 		while (!GameEvents.LevelFail && !GameEvents.docked) {
 			yield return new WaitForEndOfFrame ();
 		}
 		//-----------3
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Congratulations. You have finished your training...", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Wow!", ttime));
 		yield return new WaitForSeconds (3f);
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "If you'd like to play around more, You can press F to undock\n"+
-		                                                     "If you feel ready, press ENTER to end this tutorial and begin your journey!", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Congratulations. You have finished your training...\n\n"+
+		                                                     "If you'd like to play around more, You can press F to undock\n" +
+		                                                     "When you feel ready, press ENTER to end this tutorial and begin your journey!", ttime));
 
 		while (!GameEvents.LevelFail && !Input.GetKey (KeyCode.Return)) {
 			yield return new WaitForEndOfFrame ();
@@ -851,10 +853,9 @@ public class ButtonPresses : MonoBehaviour
 
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Brilliant!", ttime));
 		yield return new WaitForSeconds (3f);
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Time to test your skills...", ttime));
-		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Here we go!", ttime));
-//		yield return new WaitForSeconds (5f);
+		yield return new WaitForSeconds (3f);
+		GameEvents.RestartLevel ();
 //		GameEvents.PlayerFuelUnlimited(false);
 //		DimFuel(false);
 	}
@@ -900,47 +901,11 @@ public class ButtonPresses : MonoBehaviour
 		Button prev = tut.transform.FindChild ("prev").gameObject.GetComponent<Button> ();
 		prev.interactable = currTut > 0;
 	}
-	//---------------------------------------------------------------------------------------------
 
-	IEnumerator SetInactiveAfter (GameObject obj, float time)
-	{
-		yield return new WaitForSeconds (time);
-		obj.SetActive (false);
-	}
+	#endregion
 
-	public void HideHelpTips ()
-	{
+	#region Game Commands 
 
-		helptip.SetActive (false);
-		menuShowing = false;
-//		Animator anim = helptip.GetComponent<Animator> ();
-//		anim.enabled = true;
-//		anim.SetBool ("isExiting", true);
-//		StartCoroutine (SetInactiveAfter (helptip, 1f));
-	}
-
-	public void ToggleAbout ()
-	{
-		GameObject about = Instance.optionsPanel.transform.FindChild ("About").gameObject;
-		about.SetActive (!about.activeInHierarchy);
-	}
-
-	//--------------------------------------------Cheats-----------------------------------//
-	public static void DimHealth (bool dim)
-	{
-
-		Instance.UI.FindChild ("Health").GetComponent<CanvasGroup> ().alpha = dim?0.2f:1f;
-	}
-
-	public static void DimFuel (bool dim)
-	{
-		Instance.UI.FindChild ("Fuel").GetComponent<CanvasGroup> ().alpha = dim?0.2f:1f;
-	}
-	//----------------------------------------------PAUSE RESUME GAME-----------------------------------
-//	public static void PauseGame(){
-//		Time.timeScale = Time.timeScale == 0 ? 1 : 0;
-//		Instance.UI.Find("PauseIcon").gameObject.SetActive (Time.timeScale == 0);
-//	}
 	public void RestartGame ()
 	{
 		GameEvents.RestartLevel ();
@@ -979,6 +944,10 @@ public class ButtonPresses : MonoBehaviour
 			GameEvents.LevelPrev ();
 	}
 
+	#endregion
+
+	#region UI Icons
+
 	public static void ChangeDockIcon (bool isOn)
 	{
 		Color curr = Instance.dockIndicator.color;
@@ -996,13 +965,89 @@ public class ButtonPresses : MonoBehaviour
 			Instance.lightIndicator.sprite = Instance.headlights [level - 1];
 		}
 	}
-	//-----------------------------------Score Display----------------------------------
-	public static bool FromOptionsLeaderboard = false;
 
-//	public void ToggleOptionsLeaderboard(){
-//		GameObject lb = Instance.optionsPanel.transform.FindChild ("OnlineScoreDisplay").gameObject;
-//		lb.SetActive(!lb.activeInHierarchy);
-//	}
+	//--------------------------------------------Cheats-----------------------------------//
+	public static void DimHealth (bool dim)
+	{
+		
+		Instance.UI.FindChild ("Health").GetComponent<CanvasGroup> ().alpha = dim ? 0.2f : 1f;
+	}
+	
+	public static void DimFuel (bool dim)
+	{
+		Instance.UI.FindChild ("Fuel").GetComponent<CanvasGroup> ().alpha = dim ? 0.2f : 1f;
+	}
+
+	#endregion
+
+	#region Success Screen
+
+	public static void initialiseCriteriaIcons (bool isOptions)
+	{
+		Color orange = new Color32 (255, 251, 94, 255);
+		int winScore = GameEvents.GetWinCriteriaScore ();
+		int winFuel = GameEvents.GetWinCriteriaFuel ();
+		float timeWin = GameEvents.GetWinCriteriaTime ();
+		
+		Transform cgroup;
+		if (isOptions)
+			cgroup = Instance.canvasObj.transform.FindChild ("TabMenu/LeftGroup/CriteriaGroup").transform;
+		else
+			cgroup = Instance.canvasObj.FindChild ("GameSuccessImage/LeftGroup/CriteriaGroup").transform;
+		
+		string[] crinames = GameEvents.GetCriteriasNames ();
+		
+		//box0:
+		if (GameManager.GetLevelSavedDocked ()) {
+			cgroup.FindChild ("Box0/Icon").GetComponent<Image> ().color = orange;
+		}
+		//box1:
+		string box1Text = "OK";
+		int box1spriteNum = 0;
+		if (GameManager.ArrayContains (crinames, "SCORE")) {
+			box1Text = winScore.ToString ();
+			box1spriteNum = 0;
+			if (GameManager.GetLevelSavedScore () >= winScore) {
+				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+			}
+		}
+		if (GameManager.ArrayContains (crinames, "FUEL")) {
+			box1Text = winFuel.ToString ();
+			box1spriteNum = 3;
+			if (GameManager.GetLevelSavedFuel ()) {
+				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+			}
+		}
+		if (GameManager.ArrayContains (crinames, "NODOCK")) {
+			box1Text = "Avoid";
+			box1spriteNum = 1;
+			if (GameManager.GetLevelSavedNoDock ())
+				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+		}
+		if (GameManager.ArrayContains (crinames, "HEALTH")) {
+			box1Text = "No Damage";
+			box1spriteNum = 2;
+			if (GameManager.GetLevelSavedHealth ())
+				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+		}
+		cgroup.FindChild ("Box1/Text").GetComponent<Text> ().text = box1Text;
+		cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().sprite = Instance.CriteriaBox1Sprites [box1spriteNum];
+		
+		//box2:
+		if (GameManager.ArrayContains (crinames, "TIME")) {
+			if (GameManager.GetLevelSavedTime () <= timeWin) {
+				cgroup.FindChild ("Box2/Icon").GetComponent<Image> ().color = orange;
+			}
+			cgroup.FindChild ("Box2/Text").GetComponent<Text> ().text = timeWin.ToString () + "s";
+		}
+		
+		if (isOptions) {
+			float BestTime = GameManager.GetLevelSavedTime ();
+			Text bestTime = Instance.canvasObj.transform.FindChild ("TabMenu/LeftGroup/MoreInfo/TimeGroup/Result").GetComponent<Text> ();
+			bestTime.text = BestTime == float.PositiveInfinity ? "N/A" : BestTime.ToString ("0.000") + " s";
+		}
+		
+	}
 
 	public static void ScoreDisplayResults (string names, string scores)
 	{
@@ -1100,8 +1145,8 @@ public class ButtonPresses : MonoBehaviour
 				GetComponent<Button> ().interactable = false;
 		}
 		GameObject tutmain = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
-		tutmain.SetActive (Application.loadedLevel == 1);
-		print (tutmain.activeInHierarchy);
+		tutmain.SetActive (false);
+//		print (tutmain.activeInHierarchy);
 
 //		tootlitSubmit.isDisabled=vi
 	}
@@ -1137,4 +1182,5 @@ public class ButtonPresses : MonoBehaviour
 //		anim.Play("SlideLeft");
 	}
 
+	#endregion
 }

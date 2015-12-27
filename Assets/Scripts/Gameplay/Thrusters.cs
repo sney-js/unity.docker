@@ -60,19 +60,17 @@ public class Thrusters
 		foreach (Transform child in tt) {
 			hide (child);
 		}
-		if (!SoundScript.NoThrusSound) {
-			if (tt_sound.isPlaying && !accelerating) {
+		if (tt_sound.isPlaying && !accelerating) {
 //			float currVol = tt_sound.volume;
-				tt_sound.volume -= 0.05f;
-				if (tt_sound.volume <= 0) {
-					//			tt_sound.volume= 0f;
-					tt_sound.Pause ();
+			tt_sound.volume -= 0.05f;
+			if (tt_sound.volume <= 0) {
+				//			tt_sound.volume= 0f;
+				tt_sound.Pause ();
 //				Debug.Log("PAUSED");
-				}
 			}
-			if (tt_sound.isPlaying && accelerating) {
-				accelerating = false;
-			}
+		}
+		if (tt_sound.isPlaying && accelerating) {
+			accelerating = false;
 		}
 
 
@@ -94,38 +92,37 @@ public class Thrusters
 		for (int i=0; i<thrus.Length; i++) {
 			show (thrus [i], amount);
 		}
-		if (!SoundScript.NoThrusSound) {
-			accelerating = true;
-			if (!tt_sound.isPlaying) {
-				tt_sound.Play ();
-				fadeStart = true;
+		accelerating = true;
+		if (!tt_sound.isPlaying) {
+			tt_sound.Play ();
+			fadeStart = true;
 //			Debug.Log("STARTED");
-			}
-			float maxVol = Mathf.Clamp01 (amount*getDistanceVolume() / maxAmount);
+		}
+		float maxVol = Mathf.Clamp01 (amount * getDistanceVolume () / maxAmount);
 //		Debug.Log("maxVol="+maxVol+",curr="+tt_sound.volume);
 
-			if (fadeStart) {
+		if (fadeStart) {
 //			tt_sound.volume= Mathf.Lerp(0f, Mathf.Clamp01(0.75f*amount),0.3f);
-				float iter = 0.05f;
+			float iter = 0.05f;
 			 
-				if (tt_sound.volume >= maxVol) {
-					tt_sound.volume = maxVol;
-					fadeStart = false;
-//				Debug.Log("LERPED");
-				}
-				tt_sound.volume += iter;
-			} else {
+			if (tt_sound.volume >= maxVol) {
 				tt_sound.volume = maxVol;
+				fadeStart = false;
+//				Debug.Log("LERPED");
 			}
+			tt_sound.volume += iter;
+		} else {
+			tt_sound.volume = maxVol;
 		}
 
 	}
 
-	float getDistanceVolume(){
+	float getDistanceVolume ()
+	{
 		float camD = Camera.main.transform.position.z;
-		float x = Mathf.Pow(-camD/400f, 2f);
-		x = Mathf.Clamp01(x);
-		return 1-x;
+		float x = Mathf.Pow (-camD / 400f, 2f);
+		x = Mathf.Clamp01 (x);
+		return 1 - x;
 
 	}
 

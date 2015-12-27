@@ -11,6 +11,22 @@ public class AnimationScript : MonoBehaviour
 	public static Transform myCanvas;
 	public static float BestTime;
 
+	public static IEnumerator FadePanel (GameObject obj, float overTime)
+	{
+		float startTime = Time.time;
+		
+		CanvasGroup cg = obj.GetComponent<CanvasGroup> ();
+		cg.alpha = 0.99f;
+		while (Time.time < startTime + overTime) {
+			if (cg.alpha == 1f)
+				break;
+			cg.alpha = Mathf.SmoothStep (0.99f, 0f, (Time.time - startTime) / overTime);
+			yield return null;
+		}
+		obj.SetActive (false);
+	}
+
+
 	public static IEnumerator ChangeText (Text text, string str, float overTime)
 	{
 		Color moreAlphaC = text.color, normC = text.color;
@@ -30,8 +46,9 @@ public class AnimationScript : MonoBehaviour
 
 	}
 
-	public static IEnumerator AnimatePrefabPos (GameObject parent, float factor, float overTime)
+	public static IEnumerator AnimatePrefabPos (GameObject parent, float factor, float overTime, float delay)
 	{
+		yield return new WaitForSeconds(delay);
 		int childCount = parent.transform.childCount;
 		Vector3[] positions = new Vector3[childCount];
 		for (int i = 0; i < childCount; i++) {
@@ -58,6 +75,12 @@ public class AnimationScript : MonoBehaviour
 		yield return new WaitForSeconds (delay);
 		Vector3 curr = obj.transform.position;
 		Vector3 vel = Vector3.zero;
+		Rigidbody2D rigid = obj.GetComponent<Rigidbody2D>();
+		if (rigid!=null){
+			print("RIGID RESET");
+			rigid.velocity=Vector2.zero;
+			rigid.angularVelocity = 0f;
+		}
 //		vel.x = obj.GetComponent<Rigidbody2D>().velocity.x;
 //		vel.y = obj.GetComponent<Rigidbody2D>().velocity.y;
 		float startTime = Time.time;
@@ -65,6 +88,21 @@ public class AnimationScript : MonoBehaviour
 			float t = (Time.time - startTime) / overTime;
 			t = t*t*t * (t * (6f*t - 15f) + 10f);
 			obj.transform.position = Vector3.Lerp (curr, newVal, t);
+			yield return null;
+		}
+	}
+
+	public static IEnumerator AnimatePrefabZ (GameObject obj, float newVal, float overTime, float delay)
+	{
+		yield return new WaitForSeconds (delay);
+		float curr = obj.transform.position.z;
+		float startTime = Time.time;
+		while (Time.time < startTime + overTime) {
+			float t = (Time.time - startTime) / overTime;
+			t = t*t*t * (t * (6f*t - 15f) + 10f);
+			Vector3 newV = obj.transform.position;
+			newV.z = Mathf.Lerp (curr, newVal, t);
+			obj.transform.position = newV;
 			yield return null;
 		}
 	}

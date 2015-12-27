@@ -15,11 +15,8 @@ public class SoundScript : MonoBehaviour
 	AudioSource t_audio_single;
 	public bool isMainMenu;
 	Transform player;
-	public bool NoThrusterSound = false;
-	public static bool NoThrusSound;
 	void Start ()
 	{
-		NoThrusSound = NoThrusterSound;
 		t_audio = GetComponents<AudioSource> ()[0];
 		t_audio_single = GetComponents<AudioSource> ()[1];
 		player=GameObject.Find("Level/Player").transform;
