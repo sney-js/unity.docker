@@ -13,7 +13,8 @@ public class LightIntensity : MonoBehaviour {
 	float currOrig;
 	private int currLightLevel;
 	// Use this for initialization
-	private float nextActionTime = 0.0f; public float period = 0.1f;
+//	private float nextActionTime = 0.0f; 
+	public float period = 0.1f;
 	private static bool toggleCalled;
 	public int StartingAmount=0;
 

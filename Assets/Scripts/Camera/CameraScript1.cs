@@ -20,11 +20,11 @@ public class CameraScript1 : MonoBehaviour
 	private Vector3 offSet;
 	private Vector3 lastPosition;
 	
-	private bool dampWorkingX = false, dampWorkingY = false;
-	private bool rotating;
+//	private bool dampWorkingX = false, dampWorkingY = false;
+//	private bool rotating;
 	private float zoomamount;
 	
-	private bool animCenter = false;
+//	private bool animCenter = false;
 	
 	void Start()
 	{
@@ -33,8 +33,8 @@ public class CameraScript1 : MonoBehaviour
 		lastPosition = target.position;
 		offSet = Vector3.zero;
 		zoomamount = transform.position.z;
-		animCenter = false;
-		rotating = false;
+//		animCenter = false;
+//		rotating = false;
 		dampTime = 8f;
 		if (InitialDelayFollow > 0f && follow) StartCoroutine(DelaySnap(InitialDelayFollow));
 	}
@@ -81,7 +81,7 @@ public class CameraScript1 : MonoBehaviour
 				{
 					offSet = Vector3.zero;
 					snap = true;
-					animCenter = true;
+//					animCenter = true;
 				}
 				KeyFreeRotate();
 				KeyFreePan();
@@ -106,7 +106,7 @@ public class CameraScript1 : MonoBehaviour
 			
 			if (!RotateAroundPlayer)
 			{
-				rotating = true;
+//				rotating = true;
 				transform.RotateAround(transform.position, Vector3.forward, 1f * Input.GetAxis("Mouse X"));
 			}
 			else
@@ -118,7 +118,7 @@ public class CameraScript1 : MonoBehaviour
 		else
 		{
 			snap = true;
-			rotating = false;
+//			rotating = false;
 		}
 		
 	}
@@ -190,7 +190,7 @@ public class CameraScript1 : MonoBehaviour
 		{
 			offSet = Vector3.zero;
 			snap = true;
-			animCenter = true;
+//			animCenter = true;
 		}
 		
 		//--------------------------Key zoom-------------------------------------

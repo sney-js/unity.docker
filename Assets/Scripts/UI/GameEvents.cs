@@ -18,8 +18,8 @@ public class GameEvents : MonoBehaviour
 	public static bool LevelSuccess, LevelFail;
 	public static bool StopListeningKeys, StopListeningKeysMain;
 	private Text timeText, scoreText, infoText;
-	private float currTimeSpeed;
-	private bool prevDocked = false;
+//	private float currTimeSpeed;
+//	private bool prevDocked = false;
 	private int failMsgID;
 	private float prevScore;
 	private bool infoMsgSet = false;
@@ -213,8 +213,8 @@ public class GameEvents : MonoBehaviour
 
 	public static void PauseGame ()
 	{
-		if (Time.timeScale != 0)
-			Instance.currTimeSpeed = Time.timeScale;
+//		if (Time.timeScale != 0)
+//			Instance.currTimeSpeed = Time.timeScale;
 		Time.timeScale = 0;
 		Instance.PauseIcon.SetActive (true);
 	}
@@ -230,8 +230,8 @@ public class GameEvents : MonoBehaviour
 	IEnumerator UnpauseGradual (float overTime)
 	{
 		float startTime = Time.time;
-		float myDeltaTime = Time.deltaTime; 
-		float speed = 100f;
+//		float myDeltaTime = Time.deltaTime; 
+//		float speed = 100f;
 		float destScale = 1f;
 		Time.timeScale = 0.1f;
 		while (Time.time < startTime + overTime) {
@@ -336,7 +336,9 @@ public class GameEvents : MonoBehaviour
 
 	void updateTime (float time)
 	{
-		timeText.text = time.ToString ("0.0");// + " s";
+		string ttext = time.ToString ("0.0");// + " s";
+		if (ttext.Length<=3) ttext += 0;
+		timeText.text = ttext;
 	}
 
 	//----------------------------------------PUBLIC CALLS--------------------------------------------------

@@ -5,18 +5,18 @@ public class GameManager : MonoBehaviour
 {
 //	public float FixedTimeStep=0.02f;
 	private float FixedTimeStepChanged;
-	private bool loading = true;
+//	private bool loading = true;
 	public static bool Run1=true;
 	public static GameManager instance;
 	Texture loadingTexture;
-	bool drawn = false;
+//	bool drawn = false;
 
 	void Awake ()
 	{
 //		DontDestroyOnLoad(this);
 //		FixedTimeStepChanged=FixedTimeStep;
 		Time.timeScale=1;
-
+		Application.targetFrameRate = 60;
 	}
 
 	void Start(){
@@ -62,16 +62,14 @@ public class GameManager : MonoBehaviour
 		return str;
 	}
 
-	void Update ()
-	{
-		loading = Application.isLoadingLevel;
-
+//	void Update ()
+//	{
+//		loading = Application.isLoadingLevel;
 //		if (FixedTimeStepChanged!=FixedTimeStep){
 //			Time.fixedDeltaTime = FixedTimeStep;
 //			FixedTimeStepChanged=FixedTimeStep;
 //		}
-
-	}
+//	}
 
 	void OnGUI()
 	{
@@ -155,9 +153,10 @@ public class GameManager : MonoBehaviour
 
 	//--------------------------------------------------------------------------------------------------
 
+	#region Player prefs
 	public static int GetMedal(){
 		//bronze would be if docked
-		string lev = "Level#"+Application.loadedLevel;
+//		string lev = "Level#"+Application.loadedLevel;
 		int medal=1;
 
 		string[] crinames = GameEvents.GetCriteriasNames();
@@ -274,5 +273,5 @@ public class GameManager : MonoBehaviour
 		}
 		return false;
 	}
-
+	#endregion
 }

@@ -7,7 +7,7 @@ public class BigInfoText : MonoBehaviour
 
 	public static string msg;
 	Text text;
-	private string prevMsg;
+//	private string prevMsg;
 	// Use this for initialization
 	public GameObject nose, sink;
 	public int lengthOfLineRenderer = 20;
@@ -17,7 +17,7 @@ public class BigInfoText : MonoBehaviour
 	void Start ()
 	{
 		msg = "";
-		prevMsg = msg;
+//		prevMsg = msg;
 		text = GetComponent<Text> ();	
 //		StartCoroutine (MyRoutine (0.05f));
 

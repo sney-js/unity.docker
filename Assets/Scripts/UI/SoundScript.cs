@@ -10,7 +10,7 @@ public class SoundScript : MonoBehaviour
 	public AudioClip SuccessPost;
 	public AudioClip IntenseEscape;
 	public AudioClip SuccessTextIter;
-	private AudioClip UnPauseSound;
+//	private AudioClip UnPauseSound;
 	AudioSource t_audio;
 	AudioSource t_audio_single;
 	public bool isMainMenu;
@@ -26,6 +26,7 @@ public class SoundScript : MonoBehaviour
 		if (isMainMenu) {
 			float value = 0f;
 			value = (Camera.main.WorldToViewportPoint(player.position).x - 0.5f)*2f;
+			value = Mathf.Clamp(value,0f,0.7f);
 //			print ("VALUE: "+value);
 			Camera.main.GetComponent<AudioSource>().panStereo=value;
 		}
@@ -56,13 +57,13 @@ public class SoundScript : MonoBehaviour
 		} catch (System.Exception ex) {}
 	}
 
-	public static void UnPausePlay(float volume){
-		instance.t_audio_single.volume =volume;
-		instance.t_audio_single.pitch=1f;
-		instance.t_audio_single.clip = instance.UnPauseSound;
-		if (!instance.t_audio_single.isPlaying) instance.t_audio_single.Play();
-		if (volume<=0) instance.t_audio_single.Stop();
-	}
+//	public static void UnPausePlay(float volume){
+//		instance.t_audio_single.volume =volume;
+//		instance.t_audio_single.pitch=1f;
+////		instance.t_audio_single.clip = instance.UnPauseSound;
+//		if (!instance.t_audio_single.isPlaying) instance.t_audio_single.Play();
+//		if (volume<=0) instance.t_audio_single.Stop();
+//	}
 
 	public static void SuccessMusic(){
 

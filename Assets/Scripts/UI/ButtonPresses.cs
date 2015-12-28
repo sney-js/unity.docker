@@ -4,6 +4,7 @@ using System.Collections;
 
 public class ButtonPresses : MonoBehaviour
 {
+	#region Declarations
 
 	public static ButtonPresses Instance;
 	public GameObject optionsPanel;
@@ -27,10 +28,10 @@ public class ButtonPresses : MonoBehaviour
 	Image lightIndicator, dockIndicator;
 	private GameObject TabMenu;
 	bool StartScreenFade = false;
-	Sprite[] tutImages;
-	int currTut = 0;
-	int[] tutnums;
 	public bool GoToMainMenuNow = false;
+	int currTut = 0;
+	Sprite[] tutImages;
+	int[] tutnums;
 	GameObject tut;
 	GameObject player;
 	public static bool inTutorial;
@@ -45,7 +46,7 @@ public class ButtonPresses : MonoBehaviour
 		public float mouseSens = 0.5f;
 	}
 
-
+	#endregion
 
 	#region Mono Behaviour
 
@@ -53,7 +54,7 @@ public class ButtonPresses : MonoBehaviour
 	{
 		Instance = this;
 		QualityOptions = new OptionsDetails ();
-		new ScoreConnection ();
+//		new ScoreConnection ();
 
 		canvasObj = GameObject.Find ("Canvas").transform;
 		if (!isMainMenu) {
@@ -184,7 +185,7 @@ public class ButtonPresses : MonoBehaviour
 	{
 		yield return www;
 		// check for errors
-		string data = www.data;
+		string data = www.text;
 		bool successful = www.error == null && data != null && data != "";
 
 		Text vtext = Instance.optionsPanel.transform.FindChild ("About/Version").GetComponent<Text> ();
@@ -196,7 +197,7 @@ public class ButtonPresses : MonoBehaviour
 			if (successful) {
 
 				float remoteVersion = ScoreConnection.AboutStringParseVersion (data);
-				System.DateTime date = ScoreConnection.AboutStringParseTime (data);
+//				System.DateTime date = ScoreConnection.AboutStringParseTime (data);
 
 
 				Text updTxt = Instance.optionsPanel.transform.FindChild ("About/vtest").GetComponent<Text> ();
@@ -235,7 +236,7 @@ public class ButtonPresses : MonoBehaviour
 	//--------------------------------------------------------------------------------------------------------
 	#endregion
 
-	#region Tab Menu
+	#region Game Dialogs
 
 	public void ToggleTabPanel ()
 	{
@@ -251,10 +252,12 @@ public class ButtonPresses : MonoBehaviour
 			TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
 			Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
 			bool rev = anim.GetBool ("reverse");
-
+			
 			//hide
 			if (TabMenu.activeInHierarchy) {
-				Instance.StartCoroutine (AnimationScript.FadePanel (TabMenu, 0.1f));
+				Instance.StartCoroutine (AnimationScript.FadeOutPanel_Disable (TabMenu, 0.1f));
+				Instance.StartCoroutine (AnimationScript.FadeInPanel (
+					UI.gameObject.GetComponent<CanvasGroup>(), 1f, 0.1f));
 				if (!rev)
 					ToggleTabLeaderboard ();
 			} 
@@ -262,17 +265,14 @@ public class ButtonPresses : MonoBehaviour
 			else {
 				TabMenu.SetActive (true);
 				anim.enabled = false;
+				UI.gameObject.GetComponent<CanvasGroup>().alpha=0f;
 				//			if (rev) ToggleTabLeaderboard ();
 			}
-
+			
 			//		menuShowing = TabMenu.activeInHierarchy;
 			//		MoreOptionsPanel.gameObject.SetActive (false);
 		}
 	}
-
-	#endregion 
-
-	#region Game Dialogs
 
 	public void ToggleActionPanel ()
 	{
@@ -417,7 +417,7 @@ public class ButtonPresses : MonoBehaviour
 			//			PrintSettings ("INIT");
 			
 		} catch (System.Exception ex) { //ignore catch for now
-			print ("ERROR occurred retrieving settings");
+			print ("ERROR occurred retrieving settings \n"+ex);
 		} finally {
 			
 			//-----------

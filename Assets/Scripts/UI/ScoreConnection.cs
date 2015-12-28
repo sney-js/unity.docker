@@ -53,7 +53,7 @@ public class ScoreConnection : MonoBehaviour
 		yield return www;
 		
 		// check for errors
-		string data = www.data;
+		string data = www.text;
 		bool successful = www.error == null && data != null && data != "";
 		if (receiving == "displaying")
 			instance.DisplayResultsUI (data, successful);

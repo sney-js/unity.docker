@@ -4,7 +4,7 @@ using System.Collections;
 public class InfiniteStars : MonoBehaviour
 {
 
-	private Transform tx;
+//	private Transform tx;
 	private ParticleSystem.Particle[] points;
 	public bool Perlin=true;
 	public int seed = 100;
@@ -32,7 +32,7 @@ public class InfiniteStars : MonoBehaviour
 	{
 		total = 0;
 		if (seed!=-1)	Random.seed = seed;
-		tx = transform.parent.transform;
+//		tx = transform.parent.transform;
 		if (!Perlin)CreateStars();
 		else CreateStarsPerlin ();
 		GetComponent<ParticleSystem> ().SetParticles (points, points.Length);
@@ -63,7 +63,7 @@ public class InfiniteStars : MonoBehaviour
 			y -= sizeXY;
 			if (noise > prob && noiseParent > prob2) {
 
-				float cutpoint = ((1-prob)/2+prob); //0.7<0.85<1
+//				float cutpoint = ((1-prob)/2+prob); //0.7<0.85<1
 		
 				float dz = DepthZ;
 				dz = (1-(noise-prob));//*(2f-DepthZ);

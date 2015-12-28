@@ -5,7 +5,7 @@ public class GavityWell : MonoBehaviour {
 
 	public float StartingForce = 0.001f;
 //	private int totalObj;
-	private bool beingPulled = false;
+//	private bool beingPulled = false;
 	void Start ()
 	{
 

@@ -37,10 +37,39 @@ public class CameraScript : MonoBehaviour
 			StartCoroutine (DelaySnap (InitialDelayFollow));
 
 		DrawOutline (false);
-		StartCoroutine (DelayMusic ());
+		StartCoroutine (FadeInMusic ());
 	}
 
-	IEnumerator DelayMusic ()
+	void LateUpdate ()
+	{
+		panPos = transform.position;
+		
+		if (!ButtonPresses.menuShowing) {
+			if (snap & follow) {
+				Vector3 destination = target.position + offSet;
+				destination.z = panPos.z;
+				panPos = destination;				
+			}
+			SpringWell.PullNow = isOutOfBounds (target.position, 1);
+			
+			bool letPan = !GameEvents.LevelFail && !GameEvents.LevelSuccess;
+			if (letPan) {	
+				KeyFreePan ();
+				if (!keyWorking)
+					MouseDrag ();
+			}
+		}
+		if (FollowsBounds) {
+			adjustViewBounds ();
+		}
+		
+		transform.position = Vector3.SmoothDamp (transform.position, panPos, ref velocity, dampTime * Time.smoothDeltaTime);
+		
+	}
+
+	#region Initial Camera functions
+
+	IEnumerator FadeInMusic ()
 	{
 		AudioSource aud = gameObject.GetComponent<AudioSource> ();
 		float max = aud.volume;
@@ -52,6 +81,18 @@ public class CameraScript : MonoBehaviour
 			aud.volume = Mathf.Lerp (0, max, (Time.time - startTime) / overTime);
 			yield return null;
 		}
+	}
+
+	IEnumerator DelaySnap (float delay)
+	{
+		follow = false;
+		yield return new WaitForSeconds (delay);
+		follow = true;
+		float tempDamp = dampTime;
+		dampTime = 10f;
+		//		print ("Delay over. Follow true: "+follow);
+		yield return new WaitForSeconds (1f);
+		dampTime = tempDamp;
 	}
 
 	public void DrawOutline (bool inCircle)
@@ -80,7 +121,7 @@ public class CameraScript : MonoBehaviour
 			float[] XX = {maxX, minX}; // n/2%2=0 = max
 			float[] YY = {maxY, minY}; // n%2. 0=max
 			float r = 5;
-			float px = maxX, py = maxY - r;
+//			float px = maxX, py = maxY - r;
 
 			for (int i = 0; i < 9; i++) {
 
@@ -107,49 +148,13 @@ public class CameraScript : MonoBehaviour
 		}
 	}
 
-	// Update is called once per frame
-	void LateUpdate ()
-	{
-		panPos = transform.position;
+	#endregion
 
-		if (!ButtonPresses.menuShowing) {
-			if (snap & follow) {
-				Vector3 destination = target.position + offSet;
-				destination.z = panPos.z;
-				panPos = destination;				
-			}
-			SpringWell.PullNow = isOutOfBounds (target.position, 1);
+	#region Move Camera
 
-			bool letPan = !GameEvents.LevelFail && !GameEvents.LevelSuccess;
-			if (letPan) {	
-				KeyFreePan ();
-				if (!keyWorking)
-					MouseDrag ();
-			}
-		}
-		if (FollowsBounds) {
-			adjustViewBounds ();
-		}
-
-		transform.position = Vector3.SmoothDamp (transform.position, panPos, ref velocity, dampTime * Time.smoothDeltaTime);
-		
-	}
-	
-	IEnumerator DelaySnap (float delay)
-	{
-		follow = false;
-		yield return new WaitForSeconds (delay);
-		follow = true;
-		float tempDamp = dampTime;
-		dampTime = 10f;
-//		print ("Delay over. Follow true: "+follow);
-		yield return new WaitForSeconds (1f);
-		dampTime = tempDamp;
-	}
-	
 	void MouseDrag ()
 	{
-		float xval = 0, yval = 0;
+//		float xval = 0, yval = 0;
 		//--------------------------------------------ZOOM-----------------------------------//
 		float mouseThresh = Input.GetAxis ("Mouse ScrollWheel");
 		if (mouseThresh != 0)
@@ -283,6 +288,10 @@ public class CameraScript : MonoBehaviour
 		
 	}
 
+	#endregion
+
+	#region scale n rotation
+
 	void SetZoom (float direction, bool isKey)
 	{
 		float zoomamount = panPos.z;
@@ -304,7 +313,7 @@ public class CameraScript : MonoBehaviour
 	IEnumerator FixAngle ()
 	{
 		
-		print ("resetting...");
+//		print ("resetting...");
 		float startTime = Time.time;
 		while (Time.time < startTime + 1f) {
 			Vector3 rot = transform.eulerAngles;
@@ -326,8 +335,10 @@ public class CameraScript : MonoBehaviour
 		}
 	}
 
-	//--------------------------------------------ViewBound-----------------------------------//
-	
+	#endregion
+
+	#region Bound
+
 	void adjustViewBounds ()
 	{
 		panPos.x = Mathf.Clamp (panPos.x, sunAt != -1 ? sunAt : minX, maxX);
@@ -354,41 +365,6 @@ public class CameraScript : MonoBehaviour
 		return FollowsBounds && (pos.x > maxX * lim || pos.y > maxY * lim || pos.x < minX * lim || pos.y < minY * lim);
 	}
 
-	//--------------------------------------------Other-----------------------------------//
-	IEnumerator throwPan (float overTime)
-	{
-		float startTime = Time.time;
-		bool stop = false;
-		while (Time.time < startTime + overTime) {
-			dampTime = 10f;
-		
-			if (PanStarted || snap) {
-				stop = true;
-				break;
-			}
-//			if (Mathf.Approximately(pX,0f) && Mathf.Approximately(pY, 0f)) {
-//				pX = 0f;
-//				pY = 0f;
-//				break;
-//			}
-//			Vector3 temp = Vector3.zero;
-//			temp.x = Mathf.SmoothStep (pX, 0f, (Time.time - startTime) / overTime);
-//			temp.y = Mathf.SmoothStep (pY, 0f, (Time.time - startTime) / overTime);
-//			print ("Time did:" + (Time.time - startTime) + " ::pX=" + pX);
-//			EasePan(temp);
-
-//			dampTime-=0.2f;
-//			print("red damp+"+dampTime);
-			yield return null;
-		}
-	
-		print ("CAME OUT");
-		if (!PanStarted) {
-			dampTime = 3f;
-			snap = true;
-		}
-	}
-
 	public static Bounds getBounds (Camera camera)
 	{
 		float screenAspect = (float)Screen.width / (float)Screen.height;
@@ -398,5 +374,7 @@ public class CameraScript : MonoBehaviour
 			new Vector3 (cameraHeight * screenAspect, cameraHeight, 0));
 		return bounds;
 	}
+
+	#endregion
 	
 }

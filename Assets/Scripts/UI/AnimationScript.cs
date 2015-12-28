@@ -11,7 +11,7 @@ public class AnimationScript : MonoBehaviour
 	public static Transform myCanvas;
 	public static float BestTime;
 
-	public static IEnumerator FadePanel (GameObject obj, float overTime)
+	public static IEnumerator FadeOutPanel_Disable (GameObject obj, float overTime)
 	{
 		float startTime = Time.time;
 		
@@ -57,7 +57,7 @@ public class AnimationScript : MonoBehaviour
 		}
 
 		float startTime = Time.time;
-		Vector3 vel  = Vector3.zero;
+//		Vector3 vel  = Vector3.zero;
 		while (Time.time < startTime + overTime) {
 			for (int i = 0; i < childCount; i++) {
 				Transform child = parent.transform.GetChild (i).transform;
@@ -74,7 +74,7 @@ public class AnimationScript : MonoBehaviour
 	{
 		yield return new WaitForSeconds (delay);
 		Vector3 curr = obj.transform.position;
-		Vector3 vel = Vector3.zero;
+//		Vector3 vel = Vector3.zero;
 		Rigidbody2D rigid = obj.GetComponent<Rigidbody2D>();
 		if (rigid!=null){
 			print("RIGID RESET");
@@ -111,7 +111,7 @@ public class AnimationScript : MonoBehaviour
 	{
 		yield return new WaitForSeconds (delay);
 		Vector3 curr = obj.transform.localEulerAngles;
-		Vector3 vel = Vector3.zero;
+//		Vector3 vel = Vector3.zero;
 		float startTime = Time.time;
 		while (Time.time < startTime + overTime) {
 //			obj.transform.localEulerAngles = Vector3.Lerp (curr, newVal, (Time.time - startTime) / overTime);
@@ -121,6 +121,17 @@ public class AnimationScript : MonoBehaviour
 			obj.transform.localEulerAngles = new Vector3(newVal.x, newVal.y, zz);
 			yield return null;
 		}
+	}
+	
+	public static IEnumerator FadeInPanel (CanvasGroup overlay, float toAlpha, float overTime)
+	{
+		float startTime = Time.time;
+		while (Time.time < startTime + overTime) {
+			overlay	.alpha = Mathf.Lerp (0f, toAlpha, (Time.time - startTime) / overTime);
+			yield return null;
+		}
+		overlay.interactable = true;
+		overlay.blocksRaycasts = true;
 	}
 
 	public static IEnumerator FadeOutPanel (CanvasGroup overlay, float overTime)
@@ -169,8 +180,8 @@ public class AnimationScript : MonoBehaviour
 
 	public static IEnumerator NudgeUI (GameObject obj, float endTime, float scaleFactor)
 	{
-		float max = 75f;
-		float min = 65f;
+//		float max = 75f;
+//		float min = 65f;
 		yield return new WaitForEndOfFrame ();
 		float startTime = Time.time;
 		float overTime = 0.1f;
@@ -223,7 +234,6 @@ public class AnimationScript : MonoBehaviour
 
 	public static IEnumerator LevelFailed (int msgID)
 	{
-		float overTime = 1f;
 		float FlashTime = 0.3f;
 
 		CanvasGroup overlay = GameObject.Find ("Canvas").transform.FindChild ("GameOverImage").GetComponent<CanvasGroup> ();
@@ -236,8 +246,6 @@ public class AnimationScript : MonoBehaviour
 		moreAlphaC += 0.5f;
 		normC = 0.3f;
 
-		float myDeltaTime = Time.deltaTime; 
-		float speed = 4f;
 		while (Time.time < startTime + FlashTime) {
 			overlay	.alpha = Mathf.Lerp (moreAlphaC, normC, (Time.time - startTime) / FlashTime);
 			yield return null;

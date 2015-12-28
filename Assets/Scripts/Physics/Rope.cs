@@ -15,7 +15,7 @@ public class Rope : MonoBehaviour
 	}
 
 	void LateUpdate(){
-		Vector3 mPos = transform.position;
+//		Vector3 mPos = transform.position;
 		Vector3 loc = Player.transform.position;
 
 //		lr.SetVertexCount (size+1);
@@ -40,7 +40,7 @@ public class Rope : MonoBehaviour
 
 	IEnumerator DrawLineDamp (float waitTime)
 	{
-		float startTime = Time.time;
+//		float startTime = Time.time;
 		while (true) {
 			for (int i = 1; i < size; i++) {
 				DrawLine(i);

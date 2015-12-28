@@ -6,7 +6,7 @@ public class TinyGravity : MonoBehaviour
 
 	public float StartingForce = 0.001f;
 	private int totalObj;
-	private bool beingPulled = false;
+//	private bool beingPulled = false;
 	public ParticleSystem burnAnimation;
 	public bool StartAtAwake=true;
 	public GameObject BurnDemParent;

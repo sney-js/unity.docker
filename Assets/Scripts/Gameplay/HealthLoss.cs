@@ -16,13 +16,13 @@ public class HealthLoss : MonoBehaviour
 	public bool showOnSlider = false;
 	private float health;
 	private bool prevShowonSlider = false;
-	private Image DamageOverlay;
+//	private Image DamageOverlay;
 	public bool loseHealth = true;
 
 	void Start ()
 	{ 
 		healthSlider = GameObject.Find("Canvas/UI/Health/HealthSlider").GetComponent<Slider>();
-		DamageOverlay = GameObject.Find("Canvas/DamageImage").gameObject.GetComponent<Image>();
+//		DamageOverlay = GameObject.Find("Canvas/DamageImage").gameObject.GetComponent<Image>();
 		health = durability;
 		if (showOnSlider & gameObject.name == "Player") {
 			GameEvents.HealthReading = health;
@@ -62,8 +62,8 @@ public class HealthLoss : MonoBehaviour
 
 	void ReduceHealth(float amount){
 
-		float ratio = durability/healthBars +0.01f;
-		float reduceBy = ratio*((int) (amount/ratio))+ratio;
+//		float ratio = durability/healthBars +0.01f;
+//		float reduceBy = ratio*((int) (amount/ratio))+ratio;
 //		Debug.Log ("Health [" + gameObject.name + "] = " + amount+ ":NORM: "+reduceBy);
 		if (showOnSlider && //amount>0.8f &&
 		    !GameEvents.LevelFail && !GameEvents.LevelSuccess) {
@@ -79,7 +79,7 @@ public class HealthLoss : MonoBehaviour
 //			StartCoroutine(CameraShaker.Instance.MyShake(amount, Mathf.Pow(amount, 1f/3f)));
 			float norm = Mathf.Abs (Mathf.Log(amount*2f)*2f);
 			norm = norm/3f;
-			float timeNorm = norm / 1.5f;
+//			float timeNorm = norm / 1.5f;
 //			print("amount="+amount+" ,norm:"+norm+ " ,timeNorm="+timeNorm);
 			CameraShaker.Instance.ShakeOnce(norm, 2f, 0.1f, Mathf.Clamp(norm, 0.5f, 1.5f));
 		}

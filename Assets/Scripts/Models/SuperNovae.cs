@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class SuperNovae : MonoBehaviour {
-	private Transform tx;
+//	private Transform tx;
 	private ParticleSystem.Particle[] points;
 	public bool Perlin=true;
 	public int seed = 100;
@@ -51,7 +51,7 @@ public class SuperNovae : MonoBehaviour {
 	{
 		total = 0;
 		Random.seed = seed==-1?Random.Range(0,100):seed;
-		tx = transform.parent.transform;
+//		tx = transform.parent.transform;
 		points = new ParticleSystem.Particle[starsMax];
 		int i = 0;
 		//print(cols[currColor].r);
