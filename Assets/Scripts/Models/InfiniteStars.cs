@@ -6,36 +6,48 @@ public class InfiniteStars : MonoBehaviour
 
 //	private Transform tx;
 	private ParticleSystem.Particle[] points;
-	public bool Perlin=true;
+	public bool Perlin = true;
 	public int seed = 100;
 	public int starsMax = 1000;
 	public float starSize = 5;
 	[Range(1f,5f)]
-	public float StarSizeNoise = 2f;
+	public float
+		StarSizeNoise = 2f;
 	public float sizeXY = 5f;
 	public float sizeZ = 600f;
-	[Range(1f,2f)]
-	public float DepthZ = 2f;
+	[Range(1f,5f)]
+	public float
+		DepthZ = 2f;
 	private int total;
 	[Range(0,0.95f)]
-	public float prob = 0.75f;
+	public float
+		prob = 0.75f;
 	[Range(0,0.95f)]
-	public float prob2 = 0.75f;
+	public float
+		prob2 = 0.75f;
 	[Range(0.00001f, 0.1f)]
-	public float zoom = 0.1f; // play with this to zoom into the noise field
+	public float
+		zoom = 0.1f; // play with this to zoom into the noise field
 	[Range(0.00001f, 0.1f)]
-	public float zoom2 = 0.002f; // play with this to zoom into the noise field
+	public float
+		zoom2 = 0.002f; // play with this to zoom into the noise field
+	public bool RandomColors = false;
 	public bool createNow = false;
 //	public Gradient gradient;
 
 	void Start ()
 	{
 		total = 0;
-		if (seed!=-1)	Random.seed = seed;
+		if (seed != -1)
+			Random.seed = seed;
 //		tx = transform.parent.transform;
-		if (!Perlin)CreateStars();
-		else CreateStarsPerlin ();
+		if (!Perlin)
+			CreateStars ();
+		else
+			CreateStarsPerlin ();
 		GetComponent<ParticleSystem> ().SetParticles (points, points.Length);
+//		GetComponent<ParticleSystem> ().startSpeed = GetComponent<ParticleSystem> ().startSpeed;
+
 	}
 	
 	//--------------------------------------------------------------------
@@ -66,18 +78,17 @@ public class InfiniteStars : MonoBehaviour
 //				float cutpoint = ((1-prob)/2+prob); //0.7<0.85<1
 		
 				float dz = DepthZ;
-				dz = (1-(noise-prob));//*(2f-DepthZ);
+				dz = (1 - (noise - prob));//*(2f-DepthZ);
 //				else dz = (1+(cutpoint-noise))*DepthZ;
 
 //				if (Random.value>0.5){
 //					dz=dz>1?1-(dz-1):1+(1-dz);
 //				}
-				dz = (Mathf.Clamp(dz, 2f-DepthZ, DepthZ));
-				float z = sizeZ*dz;
+				dz = (Mathf.Clamp (dz, 2f - DepthZ, DepthZ));
+				float z = sizeZ * dz;
 				AddParticle (new Vector3 (x, y, z));
 				i++;
-			}
-			else if (Random.value>0.95f){
+			} else if (Random.value > 0.95f) {
 				float z = sizeZ;
 				AddParticle (new Vector3 (x, y, z));
 				i++;
@@ -90,20 +101,29 @@ public class InfiniteStars : MonoBehaviour
 	{
 		int i = total;
 		points [i].position = pos;
-		points [i].color = GetComponent<ParticleSystem> ().startColor;//getRandomColor();
+		points [i].color = RandomColors?getRandomColor():GetComponent<ParticleSystem> ().startColor;//getRandomColor();
 		points [i].rotation = GetComponent<ParticleSystem> ().startRotation;
+//		points [i].velocity = GetComponent<ParticleSystem> ().startSpeed;
 //		float size = starSize * Random.Range (1f, StarSizeNoise);
 
-		float rando = Random.Range(0.5f, 1f+StarSizeNoise/5f);//Range (1f, StarSizeNoise/5f+1f);
-		if (Random.value>0.98f){
+		float rando = Random.Range (0.5f, 1f + StarSizeNoise / 5f);//Range (1f, StarSizeNoise/5f+1f);
+		if (Random.value > 0.98f) {
 			rando = Random.Range (rando, StarSizeNoise);
 //			if (Random.value>0.6f) rando = StarSizeNoise*3f;
 		}
 
-		points [i].size = starSize*rando;
+		points [i].size = starSize * rando;
+//		Vector3 vel = Vector3.zero;
+////		if (Random.value > 0.1f) {
+//			vel.x = Random.Range (1000f, 10000f);
+//			vel.y = Random.Range (1000f, 10000f);
+////		}
+//		points [i].velocity = vel;
 		total++;
 	}
+
 	//----------------------------------------------------------------------------
+
 	private void CreateStars ()
 	{
 		points = new ParticleSystem.Particle[starsMax];
@@ -112,7 +132,7 @@ public class InfiniteStars : MonoBehaviour
 //			points[i].position = Random.insideUnitSphere.normalized * starDistance + tx.position;;//GetRandomPos();
 			Vector3 pos = GetRandomPos ();
 			if (pos != Vector3.one) {
-				AddParticle(pos);
+				AddParticle (pos);
 				i++;
 			}
 		}
@@ -144,8 +164,8 @@ public class InfiniteStars : MonoBehaviour
 //		else
 //			tmp = new Vector3(Random.Range(-1400f,1400f),Random.Range(-1700f,1700f),Random.Range(200f,255f));
 
-					float vz = Random.Range (sizeZ, sizeZ * DepthZ);
-					return new Vector3 (randX, randY, vz);
+		float vz = Random.Range (sizeZ, sizeZ * DepthZ);
+		return new Vector3 (randX, randY, vz);
 
 	}
 
@@ -153,23 +173,23 @@ public class InfiniteStars : MonoBehaviour
 	{
 		Color cl = new Color (1, 1, 1, 1);
 		if (Random.value > 0.3) {
-			cl.r = 1.0f;
-			cl.b = 1.0f;
-			cl.g = 1.0f;
+			cl.r = 0.8f;
+			cl.b = 0.8f;
+			cl.g = 0.8f;
 			return cl;
 		}
 
 		cl.b = Random.Range (0.4f, 1.0f);
 
 		if (cl.b >= 0.7f) {
-			cl.r = Random.Range (0.7f, 0.8f);
-			cl.g = Random.Range (0.7f, 0.8f);
+			cl.r = Random.Range (0.5f, 0.8f);
+			cl.g = Random.Range (0.5f, 0.8f);
 		} else if (cl.b < 0.7f) {
-			cl.b = Random.Range (0.7f, 0.9f);
+			cl.b = Random.Range (0.5f, 0.9f);
 			cl.r = Random.Range (0.8f, 1.0f);
-			cl.g = Random.Range (0.6f, 0.9f);
+			cl.g = Random.Range (0.5f, 0.9f);
 		}
-
+//		cl.a = Random.value/2f;
 		return cl;
 	}
 	

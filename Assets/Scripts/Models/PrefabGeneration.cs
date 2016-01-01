@@ -132,6 +132,10 @@ public class PrefabGeneration : MonoBehaviour
 				if (Random.value < ProbVel) {
 					vel *= Random.Range (6f, 12f);
 				}
+				if (myRock.GetComponent<Rigidbody2D>()==null){
+					myRock.AddComponent<Rigidbody2D> ();
+					myRock.GetComponent<Rigidbody2D> ().mass = 0.1f;
+				}
 				myRock.GetComponent<Rigidbody2D> ().velocity = vel;
 			}
 		}

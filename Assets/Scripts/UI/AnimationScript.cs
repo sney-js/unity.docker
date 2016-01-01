@@ -77,7 +77,7 @@ public class AnimationScript : MonoBehaviour
 //		Vector3 vel = Vector3.zero;
 		Rigidbody2D rigid = obj.GetComponent<Rigidbody2D>();
 		if (rigid!=null){
-			print("RIGID RESET");
+//			print("RIGID RESET");
 			rigid.velocity=Vector2.zero;
 			rigid.angularVelocity = 0f;
 		}
@@ -149,8 +149,10 @@ public class AnimationScript : MonoBehaviour
 
 	public static IEnumerator FlashScreen (Image overlay, float overTime, int color, string str)
 	{
+		if (ButtonPresses.isMainMenu) yield break;
 		if (overlay == null)
 			overlay = GameObject.Find ("Canvas/DamageImage").gameObject.GetComponent<Image> ();
+
 		Text info = overlay.transform.FindChild ("Text").GetComponent<Text> ();
 		info.text = str == null ? "" : str;
 
@@ -192,7 +194,7 @@ public class AnimationScript : MonoBehaviour
 			obj.transform.localScale = Vector3.Lerp (defScale, scaleTo, (Time.time - startTime) / overTime);
 			yield return null;
 		}
-		print ("Scale set" + obj.transform.localScale);
+//		print ("Scale set" + obj.transform.localScale);
 		startTime = Time.time;
 //		endTime = 0.3f;
 		while (Time.time < startTime + overTime) {

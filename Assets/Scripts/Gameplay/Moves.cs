@@ -70,7 +70,7 @@ public class Moves : MonoBehaviour
 	{
 		if (Input.GetKeyUp (KeyCode.X)) {
 			stabilizeOn = !stabilizeOn;
-			print ("X key up!!! " + stabilizeOn);
+//			print ("X key up!!! " + stabilizeOn);
 			
 			StartCoroutine (AnimationScript.FlashScreen (null, 1.5f, 2, "Stabilisation " + (stabilizeOn ? "On" : "Off")));
 		}

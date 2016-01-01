@@ -17,7 +17,7 @@ public class ButtonPresses : MonoBehaviour
 	private Slider t_mouse;
 	private int t_qualityLevel;
 	public bool NoPause = false;
-	public bool isMainMenu = false;
+	public static bool isMainMenu = false;
 	private Transform UI;
 	private GameObject helptip;
 	public bool FlagHelpTip = false;
@@ -57,6 +57,7 @@ public class ButtonPresses : MonoBehaviour
 //		new ScoreConnection ();
 
 		canvasObj = GameObject.Find ("Canvas").transform;
+		isMainMenu=Application.loadedLevel==0;
 		if (!isMainMenu) {
 			Instance.lightIndicator = canvasObj.FindChild ("UI/Other/LightIndicator/Image").gameObject.GetComponent<Image> ();
 			Instance.dockIndicator = canvasObj.FindChild ("UI/Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
@@ -339,8 +340,10 @@ public class ButtonPresses : MonoBehaviour
 	{
 		
 		ShortCutDialog.SetActive (true);
-		Animator anim = ShortCutDialog.GetComponent<Animator> ();
-		anim.enabled = true;
+		if (!isMainMenu){
+			Animator anim = ShortCutDialog.GetComponent<Animator> ();
+			anim.enabled = true;
+		}
 	}
 	
 	public void hideShortcutDialog ()
@@ -626,7 +629,9 @@ public class ButtonPresses : MonoBehaviour
 	{
 		GameObject tut0 = Instance.canvasObj.transform.FindChild ("Tutorial0").gameObject;
 		tut0.SetActive (false);
-
+//		if (GameManager.Run1)
+//		Invoke("ShowHelpTips", 0.5f);
+//		ShowHelpTips();
 	}
 
 	void SetUpTutorial ()
@@ -684,64 +689,39 @@ public class ButtonPresses : MonoBehaviour
 //		GameEvents.PlayerFuelUnlimited(true);
 //		DimFuel(true);
 		//----------1
-		float startTime = 0;
-		while (!GameEvents.LevelFail) {
-			if (Input.GetKey (KeyCode.W)) {
-				if (startTime == 0)
-					startTime = Time.time;
-			}
-			if (startTime > 0 && Time.time - startTime > 1f)
-				break;
+		while (!Input.GetKey (KeyCode.W))
 			yield return new WaitForEndOfFrame ();
-		}
+
 		//-----------2
+		yield return new WaitForSeconds (1.5f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let Go", ttime));
 		yield return new WaitForSeconds (2.5f);
 //		/*
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold S to accelerate backwards", ttime));
-		startTime = 0;
-		while (!GameEvents.LevelFail) {
-			if (Input.GetKey (KeyCode.S)) {
-				if (startTime == 0)
-					startTime = Time.time;
-			}
-			if (startTime > 0 && Time.time - startTime > 1f)
-				break;
+		while (!Input.GetKey (KeyCode.S))
 			yield return new WaitForEndOfFrame ();
-		}
+		yield return new WaitForSeconds (1.5f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let Go", ttime));
 		yield return new WaitForSeconds (2.5f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold A to accelerate left\n and D to accelerate right", ttime));
-		yield return new WaitForSeconds (5f);
+		while (!Input.GetKey (KeyCode.A) && !Input.GetKey (KeyCode.D))
+			yield return new WaitForEndOfFrame ();
+		yield return new WaitForSeconds (2f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Going good. Now lets learn to rotate...", ttime));
 		yield return new WaitForSeconds (3f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold Q to rotate left", ttime));
-		startTime = 0;
-		while (!GameEvents.LevelFail) {
-			if (Input.GetKey (KeyCode.Q)) {
-				if (startTime == 0)
-					startTime = Time.time;
-			}
-			if (startTime > 0 && Time.time - startTime > 2f)
-				break;
+		while (!Input.GetKey (KeyCode.Q))
 			yield return new WaitForEndOfFrame ();
-		}
+		yield return new WaitForSeconds (2f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold E to rotate right", ttime));
-		startTime = 0;
-		while (!GameEvents.LevelFail) {
-			if (Input.GetKey (KeyCode.E)) {
-				if (startTime == 0)
-					startTime = Time.time;
-			}
-			if (startTime > 0 && Time.time - startTime > 2f)
-				break;
+		while (!Input.GetKey (KeyCode.E))
 			yield return new WaitForEndOfFrame ();
-		}
+		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "You're a natural!", ttime));
 		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "That's all from maneuvering!", ttime));
@@ -752,16 +732,8 @@ public class ButtonPresses : MonoBehaviour
 			"Click and Drag mouse to pan camera around\n" +
 			"Use mouse scroll to zoom in and out\n\n" +
 			"When you are ready to proceed, press ENTER.", ttime));
-		startTime = 0;
-		while (!GameEvents.LevelFail) {
-			if (Input.GetKey (KeyCode.Return)) {
-				if (startTime == 0)
-					startTime = Time.time;
-			}
-			if (startTime > 0 && Time.time - startTime > 0.2f)
-				break;
+		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
-		}
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Great!", ttime));
 		yield return new WaitForSeconds (2f);
@@ -785,9 +757,10 @@ public class ButtonPresses : MonoBehaviour
 		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "One more thing...", ttime));
 		yield return new WaitForSeconds (3f);
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Stabilisers assist beginners by automatically bringing them down to a stop\n" +
-			"For best experience, the stabilisers are turned off by default for future levels\n\n" +
-			"Press X to disable/enable stabilisers\n", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, 
+		    "Stabilisers assist beginners by automatically bringing them down to a stop\n" +
+			"For best experience, the stabilisers are turned off by default in future levels\n\n" +
+			"Press X to disable stabilisers\n", ttime));
 		while (!Input.GetKey (KeyCode.X))
 			yield return new WaitForEndOfFrame ();
 		//----------kk
@@ -801,15 +774,15 @@ public class ButtonPresses : MonoBehaviour
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
-		yield return new WaitForSeconds (3f);
+		yield return new WaitForSeconds (1.5f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
-			"1. Dock\n2. Score 10 (Collect orbs)\n3. Dock in less than 15 seconds\n\n" +
+			"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
 			"If you complete all 3 objectives, you get a gold medal\n" + 
 			"When you have a gold medal, you can add your best time on the online leaderboard (right)\n\n" +
-			"Press ENTER to proceed", ttime));
-		while (!Input.GetKey (KeyCode.Return))
+			"Press TAB again to proceed", ttime));
+		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
-		ToggleTabPanel ();
+//		ToggleTabPanel ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "That's it for now...", ttime));
 		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let's Dock...", ttime));
@@ -841,21 +814,21 @@ public class ButtonPresses : MonoBehaviour
 			yield return new WaitForEndOfFrame ();
 		}
 		//-----------3
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Wow!", ttime));
-		yield return new WaitForSeconds (3f);
+//		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Wow!", ttime));
+//		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Congratulations. You have finished your training...\n\n"+
 		                                                     "If you'd like to play around more, You can press F to undock\n" +
-		                                                     "When you feel ready, press ENTER to end this tutorial and begin your journey!", ttime));
+		                                                     "Whenever you feel ready, press SPACE BAR to start Level 1!", ttime));
 
-		while (!GameEvents.LevelFail && !Input.GetKey (KeyCode.Return)) {
+		while (!Input.GetKey (KeyCode.F) && !Input.GetKey (KeyCode.Return)) {
 			yield return new WaitForEndOfFrame ();
 		}
-
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Brilliant!", ttime));
-		yield return new WaitForSeconds (3f);
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Here we go!", ttime));
-		yield return new WaitForSeconds (3f);
-		GameEvents.RestartLevel ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
+//		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Brilliant!", ttime));
+//		yield return new WaitForSeconds (3f);
+//		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Here we go!", ttime));
+//		yield return new WaitForSeconds (3f);
+//		GameEvents.RestartLevel ();
 //		GameEvents.PlayerFuelUnlimited(false);
 //		DimFuel(false);
 	}
