@@ -11,20 +11,6 @@ public class AnimationScript : MonoBehaviour
 	public static Transform myCanvas;
 	public static float BestTime;
 
-	public static IEnumerator FadeOutPanel_Disable (GameObject obj, float overTime)
-	{
-		float startTime = Time.time;
-		
-		CanvasGroup cg = obj.GetComponent<CanvasGroup> ();
-		cg.alpha = 0.99f;
-		while (Time.time < startTime + overTime) {
-			if (cg.alpha == 1f)
-				break;
-			cg.alpha = Mathf.SmoothStep (0.99f, 0f, (Time.time - startTime) / overTime);
-			yield return null;
-		}
-		obj.SetActive (false);
-	}
 
 
 	public static IEnumerator ChangeText (Text text, string str, float overTime)
@@ -48,7 +34,7 @@ public class AnimationScript : MonoBehaviour
 
 	public static IEnumerator AnimatePrefabPos (GameObject parent, float factor, float overTime, float delay)
 	{
-		yield return new WaitForSeconds(delay);
+		yield return new WaitForSeconds (delay);
 		int childCount = parent.transform.childCount;
 		Vector3[] positions = new Vector3[childCount];
 		for (int i = 0; i < childCount; i++) {
@@ -75,10 +61,10 @@ public class AnimationScript : MonoBehaviour
 		yield return new WaitForSeconds (delay);
 		Vector3 curr = obj.transform.position;
 //		Vector3 vel = Vector3.zero;
-		Rigidbody2D rigid = obj.GetComponent<Rigidbody2D>();
-		if (rigid!=null){
+		Rigidbody2D rigid = obj.GetComponent<Rigidbody2D> ();
+		if (rigid != null) {
 //			print("RIGID RESET");
-			rigid.velocity=Vector2.zero;
+			rigid.velocity = Vector2.zero;
 			rigid.angularVelocity = 0f;
 		}
 //		vel.x = obj.GetComponent<Rigidbody2D>().velocity.x;
@@ -86,7 +72,7 @@ public class AnimationScript : MonoBehaviour
 		float startTime = Time.time;
 		while (Time.time < startTime + overTime) {
 			float t = (Time.time - startTime) / overTime;
-			t = t*t*t * (t * (6f*t - 15f) + 10f);
+			t = t * t * t * (t * (6f * t - 15f) + 10f);
 			obj.transform.position = Vector3.Lerp (curr, newVal, t);
 			yield return null;
 		}
@@ -99,7 +85,7 @@ public class AnimationScript : MonoBehaviour
 		float startTime = Time.time;
 		while (Time.time < startTime + overTime) {
 			float t = (Time.time - startTime) / overTime;
-			t = t*t*t * (t * (6f*t - 15f) + 10f);
+			t = t * t * t * (t * (6f * t - 15f) + 10f);
 			Vector3 newV = obj.transform.position;
 			newV.z = Mathf.Lerp (curr, newVal, t);
 			obj.transform.position = newV;
@@ -116,22 +102,55 @@ public class AnimationScript : MonoBehaviour
 		while (Time.time < startTime + overTime) {
 //			obj.transform.localEulerAngles = Vector3.Lerp (curr, newVal, (Time.time - startTime) / overTime);
 			float t = (Time.time - startTime) / overTime;
-			t = t*t*t * (t * (6f*t - 15f) + 10f);
+			t = t * t * t * (t * (6f * t - 15f) + 10f);
 			float zz = Mathf.LerpAngle (curr.z, newVal.z, t);
-			obj.transform.localEulerAngles = new Vector3(newVal.x, newVal.y, zz);
+			obj.transform.localEulerAngles = new Vector3 (newVal.x, newVal.y, zz);
 			yield return null;
 		}
 	}
 	
-	public static IEnumerator FadeInPanel (CanvasGroup overlay, float toAlpha, float overTime)
+	public static IEnumerator FadeInPanel_Enable (GameObject obj, float toAlpha, float overTime, bool enableIB)
 	{
+			
+		CanvasGroup overlay = obj.GetComponent<CanvasGroup> ();
+		if (overlay == null) {
+			obj.AddComponent<CanvasGroup>();
+			overlay = obj.GetComponent<CanvasGroup> ();
+		}
+		overlay	.alpha = 0f;
+		obj.SetActive (true);
 		float startTime = Time.time;
 		while (Time.time < startTime + overTime) {
-			overlay	.alpha = Mathf.Lerp (0f, toAlpha, (Time.time - startTime) / overTime);
+			float t = (Time.time - startTime) / overTime;
+			t = Mathf.Sin(t * Mathf.PI * 0.5f);
+			overlay	.alpha = Mathf.Lerp (0f, toAlpha, t);
 			yield return null;
 		}
-		overlay.interactable = true;
-		overlay.blocksRaycasts = true;
+		if (enableIB) {
+			overlay.interactable = true;
+			overlay.blocksRaycasts = true;
+		}
+		overlay.alpha=1f;
+//		yield break;
+	}
+	//https://chicounity3d.wordpress.com/2014/05/23/how-to-lerp-like-a-pro/
+	public static IEnumerator FadeOutPanel_Disable (GameObject obj, float overTime)
+	{
+		CanvasGroup cg = obj.GetComponent<CanvasGroup> ();
+		if (cg == null) {
+			obj.AddComponent<CanvasGroup>();
+			cg = obj.GetComponent<CanvasGroup> ();
+		}
+		cg.alpha = 1.0f;
+		float startTime = Time.time;
+		while (Time.time < startTime + overTime) {
+			float t = (Time.time - startTime) / overTime;
+			t = Mathf.Sin(t * Mathf.PI * 0.5f);
+			cg.alpha = Mathf.Lerp (1.0f, 0f, t);
+			yield return null;
+		}
+		obj.SetActive (false);
+//		yield break;
 	}
 
 	public static IEnumerator FadeOutPanel (CanvasGroup overlay, float overTime)
@@ -149,7 +168,8 @@ public class AnimationScript : MonoBehaviour
 
 	public static IEnumerator FlashScreen (Image overlay, float overTime, int color, string str)
 	{
-		if (ButtonPresses.isMainMenu) yield break;
+		if (ButtonPresses.isMainMenu)
+			yield break;
 		if (overlay == null)
 			overlay = GameObject.Find ("Canvas/DamageImage").gameObject.GetComponent<Image> ();
 

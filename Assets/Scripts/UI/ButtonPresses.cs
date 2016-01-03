@@ -7,35 +7,21 @@ public class ButtonPresses : MonoBehaviour
 	#region Declarations
 
 	public static ButtonPresses Instance;
-	public GameObject optionsPanel;
-	public static bool menuShowing;
-	OptionsDetails QualityOptions, OptionsSaved;
-	private GameObject MoreOptionsPanel;
+	public static bool menuShowing=false,isMainMenu = false,inTutorial=false,FromOptionsLeaderboard = false;
+
+	private OptionsDetails QualityOptions, OptionsSaved;
 	private Text QualityText;
-	private GameObject ShortCutDialog;
 	private Toggle t_antialias, t_bloom, t_grain, t_shadow;
 	private Slider t_mouse;
 	private int t_qualityLevel;
-	public bool NoPause = false;
-	public static bool isMainMenu = false;
-	private Transform UI;
-	private GameObject helptip;
-	public bool FlagHelpTip = false;
-	private Transform successObjTarget;
-	private Transform canvasObj;
-	public Sprite[] headlights;
-	public Sprite[] CriteriaBox1Sprites;
-	Image lightIndicator, dockIndicator;
-	private GameObject TabMenu;
-	bool StartScreenFade = false;
-	public bool GoToMainMenuNow = false;
-	int currTut = 0;
-	Sprite[] tutImages;
-	int[] tutnums;
-	GameObject tut;
-	GameObject player;
-	public static bool inTutorial;
-	public static bool FromOptionsLeaderboard = false;
+	public bool NoPause = false,StartScreenFade = false, GoToMainMenuNow = false;
+
+	private GameObject MoreOptionsPanel, optionsPanel, helptip, TabMenu,ShortCutDialog, tutDialog, player;
+	private Transform successObjTarget, canvasObj,UI;
+
+	public Sprite[] headlights, CriteriaBox1Sprites;
+	private Image lightIndicator, dockIndicator;
+	private float ttime=0.35f;
 
 //	[System.Serializable]
 	public class OptionsDetails
@@ -67,19 +53,16 @@ public class ButtonPresses : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		inTutorial = false;
-		menuShowing = optionsPanel.activeInHierarchy;
-
-		MoreOptionsPanel = optionsPanel.transform.Find ("MoreOptions").gameObject;
+		optionsPanel = canvasObj.transform.FindChild ("OptionsPanel").gameObject;
+		MoreOptionsPanel = optionsPanel.transform.FindChild ("MoreOptions").gameObject;
 		ShortCutDialog = optionsPanel.transform.FindChild ("ShortcutDialog").gameObject;
 		UI = canvasObj.FindChild ("UI").transform;
 		successObjTarget = canvasObj.FindChild ("GameSuccessImage/OnlineScoreDisplay/Panel");
 		player = GameObject.Find ("Player").gameObject;
-		//-----------icons-------------------------
 		helptip = canvasObj.FindChild ("HelpTip").gameObject;
-		if (Application.loadedLevel == 1 && FlagHelpTip && GameManager.Run1) {          
-			ShowHelpTips ();
-		}
+		//------------------------------------
+		inTutorial = false;
+		menuShowing = false;
 
 		initSettings ();
 
@@ -110,12 +93,16 @@ public class ButtonPresses : MonoBehaviour
 			FromOptionsLeaderboard = true;
 			initialiseCriteriaIcons (true);
 			ToggleDateRangeClicksOptions (2);
-			canvasObj.FindChild ("Tutorial0").gameObject.SetActive ((Application.loadedLevel == 1));
 
+			Transform tut0 = canvasObj.FindChild ("Tutorial0");
+			tutDialog = tut0.FindChild ("Dialog").gameObject;
+			tut0.gameObject.SetActive ((Application.loadedLevel == 1));
 			//-------sucess menus
 			int lev = Application.loadedLevel;
-			if (lev == 1)
+			if (lev == 1){
 				canvasObj.FindChild ("GameSuccessImage/TopBar/PrevLevel").gameObject.GetComponent<Button> ().interactable = false;
+				tut0.FindChild ("Dialog/No").gameObject.GetComponent<Button>().Select();
+			}
 //			else if (lev==Application.levelCount-1) 
 //				canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.GetComponent<Button>().interactable=false;
 		}
@@ -127,11 +114,11 @@ public class ButtonPresses : MonoBehaviour
 		if (!GameEvents.StopListeningKeys) {
 			if (!NoPause && Input.GetKeyDown (KeyCode.Escape)) {
 				if (Application.loadedLevel > 0) {
-					GameObject[] dialogs = {TabMenu,ShortCutDialog, MoreOptionsPanel,
+					GameObject[] dialogs = {tutDialog, TabMenu,ShortCutDialog, MoreOptionsPanel,
 						optionsPanel, helptip};
 					bool wasActive = false;
 					foreach (var di in dialogs) {
-						if (di.activeInHierarchy) {
+						if (di!=null && di.activeInHierarchy) {
 							wasActive = true;
 							
 							if (di == TabMenu)
@@ -144,6 +131,8 @@ public class ButtonPresses : MonoBehaviour
 								ToggleActionPanel ();
 							else if (di == helptip)
 								HideHelpTips ();
+							else if (di == tutDialog)
+								RejectTutorial ();
 							break;
 						}
 					}
@@ -257,8 +246,7 @@ public class ButtonPresses : MonoBehaviour
 			//hide
 			if (TabMenu.activeInHierarchy) {
 				Instance.StartCoroutine (AnimationScript.FadeOutPanel_Disable (TabMenu, 0.1f));
-				Instance.StartCoroutine (AnimationScript.FadeInPanel (
-					UI.gameObject.GetComponent<CanvasGroup>(), 1f, 0.1f));
+				Instance.StartCoroutine (AnimationScript.FadeInPanel_Enable (UI.gameObject, 1f, 0.1f, true));
 				if (!rev)
 					ToggleTabLeaderboard ();
 			} 
@@ -298,30 +286,12 @@ public class ButtonPresses : MonoBehaviour
 
 	public void showMoreSettings ()
 	{
+//		StartCoroutine(AnimationScript.FadeInPanel_Enable(MoreOptionsPanel, 1f, ttime, false));
 		MoreOptionsPanel.SetActive (true);
 		Animator anim = MoreOptionsPanel.GetComponent<Animator> ();
 		anim.enabled = true;
 
 		ResetToPrevSettings (OptionsSaved);
-	}
-
-	public void showMoreSettingsOnly ()
-	{
-		optionsPanel.SetActive (true);
-		menuShowing = optionsPanel.activeInHierarchy;
-
-		MoreOptionsPanel.SetActive (true);
-//		ResetToPrevSettings (OptionsSaved);
-	}
-
-	public void hideMoreSettingsOnly ()
-	{
-		optionsPanel.SetActive (false);
-		menuShowing = optionsPanel.activeInHierarchy;
-
-		QualityOptions = OptionsSaved;
-		MoreOptionsPanel.SetActive (false);
-
 	}
 
 	public void hideMoreSettings ()
@@ -332,13 +302,34 @@ public class ButtonPresses : MonoBehaviour
 			QualityOptions = OptionsSaved;
 			MoreOptionsPanel.SetActive (false);
 		}
-//		saveSettings();
-//		print(MoreOptionsPanel);//.enabled=false;
+		//		saveSettings();
+		//		print(MoreOptionsPanel);//.enabled=false;
 	}
+
+	public void showMoreSettingsOnly ()
+	{
+		menuShowing = true;
+		optionsPanel.SetActive (true);
+//		menuShowing = optionsPanel.activeInHierarchy;
+
+		MoreOptionsPanel.SetActive (true);
+//		ResetToPrevSettings (OptionsSaved);
+	}
+
+	public void hideMoreSettingsOnly ()
+	{
+		optionsPanel.SetActive (false);
+		menuShowing = false;
+
+		QualityOptions = OptionsSaved;
+		MoreOptionsPanel.SetActive (false);
+
+	}
+
+
 
 	public void showShortcutDialog ()
 	{
-		
 		ShortCutDialog.SetActive (true);
 		if (!isMainMenu){
 			Animator anim = ShortCutDialog.GetComponent<Animator> ();
@@ -354,12 +345,12 @@ public class ButtonPresses : MonoBehaviour
 	public void ShowHelpTips ()
 	{
 		//		GameObject lv = GameObject.Find("Canvas").transform.FindChild("HelpTip").gameObject;
-		
-		helptip.SetActive (true);
-		Animator anim = helptip.GetComponent<Animator> ();
-		anim.enabled = true;
-		anim.SetBool ("isExiting", false);
-		anim.Rebind ();
+		StartCoroutine(AnimationScript.FadeInPanel_Enable(helptip, 1f, ttime, false));
+//		helptip.SetActive (true);
+//		Animator anim = helptip.GetComponent<Animator> ();
+//		anim.enabled = true;
+//		anim.SetBool ("isExiting", false);
+//		anim.Rebind ();
 		
 		menuShowing = true;
 		
@@ -368,8 +359,9 @@ public class ButtonPresses : MonoBehaviour
 	public void HideHelpTips ()
 	{
 		
-		helptip.SetActive (false);
+//		helptip.SetActive (false);
 		menuShowing = false;
+		StartCoroutine(AnimationScript.FadeOutPanel_Disable(helptip, ttime));
 		//		Animator anim = helptip.GetComponent<Animator> ();
 		//		anim.enabled = true;
 		//		anim.SetBool ("isExiting", true);
@@ -594,44 +586,42 @@ public class ButtonPresses : MonoBehaviour
 
 	#region tutorial
 
-	public void initTutorial ()
-	{
-		inTutorial = true;
-
-		/*
-		Instance.canvasObj.FindChild ("Tutorial0").gameObject.SetActive (true);
-		int[] tuts = {0,1,2,6, 7, 5, 4, 8, 3};
-		tutnums = tuts;
-
-		tutImages = Resources.LoadAll<Sprite> ("Images/UI/helpTip");
-		tut = Instance.canvasObj.FindChild ("Tutorial0/Tutorial").gameObject;
-		tut.SetActive (true);
-		Image img = tut.transform.FindChild ("image").gameObject.GetComponent<Image> ();
-		currTut = 0;
-		img.sprite = tutImages [currTut];
-		tut.transform.FindChild ("num").gameObject.GetComponent<Text> ().text = 
-			(currTut + 1).ToString () + "/" + tutnums.Length;
-		*/
-
-		StartCoroutine (TutorialController ());
-	}
-
-
 	public void AcceptTutorial ()
 	{
-		Transform tut0 = Instance.canvasObj.transform.FindChild ("Tutorial0");
-		tut0.FindChild ("Dialog").gameObject.SetActive (false);
-		initTutorial ();
-
+		inTutorial = true;
+//		tutDialog.SetActive (false);
+		StartCoroutine(AnimationScript.FadeOutPanel_Disable(tutDialog, 0.7f));
+		StartCoroutine (TutorialController ());
 	}
 
 	public void RejectTutorial ()
 	{
-		GameObject tut0 = Instance.canvasObj.transform.FindChild ("Tutorial0").gameObject;
+		inTutorial=false;
+		StartCoroutine(AnimationScript.FadeOutPanel_Disable(tutDialog, 0.7f));
+//		tutDialog.SetActive (false);
+		StartCoroutine(ShowSimpleHelpMsg());
+
+	}
+
+	IEnumerator ShowSimpleHelpMsg(){
+		float ttime=0.7f;
+		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
+		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
+		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
+		Text tipInfo = tut0.transform.FindChild ("Tip_Info").gameObject.GetComponent<Text> ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Dock with the satellite", ttime));
+		yield return new WaitForSeconds (8f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
+		yield return new WaitForSeconds (6f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (tipInfo, "Need tips? Press T", ttime));
+		yield return new WaitForSeconds (10f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (tipInfo, "", ttime));
+		yield return new WaitForSeconds (1f);
+		//END------------------
 		tut0.SetActive (false);
-//		if (GameManager.Run1)
-//		Invoke("ShowHelpTips", 0.5f);
-//		ShowHelpTips();
+		yield break;
 	}
 
 	void SetUpTutorial ()
@@ -674,7 +664,7 @@ public class ButtonPresses : MonoBehaviour
 
 	IEnumerator TutorialController ()
 	{
-		const float ttime = 0.7f;
+		 float ttime = 0.7f;
 		SetUpTutorial ();
 
 		yield return new WaitForSeconds (5f);
@@ -767,14 +757,16 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now you can move around freely. Try it!\n\nPress Enter when you are ready to proceed", ttime));
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now a bit about other game options...", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "But before we begin, a quick guide of game options...", ttime));
 		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with your satellite...\n" +
 			"Press TAB to see Level objectives and leaderboard", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
 		yield return new WaitForSeconds (1.5f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
 			"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
 			"If you complete all 3 objectives, you get a gold medal\n" + 
@@ -831,48 +823,6 @@ public class ButtonPresses : MonoBehaviour
 //		GameEvents.RestartLevel ();
 //		GameEvents.PlayerFuelUnlimited(false);
 //		DimFuel(false);
-	}
-
-	public void tutorialNext ()
-	{
-		Image img = tut.transform.FindChild ("image").gameObject.GetComponent<Image> ();
-		if (currTut < tutnums.Length) {
-			img.sprite = tutImages [tutnums [currTut + 1]];
-			currTut++;
-			tut.transform.FindChild ("num").gameObject.GetComponent<Text> ().text = 
-				(currTut + 1).ToString () + "/" + tutnums.Length;
-		}
-		tutorialUpdateButtons ();
-	}
-
-	public void tutorialClose ()
-	{
-		tut.SetActive (false);
-	}
-
-	public void tutorialPrev ()
-	{
-		Image img = tut.transform.FindChild ("image").gameObject.GetComponent<Image> ();
-		if (currTut > 0) {
-//			if (currTut == tutnums.Length - 1) {
-//				img.color = new Color (1, 1, 1, 0.85f);
-//				img.transform.FindChild ("text_1").gameObject.SetActive (false);
-//				img.transform.FindChild ("text_2").gameObject.SetActive (false);
-//			}
-			img.sprite = tutImages [tutnums [currTut - 1]];
-			currTut--;
-			tut.transform.FindChild ("num").gameObject.GetComponent<Text> ().text = 
-				(currTut + 1).ToString () + "/" + tutnums.Length;
-		}
-		tutorialUpdateButtons ();
-	}
-
-	public void tutorialUpdateButtons ()
-	{
-		Button next = tut.transform.FindChild ("next").gameObject.GetComponent<Button> ();
-		next.interactable = currTut < tutnums.Length - 1;
-		Button prev = tut.transform.FindChild ("prev").gameObject.GetComponent<Button> ();
-		prev.interactable = currTut > 0;
 	}
 
 	#endregion

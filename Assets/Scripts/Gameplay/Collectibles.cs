@@ -14,16 +14,20 @@ public class Collectibles : MonoBehaviour {
 	
 	void OnTriggerEnter2D(Collider2D other){
 		bool found=false;
-		if (other.tag.Equals("Player") && !GameEvents.docked)found=true;
+		if (other.tag.Equals("Player") && !GameEvents.docked)
+			found=true;
 		if (found & callOnce){
 			GameEvents.Score++;
 //			StartCoroutine( AnimationScript.FlashScreen(null, 1f, 1, null));
 			SoundScript.PlayOnce(CollectSound, true);
-			transform.FindChild("Particles").GetComponent<ParticleSystem>().Stop();
+			ParticleSystem sysP = transform.FindChild ("Particles").GetComponent<ParticleSystem> ();
+			if (sysP!=null){
+				sysP.Stop ();
+				found=false;
+				callOnce=false;
+				StartCoroutine(animateScore());
+			}
 			Invoke("destroyGroup", 0.7f);
-			found=false;
-			callOnce=false;
-			StartCoroutine(animateScore());
 		}
 
 	}
