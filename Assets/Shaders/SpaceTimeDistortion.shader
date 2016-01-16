@@ -1,53 +1,62 @@
-﻿Shader "Cg shader with refraction mapping" {
-   Properties {
-      _Cube("Reflection Map", Cube) = "" {}
-   }
-   SubShader {
-      Pass {   
-         CGPROGRAM
- 
-         #pragma vertex vert  
-         #pragma fragment frag 
- 
-         #include "UnityCG.cginc"
+﻿Shader "Dvornik/Distort" {
+Properties {
+	_Refraction ("Refraction", Range (0.00, 1000.0)) = 1.0
+	_DistortTex ("Base (RGB)", 2D) = "white" {}
+}
 
-         // User-specified uniforms
-         uniform samplerCUBE _Cube;   
- 
-         struct vertexInput {
-            float4 vertex : POSITION;
-            float3 normal : NORMAL;
-         };
-         struct vertexOutput {
-            float4 pos : SV_POSITION;
-            float3 normalDir : TEXCOORD0;
-            float3 viewDir : TEXCOORD1;
-         };
- 
-         vertexOutput vert(vertexInput input) 
-         {
-            vertexOutput output;
- 
-            float4x4 modelMatrix = _Object2World;
-            float4x4 modelMatrixInverse = _World2Object; 
- 
-            output.viewDir = mul(modelMatrix, input.vertex).xyz 
-               - _WorldSpaceCameraPos;
-            output.normalDir = normalize(
-               mul(float4(input.normal, 0.0), modelMatrixInverse).xyz);
-            output.pos = mul(UNITY_MATRIX_MVP, input.vertex);
-            return output;
-         }
- 
-         float4 frag(vertexOutput input) : COLOR
-         {
-            float refractiveIndex = 1.5;
-            float3 refractedDir = refract(normalize(input.viewDir), 
-               normalize(input.normalDir), 1.0 / refractiveIndex);
-            return texCUBE(_Cube, refractedDir);
-         }
- 
-         ENDCG
-      }
-   }
+SubShader 
+{	
+	Tags { "RenderType"="Transparent" "Queue"="Overlay" }
+	LOD 100
+	
+	GrabPass 
+	{ 
+		
+	}
+	
+CGPROGRAM
+#pragma exclude_renderers gles
+
+#pragma surface surf NoLighting
+#pragma vertex vert
+
+fixed4 LightingNoLighting(SurfaceOutput s, fixed3 lightDir, fixed atten)
+    {
+        fixed4 c;
+        c.rgb = s.Albedo; 
+        c.a = s.Alpha;
+        return c;
+    }
+
+sampler2D _GrabTexture : register(s0);
+sampler2D _DistortTex : register(s2);
+float _Refraction;
+
+float4 _GrabTexture_TexelSize;
+
+struct Input {
+	float2 uv_DistortTex;
+	float3 color;
+	float3 worldRefl; 
+	float4 screenPos;
+	INTERNAL_DATA
+};
+
+void vert (inout appdata_full v, out Input o) {
+  UNITY_INITIALIZE_OUTPUT(Input,o);
+  o.color = v.color;
+}
+
+void surf (Input IN, inout SurfaceOutput o) 
+{
+    float3 distort = tex2D(_DistortTex, IN.uv_DistortTex) * IN.color.rgb;
+    float2 offset = distort * _Refraction * _GrabTexture_TexelSize.xy;
+	IN.screenPos.xy = offset * IN.screenPos.z + IN.screenPos.xy;	
+	float4 refrColor = tex2Dproj(_GrabTexture, IN.screenPos);
+	o.Alpha = refrColor.a;
+	o.Emission = refrColor.rgb;
+}
+ENDCG
+}
+FallBack "Diffuse"
 }
