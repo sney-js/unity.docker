@@ -4,7 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(Rigidbody2D))]
 public class AnimationMovements : MonoBehaviour
 {
-	[Range(-1,5)]
+	[Range(-1,3)]
 	public int
 		Movement = -1;
 	//0-left 1-right 2-forward 3-back 4-rotateLeft 5-rotateRight
