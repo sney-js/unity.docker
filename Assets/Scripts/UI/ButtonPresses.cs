@@ -723,8 +723,9 @@ public class ButtonPresses : MonoBehaviour
 
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "" +
-		"Click and Drag mouse to pan camera around\n" +
-		"Use mouse scroll to zoom in and out\n\n" +
+			"Click and Drag mouse to pan camera around (or) Arrow Keys\n" +
+			"Use mouse scroll to zoom in/out (or) RCtrl/RCmd + Arrow Keys\n" +
+			"Right click (or) Double tap 'C' to reset Camera\n\n" +
 		"When you are ready to proceed, press ENTER.", ttime));
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
@@ -732,7 +733,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Great!", ttime));
 		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now, let's see if you can...\n" +
-		"Collect at least 4 red orbs\n" +
+		"Collect at least 6 red orbs\n" +
 		"\n" +
 		"(Use the maneuvering keys to move around)", ttime));
 
@@ -743,7 +744,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (player, newPosPlayer, 1.5f, 0.8f));
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabRotation (player, angle, 1.5f, 0.8f));
 
-		while (!GameEvents.LevelFail && GameEvents.Score < 4) {
+		while (!GameEvents.LevelFail && GameEvents.Score < 6) {
 			yield return new WaitForEndOfFrame ();
 		}
 		//--------------
