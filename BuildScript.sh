@@ -47,7 +47,7 @@ elif [ "$BUILD_PLATFORM" == "win32" ]; then
 elif [ "$BUILD_PLATFORM" == "linux32" ]; then   
 	BUILD_METHOD="Linux_32"
 else
-	BUILD_METHOD="Linux"
+	BUILD_METHOD="Mac"
 fi
 #----------------print info
 echo "... Unity Location : "$UNITYLOC

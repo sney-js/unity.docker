@@ -8,17 +8,14 @@ public class ButtonPresses : MonoBehaviour
 
 	public static ButtonPresses Instance;
 	public static bool menuShowing = false, isMainMenu = false, inTutorial = false, FromOptionsLeaderboard = false;
-
 	private OptionsDetails QualityOptions, OptionsSaved;
 	private Text QualityText;
 	private Toggle t_antialias, t_bloom, t_grain, t_shadow;
 	private Slider t_mouse;
 	private int t_qualityLevel;
 	public bool NoPause = false, StartScreenFade = false, GoToMainMenuNow = false;
-
 	private GameObject MoreOptionsPanel, optionsPanel, helptip, TabMenu, ShortCutDialog, tutDialog, player;
 	private Transform successObjTarget, canvasObj, UI;
-
 	public Sprite[] headlights, CriteriaBox1Sprites;
 	private Image lightIndicator, dockIndicator;
 	private float ttime = 0.35f;
@@ -161,6 +158,9 @@ public class ButtonPresses : MonoBehaviour
 			if (Input.GetKeyDown (KeyCode.Tab)) {
 				ToggleTabPanel ();
 			}
+		}
+		if (Input.GetKeyUp (KeyCode.Return) && GameEvents.LevelSuccess) {
+			Instance.LoadLevel (true);
 		}
 		if (GoToMainMenuNow) {
 			GoToMainMenuNow = false;
@@ -327,8 +327,6 @@ public class ButtonPresses : MonoBehaviour
 		MoreOptionsPanel.SetActive (false);
 
 	}
-
-
 
 	public void showShortcutDialog ()
 	{
@@ -723,18 +721,18 @@ public class ButtonPresses : MonoBehaviour
 
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "" +
-		"Click and Drag mouse to pan camera around\n" +
-		"Use mouse scroll to zoom in and out\n\n" +
-		"When you are ready to proceed, press ENTER.", ttime));
+			"Click and Drag mouse to pan camera around\n" +
+			"Use mouse scroll to zoom in and out\n\n" +
+			"When you are ready to proceed, press ENTER.", ttime));
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Great!", ttime));
 		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now, let's see if you can...\n" +
-		"Collect at least 4 red orbs\n" +
-		"\n" +
-		"(Use the maneuvering keys to move around)", ttime));
+			"Collect at least 4 red orbs\n" +
+			"\n" +
+			"(Use the maneuvering keys to move around)", ttime));
 
 		Vector3 newPosPlayer = player.transform.position;
 		newPosPlayer.x = 0f;
@@ -764,7 +762,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "But before we begin, a quick guide of game options...", ttime));
 		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with your satellite...\n" +
-		"Press TAB to see Level objectives and leaderboard", ttime));
+			"Press TAB to see Level objectives and leaderboard", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "", ttime));
@@ -772,10 +770,10 @@ public class ButtonPresses : MonoBehaviour
 		yield return new WaitForSeconds (1.5f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
-		"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
-		"If you complete all 3 objectives, you get a gold medal\n" +
-		"When you have a gold medal, you can add your best time on the online leaderboard (right)\n\n" +
-		"Press TAB again to proceed", ttime));
+			"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
+			"If you complete all 3 objectives, you get a gold medal\n" +
+			"When you have a gold medal, you can add your best time on the online leaderboard (right)\n\n" +
+			"Press TAB again to proceed", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
 //		ToggleTabPanel ();
@@ -813,8 +811,8 @@ public class ButtonPresses : MonoBehaviour
 //		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Wow!", ttime));
 //		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Congratulations. You have finished your training...\n\n" +
-		"If you'd like to play around more, You can press F to undock\n" +
-		"Whenever you feel ready, press SPACE BAR to start Level 1!", ttime));
+			"If you'd like to play around more, You can press F to undock\n" +
+			"Whenever you feel ready, press SPACE BAR to start Level 1!", ttime));
 
 		while (!Input.GetKey (KeyCode.F) && !Input.GetKey (KeyCode.Return)) {
 			yield return new WaitForEndOfFrame ();
@@ -863,28 +861,37 @@ public class ButtonPresses : MonoBehaviour
 				Transform lev = GameObject.Find ("Level").transform;
 				Destroy (lev.FindChild ("AsteroidGroup").gameObject);
 
-				player.GetComponent<Collider2D> ().enabled = false;
-				Collider2D[] colls = player.GetComponentsInChildren<Collider2D> ();
-				for (int c = 0; c < colls.Length; c++)
-					colls [c].enabled = false;
-				player.GetComponent<SpringJoint2D> ().enabled = false;
-				player.GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
-				player.GetComponent<Rigidbody2D> ().angularVelocity = 0f;
-				player.transform.Rotate(new Vector3 (0, 0, 90f));
+//				player.GetComponent<Collider2D> ().enabled = false;
+//				MonoBehaviour[] colls = player.GetComponents<MonoBehaviour> ();
+//				for (int c = 0; c < colls.Length; c++) Destroy(colls[c]);
+//					colls [c].enabled = false;
+				Destroy (player.GetComponent<CenterOfMass> ());
+				Destroy (player.GetComponent<GeyserControl> ());
+				Destroy (player.GetComponent<Moves> ());
+				Destroy (player.GetComponent<HealthLoss> ());
+				Destroy (player.GetComponent<SpringJoint2D> ());
+				Destroy (player.GetComponent<Rigidbody2D> ());
+				Destroy (player.transform.FindChild ("outline").gameObject);
+				Destroy (player.transform.FindChild ("Nose").gameObject);
+				Destroy (player.transform.FindChild ("Trail").gameObject);
 
 				GameObject satellite = lev.FindChild ("Dockables/Satellite").gameObject;
-				satellite.GetComponent<SpringJoint2D> ().enabled = false;
-				satellite.GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
-				satellite.GetComponent<Rigidbody2D> ().angularVelocity = 0f;
-				satellite.transform.Rotate(new Vector3 (0, 0, 90f));
-				colls = satellite.GetComponentsInChildren<Collider2D> ();
-				for (int c = 0; c < colls.Length; c++)
-					colls [c].enabled = false;
+
+				Destroy (satellite.GetComponent<AnimationMovements> ());
+				Destroy (satellite.GetComponent<SpringJoint2D> ());
+				Destroy (satellite.GetComponent<Rigidbody2D> ());
+				Destroy (satellite.transform.FindChild ("outline").gameObject);
+				Destroy (satellite.transform.FindChild ("touchdown").gameObject);
+				Destroy (satellite.transform.FindChild ("DockArea").gameObject);
 
 
+//				player.transform.Rotate (new Vector3 (0, 0, 90f));
+//				satellite.transform.Rotate (new Vector3 (0, 0, 90f));
 
-				Instance.StartCoroutine (AnimationScript.FadeOutPanel (
-					Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> (), 2f));
+				Instance.StartCoroutine (
+					AnimationScript.FadeOutPanel (
+					Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> ()
+					, 2f));
 				lev.GetComponent<Animator> ().enabled = true;
 
 			} else {
@@ -1117,6 +1124,7 @@ public class ButtonPresses : MonoBehaviour
 	{
 		FromOptionsLeaderboard = false;
 		Instance.UI.gameObject.GetComponent<CanvasGroup> ().alpha = 0f;
+
 	}
 
 	public void ToggleTabLeaderboard ()
