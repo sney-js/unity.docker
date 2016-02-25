@@ -13,14 +13,17 @@ public class AnimationMovements : MonoBehaviour
 	private Rigidbody2D body;
 	public float OffsetTime = 0f;
 	public float RunTime = 3f;
+	public bool random = false;
 
 	// Use this for initialization
 	void Start ()
 	{
 //		print ("force:" + force + " ,rotLeft:" + rotLeft);
 		body = GetComponent<Rigidbody2D> ();
-		if (RunTime==0)AddForce();
-		else StartCoroutine(PhysicMovement());
+		if (RunTime == 0)
+			AddForce ();
+		else
+			StartCoroutine (PhysicMovement ());
 //		StartCoroutine (PhysicMovement ());
 
 	}
@@ -43,25 +46,31 @@ public class AnimationMovements : MonoBehaviour
 	void AddForce ()
 	{
 		Vector3 position = body.transform.position;
-		switch (Movement) {
-		case 0:
-			body.AddForceAtPosition (body.transform.up * (force), position);
-			break;
-		case 1:
-			body.AddForceAtPosition (-body.transform.up * (force), position);
-			break;
-		case 2:
-			body.AddForceAtPosition (body.transform.right * (force), position);
-			break;
-		case 3:
-			body.AddForceAtPosition (-body.transform.right * (force), position);
-			break;
+		if (!random) {
+			switch (Movement) {
+			case 0:
+				body.AddForceAtPosition (body.transform.up * (force), position);
+				break;
+			case 1:
+				body.AddForceAtPosition (-body.transform.up * (force), position);
+				break;
+			case 2:
+				body.AddForceAtPosition (body.transform.right * (force), position);
+				break;
+			case 3:
+				body.AddForceAtPosition (-body.transform.right * (force), position);
+				break;
+			}
+		} else {
+			Vector2 rando = new Vector2 (Random.Range (-10, 10), Random.Range (-10, 10));
+			body.AddForceAtPosition (rando * (force), position);
 		}
-	
+
+		if (random)force/=5f;
 		if (rotLeft)
-			body.angularVelocity =-force;
+			body.angularVelocity = -force;
 		if (rotRight)
-			body.angularVelocity =force;
+			body.angularVelocity = force;
 	}
 
 
