@@ -215,7 +215,7 @@ public class ButtonPresses : MonoBehaviour
 		lv.SetActive (true);
 		lv.GetComponent<Animator> ().Play ("LevelSelectionEnter");
 		lv.GetComponent<Animator> ().Rebind ();
-		lv.transform.FindChild("Actual/Area/Grid/Level#1/Button").gameObject.GetComponent<Button>().Select();
+
 	}
 
 	public void hideLevelSelection ()
@@ -374,15 +374,6 @@ public class ButtonPresses : MonoBehaviour
 		about.SetActive (!about.activeInHierarchy);
 	}
 
-	public void ResetSettings(){
-		Text lv = canvasObj.FindChild ("LevelSelection/Actual/Reset/Text").gameObject.GetComponent<Text>();
-		if (lv.text.Equals("Reset Progress")) lv.text = "Click again to Confirm";
-		else {
-			PlayerPrefs.DeleteAll();
-			GameEvents.RestartLevel();
-		}
-	}
-
 	#endregion
 
 	#region settings prefs
@@ -432,8 +423,6 @@ public class ButtonPresses : MonoBehaviour
 			
 		}
 	}
-
-
 
 	private void saveSettings ()
 	{
@@ -731,29 +720,39 @@ public class ButtonPresses : MonoBehaviour
 		yield return new WaitForSeconds (3f);
 
 		//-----------3
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective,
-			"1. Click and Drag mouse to pan camera around     (or Arrow Keys)\n" +
-			"2. Scroll mouse to zoom in-out                            (or RCtrl/RCmd + Arrow Keys)\n" +
-			"3. Right click to reset camera                               (or Tap C)\n\n" +
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "" +
+<<<<<<< HEAD
+			"Click and Drag mouse to pan camera around\n" +
+			"Use mouse scroll to zoom in and out\n\n" +
+			"When you are ready to proceed, press ENTER.", ttime));
+=======
+			"Click and Drag mouse to pan camera around (or) Arrow Keys\n" +
+			"Use mouse scroll to zoom in/out (or) RCtrl/RCmd + Arrow Keys\n" +
+			"Right click (or) Double tap 'C' to reset Camera\n\n" +
 		"When you are ready to proceed, press ENTER.", ttime));
+>>>>>>> 76b9544cba2a93dcb32424cc8df7ed4e66959e5c
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Great!", ttime));
 		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now, let's see if you can...\n" +
+<<<<<<< HEAD
+			"Collect at least 4 red orbs\n" +
+			"\n" +
+			"(Use the maneuvering keys to move around)", ttime));
+=======
 		"Collect at least 6 red orbs\n" +
 		"\n" +
 		"(Use the maneuvering keys to move around)", ttime));
+>>>>>>> 76b9544cba2a93dcb32424cc8df7ed4e66959e5c
 
 		Vector3 newPosPlayer = player.transform.position;
 		newPosPlayer.x = 0f;
 		newPosPlayer.y = 0f;
 		Vector3 angle = new Vector3 (0f, 0f, 90f);
-//		print(player.GetComponent<Rigidbody2D>().velocity);
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (player, newPosPlayer, 1.5f, 0.8f));
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabRotation (player, angle, 1.5f, 0.8f));
-//		print(player.GetComponent<Rigidbody2D>().velocity);
 
 		while (!GameEvents.LevelFail && GameEvents.Score < 6) {
 			yield return new WaitForEndOfFrame ();
@@ -770,12 +769,12 @@ public class ButtonPresses : MonoBehaviour
 		while (!Input.GetKey (KeyCode.X))
 			yield return new WaitForEndOfFrame ();
 		//----------kk
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now your movement is frictionless. Try it!\n\nPress Enter when you are ready to proceed", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now you can move around freely. Try it!\n\nPress Enter when you are ready to proceed", ttime));
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "But before we begin, a quick guide of game options...", ttime));
 		yield return new WaitForSeconds (3f);
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with the satellite...\n" +
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with your satellite...\n" +
 			"Press TAB to see Level objectives and leaderboard", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();

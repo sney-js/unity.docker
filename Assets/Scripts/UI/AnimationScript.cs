@@ -63,7 +63,7 @@ public class AnimationScript : MonoBehaviour
 //		Vector3 vel = Vector3.zero;
 		Rigidbody2D rigid = obj.GetComponent<Rigidbody2D> ();
 		if (rigid != null) {
-//			print("RIGID RESET");
+			print("RIGID RESET");
 			rigid.velocity = Vector2.zero;
 			rigid.angularVelocity = 0f;
 		}
