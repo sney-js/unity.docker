@@ -37,11 +37,11 @@ public class GameManager : MonoBehaviour
 			print(cursor+"CURSOR"+Cursor.visible);
 		}
 	}
-	public void ResetProgress(){
-		PlayerPrefs.DeleteAll();
-		Application.LoadLevel(Application.loadedLevel);
 
-	}
+//	public static void ResetProgress(){
+//		PlayerPrefs.DeleteAll();
+//		Application.LoadLevel(Application.loadedLevel);
+//	}
 
 	public static string GetLevelName(int lev){
 		string str = lev +". ";
