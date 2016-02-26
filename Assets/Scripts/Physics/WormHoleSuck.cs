@@ -18,7 +18,7 @@ public class WormHoleSuck : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if (!started && (GameEvents.startCounting) ) {
+		if (!started){//} && (GameEvents.startCounting) ) {
 			Sucker.enabled = true;
 			started = true;
 		}
@@ -35,8 +35,10 @@ public class WormHoleSuck : MonoBehaviour
 			} else if (other.gameObject.name == "outline" && other.gameObject.tag == "Satellite") {
 				StretchAnim (other.transform.parent.transform);
 				print ("Sucked sat");
-			} else if (other.gameObject.tag != "blackhole") {
+			} else if (other.gameObject.tag == "blackhole") {
 //			CheckAndPull (other.transform);
+			}else{
+//				print("recevied");
 				StretchAnim (other.transform);
 			}
 		}

@@ -66,7 +66,8 @@ public class AnimationMovements : MonoBehaviour
 			body.AddForceAtPosition (rando * (force), position);
 		}
 
-		if (random)force/=5f;
+		if (random)
+			force /= 5f;
 		if (rotLeft)
 			body.angularVelocity = -force;
 		if (rotRight)
