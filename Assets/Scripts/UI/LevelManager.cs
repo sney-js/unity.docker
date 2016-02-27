@@ -38,7 +38,8 @@ public class LevelManager : MonoBehaviour {
 		for (int i = 1; i < totLevels; i++) {
 			GameObject level= (GameObject) Instantiate(LevelGrid.transform.GetChild(0).gameObject);
 			level.name = "Level#"+(i+1);
-			level.transform.parent = LevelGrid.transform;
+			level.transform.SetParent(LevelGrid.transform);
+//			level.transform.parent = LevelGrid.transform;
 		}
 
 		//---------------------------------------------------------------------------------------------------
@@ -169,7 +170,7 @@ public class LevelManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.F7)){
+		if (Input.GetKeyDown(KeyCode.F7) && Input.GetKey(KeyCode.LeftControl)){
 			int totLevels = LevelGrid.childCount;
 
 			for (int i = 0; i < totLevels; i++) {

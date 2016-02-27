@@ -4,13 +4,15 @@ using System.Collections;
 public class ScoreConnection : MonoBehaviour
 {
 	public static ScoreConnection instance;
+
 	private string secretKey = "2pAk&&";
+	private static string buildversion = "1.0#2016-2-26--20:43#";
 
 	void Start ()
 	{
 		instance = this;
 	}
-	
+
 	public static void ReceiveScore (int level, string dateRange)
 	{
 		string url = "http://arc-nova.net78.net/ReceiveScores.php";
@@ -27,7 +29,7 @@ public class ScoreConnection : MonoBehaviour
 		if (instance != null)
 			instance.StartCoroutine (instance.WaitForRequest (receive, "displaying"));
 	}
-	
+
 	public static void AddScore (string name, float score)
 	{
 		string url = "http://arc-nova.net78.net/AddScore.php";
@@ -72,17 +74,26 @@ public class ScoreConnection : MonoBehaviour
 
 	public static float GetCurrentGameVersion ()
 	{
-		string line;
-		System.IO.StreamReader file = new System.IO.StreamReader (Application.dataPath + "/Resources/version.txt"); //load text file with data
-		while ((line = file.ReadLine()) != null) { //while text exists.. repeat
-			
-			float version = AboutStringParseVersion(line);
-			System.DateTime date = AboutStringParseTime(line);
-			print (version + " , " + date);
-			return version;
-		}
-		file.Close ();
-		return -1;
+//		try {
+//			string line;
+//			System.IO.StreamReader file = new System.IO.StreamReader (Application.dataPath + "/Resources/version.txt"); //load text file with data
+//			while ((line = file.ReadLine ()) != null) { //while text exists.. repeat
+//			
+//				float version = AboutStringParseVersion (line);
+//				System.DateTime date = 
+//					AboutStringParseTime (line);
+//				print (version + " , " + date);
+//				return version;
+//			}
+//			file.Close ();
+//		} catch (System.Exception e) {
+//		}
+//		return -1;
+//
+		float version = AboutStringParseVersion (buildversion);
+		System.DateTime date = AboutStringParseTime (buildversion);
+//		print (version + " , " + date);
+		return version;
 	}
 
 	public static System.DateTime AboutStringParseTime (string line)
@@ -120,7 +131,7 @@ public class ScoreConnection : MonoBehaviour
 
 	public static string[] GetDateRanges ()
 	{
-		string[] s = {"week", "month", "year"}; 
+		string[] s = { "week", "month", "year" }; 
 		return s; 
 	}
 
@@ -152,11 +163,9 @@ public class ScoreConnection : MonoBehaviour
 	{
 		Debug.Log ("RESPONSE: " + data);
 		if (successful) {
-			print ("SENT FROM 2");
 			ButtonPresses.ChangeSendScoreText (true);
 			GameManager.SetLevelSavedSentTime (GameManager.GetLevelSavedTime ());
 		} else {
-			print ("SENT FROM 3");
 			ButtonPresses.ChangeSendScoreText (false);
 		}
 		ButtonPresses.RefreshScores ();

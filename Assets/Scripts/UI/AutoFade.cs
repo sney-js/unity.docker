@@ -29,6 +29,15 @@ public class AutoFade : MonoBehaviour
 		loadingTexture = Resources.Load<Texture> ("Images/UI/background1");
 	}
 	
+	Color col;
+
+	void OnGUI(){
+		if (m_Fading) {
+			Rect rect = new Rect (0, 0, Screen.width, Screen.height);
+			GUI.color = col;
+			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
+		}
+	}
 
 	private IEnumerator Fade (float aFadeOutTime, float aFadeInTime)
 	{
@@ -37,15 +46,15 @@ public class AutoFade : MonoBehaviour
 
 		Color transparent = new Color (1, 1, 1, 0);
 		Color opaque = new Color (1, 1, 1, 1f);
-		Color col = transparent;
+//		Color col = transparent;
 
 		float startTime = Time.time;
 		while (Time.time < startTime + aFadeInTime) {
 			yield return new WaitForEndOfFrame ();
 			col.a += Mathf.Clamp01 (0.06f);
 
-			GUI.color = col;
-			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
+//			GUI.color = col;
+//			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
 			yield return null;
 		}
 
@@ -55,8 +64,9 @@ public class AutoFade : MonoBehaviour
 		startTime = Time.time;
 		while (Time.time < startTime + 0.1f) {
 			yield return new WaitForEndOfFrame ();
-			GUI.color = opaque;
-			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
+			col = opaque;
+//			GUI.color = opaque;
+//			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
 			yield return null;
 		}
 
@@ -64,8 +74,8 @@ public class AutoFade : MonoBehaviour
 		while (Time.time < startTime + aFadeOutTime) {
 			yield return new WaitForEndOfFrame ();
 			col.a -= Mathf.Clamp01 (0.06f);
-			GUI.color = col;
-			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
+//			GUI.color = col;
+//			GUI.DrawTexture (rect, loadingTexture, ScaleMode.ScaleAndCrop);
 			yield return null;
 		}
 

@@ -172,6 +172,10 @@ public class ButtonPresses : MonoBehaviour
 
 	#region Main Menu
 
+	public void OpenGamePage(){
+		Application.OpenURL ("https://aneilator.itch.io/docker");
+	}
+
 	public static IEnumerator WaitForVersion (WWW www, string receiving)
 	{
 		yield return www;
@@ -190,11 +194,11 @@ public class ButtonPresses : MonoBehaviour
 				float remoteVersion = ScoreConnection.AboutStringParseVersion (data);
 //				System.DateTime date = ScoreConnection.AboutStringParseTime (data);
 
-
 				Text updTxt = Instance.optionsPanel.transform.FindChild ("About/vtest").GetComponent<Text> ();
+				GameObject updateReminder = Instance.canvasObj.FindChild ("Update_Reminder").gameObject;
 				if (yourVersion < remoteVersion) {
 					print ("UPDATE AVAILABLE!");
-
+					updateReminder.SetActive (true); 
 					updTxt.text = "Updated v" + remoteVersion + " available!";
 				} else {
 					print ("No Update Available");
@@ -215,7 +219,7 @@ public class ButtonPresses : MonoBehaviour
 		lv.SetActive (true);
 		lv.GetComponent<Animator> ().Play ("LevelSelectionEnter");
 		lv.GetComponent<Animator> ().Rebind ();
-		lv.transform.FindChild("Actual/Area/Grid/Level#1/Button").gameObject.GetComponent<Button>().Select();
+		lv.transform.FindChild ("Actual/Area/Grid/Level#1/Button").gameObject.GetComponent<Button> ().Select ();
 	}
 
 	public void hideLevelSelection ()
@@ -374,12 +378,14 @@ public class ButtonPresses : MonoBehaviour
 		about.SetActive (!about.activeInHierarchy);
 	}
 
-	public void ResetSettings(){
-		Text lv = canvasObj.FindChild ("LevelSelection/Actual/Reset/Text").gameObject.GetComponent<Text>();
-		if (lv.text.Equals("Reset Progress")) lv.text = "Click again to Confirm";
+	public void ResetSettings ()
+	{
+		Text lv = canvasObj.FindChild ("LevelSelection/Actual/Reset/Text").gameObject.GetComponent<Text> ();
+		if (lv.text.Equals ("Reset Progress"))
+			lv.text = "Click again to Confirm";
 		else {
-			PlayerPrefs.DeleteAll();
-			GameEvents.RestartLevel();
+			PlayerPrefs.DeleteAll ();
+			GameEvents.RestartLevel ();
 		}
 	}
 
@@ -735,7 +741,7 @@ public class ButtonPresses : MonoBehaviour
 			"1. Click and Drag mouse to pan camera around     (or Arrow Keys)\n" +
 			"2. Scroll mouse to zoom in-out                            (or RCtrl/RCmd + Arrow Keys)\n" +
 			"3. Right click to reset camera                               (or Tap C)\n\n" +
-		"When you are ready to proceed, press ENTER.", ttime));
+			"When you are ready to proceed, press ENTER.", ttime));
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
 		//-----------3
@@ -776,7 +782,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "But before we begin, a quick guide of game options...", ttime));
 		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with the satellite...\n" +
-			"Press TAB to see Level objectives and leaderboard", ttime));
+		"Press TAB to see Level objectives and leaderboard", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "", ttime));
@@ -784,10 +790,10 @@ public class ButtonPresses : MonoBehaviour
 		yield return new WaitForSeconds (1.5f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
-			"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
-			"If you complete all 3 objectives, you get a gold medal\n" +
-			"When you have a gold medal, you can add your best time on the online leaderboard (right)\n\n" +
-			"Press TAB again to proceed", ttime));
+		"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
+		"If you complete all 3 objectives, you get a gold medal\n" +
+		"When you have a gold medal, you can add your best time on the online leaderboard (right)\n\n" +
+		"Press TAB again to proceed", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
 //		ToggleTabPanel ();
@@ -825,8 +831,8 @@ public class ButtonPresses : MonoBehaviour
 //		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Wow!", ttime));
 //		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Congratulations. You have finished your training...\n\n" +
-			"If you'd like to play around more, You can press F to undock\n" +
-			"Whenever you feel ready, press SPACE BAR to start Level 1!", ttime));
+		"If you'd like to play around more, You can press F to undock\n" +
+		"Whenever you feel ready, press SPACE BAR to start Level 1!", ttime));
 
 		while (!Input.GetKey (KeyCode.F) && !Input.GetKey (KeyCode.Return)) {
 			yield return new WaitForEndOfFrame ();
@@ -904,7 +910,7 @@ public class ButtonPresses : MonoBehaviour
 
 				Instance.StartCoroutine (
 					AnimationScript.FadeOutPanel (
-					Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> ()
+						Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> ()
 					, 2f));
 				lev.GetComponent<Animator> ().enabled = true;
 
