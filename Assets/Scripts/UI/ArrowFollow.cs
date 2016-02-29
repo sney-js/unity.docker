@@ -16,8 +16,9 @@ public class ArrowFollow : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		if (goToTrack==null) goToTrack = GameObject.Find ("Level/Dockables/Satellite");
-		fromTrack=blob;
+		if (goToTrack == null)
+			goToTrack = GameObject.Find ("Level/Dockables/Satellite");
+		fromTrack = blob;
 		min = 0.02f;
 		max = 0.98f;
 		nextActionTime = 0.0f;
@@ -43,13 +44,17 @@ public class ArrowFollow : MonoBehaviour
 //		Debug.Log("sat at: "+v3Screen);
 			if (v3Screen.x > -0.01f && v3Screen.x < 1.01f && v3Screen.y > -0.01f && v3Screen.y < 1.01f) {
 //			gameObject.GetComponent<SpriteRenderer>().enabled=false;
-				blob.SetActive (false);
-				text.gameObject.SetActive (false);
+				if (text.IsActive ()) {
+					blob.SetActive (false);
+					text.gameObject.SetActive (false);
+				}
 			} else {
 //			gameObject.GetComponent<SpriteRenderer>().enabled=true;
 //			gameObject.SetActive(false);
-				text.gameObject.SetActive (true);
-				blob.SetActive (true);
+				if (!text.IsActive ()) {
+					text.gameObject.SetActive (true);
+					blob.SetActive (true);
+				}
 
 				Vector3 v3Screen2 = v3Screen;
 
