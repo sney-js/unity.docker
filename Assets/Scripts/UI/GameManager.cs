@@ -138,13 +138,13 @@ public class GameManager : MonoBehaviour
 		case 3:
 			return "Your score is not high enough"; 
 		case 4:
-			return "You went into the Sun"; 
+			return "";//You went into the Sun"; 
 		case 5:
-			return "You got sucked into the black hole"; 
+			return "";//You got sucked into the black hole"; 
 		case 6:
 			return "You went into the Abyss"; 
 		case 7:
-			return "You got hit!"; 
+			return "";//You got hit!"; 
 		default:
 			return "FAILED!";
 		}
