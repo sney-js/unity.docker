@@ -273,6 +273,10 @@ public class GameEvents : MonoBehaviour
 				Failed (failMsgID);
 				return;
 			}
+			if (!infoMsgSet && FuelReading <= 0f) {
+				StartCoroutine (setInfoText ("You ran out of fuel!", 0f));	
+				StartCoroutine (setInfoText ("", 2f));
+			}
 		}
 		//------------------------win params----------------------------------
 		if (!LevelSuccess) {

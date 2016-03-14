@@ -170,7 +170,7 @@ public class LevelManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.F7) && Input.GetKey(KeyCode.LeftControl)){
+		if (Input.GetKeyUp(KeyCode.F7)){
 			int totLevels = LevelGrid.childCount;
 
 			for (int i = 0; i < totLevels; i++) {

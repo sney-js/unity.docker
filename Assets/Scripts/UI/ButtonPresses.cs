@@ -698,7 +698,7 @@ public class ButtonPresses : MonoBehaviour
 //		GameEvents.PlayerFuelUnlimited(true);
 //		DimFuel(true);
 		//----------1
-		while (!Input.GetKey (KeyCode.W))
+		while (MInput.fwd)
 			yield return new WaitForEndOfFrame ();
 
 		//-----------2
@@ -708,14 +708,14 @@ public class ButtonPresses : MonoBehaviour
 //		/*
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold S to accelerate backwards", ttime));
-		while (!Input.GetKey (KeyCode.S))
+		while (!MInput.bck)
 			yield return new WaitForEndOfFrame ();
 		yield return new WaitForSeconds (1.5f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let Go", ttime));
 		yield return new WaitForSeconds (2.5f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold A to accelerate left\n and D to accelerate right", ttime));
-		while (!Input.GetKey (KeyCode.A) && !Input.GetKey (KeyCode.D))
+		while (!MInput.sleft && !MInput.sright)
 			yield return new WaitForEndOfFrame ();
 		yield return new WaitForSeconds (2f);
 		//-----------3
@@ -723,12 +723,12 @@ public class ButtonPresses : MonoBehaviour
 		yield return new WaitForSeconds (3f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold Q to rotate left", ttime));
-		while (!Input.GetKey (KeyCode.Q))
+		while (!MInput.rleft)
 			yield return new WaitForEndOfFrame ();
 		yield return new WaitForSeconds (2f);
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Hold E to rotate right", ttime));
-		while (!Input.GetKey (KeyCode.E))
+		while (!MInput.rright)
 			yield return new WaitForEndOfFrame ();
 		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "You're a natural!", ttime));

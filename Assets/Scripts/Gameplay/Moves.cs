@@ -22,7 +22,7 @@ public class Moves : MonoBehaviour
 	private Thrusters thrusterScript;
 	private float fuelGuage;
 	private float initialMass;
-	[Range(1,2)]
+	[Range (1, 2)]
 	public int
 		navType = 1;
 	private bool stabilizeOn;
@@ -32,7 +32,8 @@ public class Moves : MonoBehaviour
 	[System.Serializable]
 	public class BurnerValues
 	{
-		public float BurnerLess = 0.2f, BurnerNormal = 1.0f, BurnerHigh = 1.8f;//		[HideInInspector]
+		public float BurnerLess = 0.2f, BurnerNormal = 1.0f, BurnerHigh = 1.8f;
+		//		[HideInInspector]
 	}
 
 	//-----------------------------------------------START----------------------------------------------------
@@ -42,12 +43,12 @@ public class Moves : MonoBehaviour
 		if (thrustersObj != null) {
 			Transform tt = thrustersObj.transform.Find ("Flames");
 
-			Transform[] lThrus = {tt.FindChild ("FlameNE"),tt.FindChild ("FlameSE")};
-			Transform[] rThrus = {tt.FindChild ("FlameNW"),tt.FindChild ("FlameSW")};
-			Transform[] fThrus = {tt.FindChild ("FlameSR"),tt.FindChild ("FlameSL")};
-			Transform[] bThrus = {tt.FindChild ("FlameNR"),tt.FindChild ("FlameNL")};
-			Transform[] spinQThrus = {tt.FindChild ("FlameNE"),tt.FindChild ("FlameSW")};
-			Transform[] spinEThrus = {tt.FindChild ("FlameNW"),tt.FindChild ("FlameSE")};
+			Transform[] lThrus = { tt.FindChild ("FlameNE"), tt.FindChild ("FlameSE") };
+			Transform[] rThrus = { tt.FindChild ("FlameNW"), tt.FindChild ("FlameSW") };
+			Transform[] fThrus = { tt.FindChild ("FlameSR"), tt.FindChild ("FlameSL") };
+			Transform[] bThrus = { tt.FindChild ("FlameNR"), tt.FindChild ("FlameNL") };
+			Transform[] spinQThrus = { tt.FindChild ("FlameNE"), tt.FindChild ("FlameSW") };
+			Transform[] spinEThrus = { tt.FindChild ("FlameNW"), tt.FindChild ("FlameSE") };
 
 			thrusterScript = new Thrusters (thrustersObj, lThrus, rThrus, fThrus, bThrus, spinQThrus, spinEThrus);
 
@@ -62,7 +63,7 @@ public class Moves : MonoBehaviour
 		SetFuelLevel ();
 		initialMass = gameObject.GetComponent<Rigidbody2D> ().mass;
 		initialMass += (initialFuel / fuelDensity);
-		stabilizeOn = Application.loadedLevel == 1 ? true : false;
+		stabilizeOn = Application.loadedLevel == 1 || GameManager.GetStabiliserPref() ? true : false;
 
 	}
 
@@ -70,9 +71,12 @@ public class Moves : MonoBehaviour
 	{
 		if (Input.GetKeyUp (KeyCode.X)) {
 			stabilizeOn = !stabilizeOn;
+			GameManager.SetStabiliserPref (stabilizeOn ? 1 : 0);
 //			print ("X key up!!! " + stabilizeOn);
 			
 			StartCoroutine (AnimationScript.FlashScreen (null, 1.5f, 2, "Stabilisation " + (stabilizeOn ? "On" : "Off")));
+		
+			
 		}
 	}
 
@@ -105,68 +109,74 @@ public class Moves : MonoBehaviour
 
 	void navigate (float amount)
 	{
-		if (navType == 2) {
+		if (MInput.CONTROL == MInput.KEYBOARD2) {
 			navigateAlternate (amount);
 			return;
 		}
+		if (MInput.CONTROL == MInput.MIXED) {
+			navigateFollow (amount);
+			return;
+		} else if (MInput.CONTROL == MInput.KEYBOARD1) {
 		
-		/*
+			/*
 		 * Input.GetAxis("Vertical") > 0 // gets forward
 			Input.GetAxis("Vertical") < 0 // gets backward
 			Input.GetAxis("Horizontal") > 0 // gets right
 			Input.GetAxis("Horizontal") < 0 // gets left
 			*/
-		if (HeldMoveKeys ()) {
+			if (HeldMoveKeys ()) {
 
-			float delta = amount / 30;
-			rotTotal = Mathf.Clamp (rotTotal, -5f, 5f);
-			Vector3 position = body.transform.position;
+				float delta = amount / 30;
+				rotTotal = Mathf.Clamp (rotTotal, -5f, 5f);
+				Vector3 position = body.transform.position;
 
-			if (Input.GetKey (KeyCode.A)) {
-				body.AddForceAtPosition (body.transform.up * (speed * amount), position);
-				if (rotTotal - delta >= -3) {
-					rotTotal += -delta;
-					Rotator3D.transform.Rotate (new Vector3 (0f, delta, 0f));
+				if (MInput.sleft) {
+					body.AddForceAtPosition (body.transform.up * (speed * amount), position);
+					if (rotTotal - delta >= -3) {
+						rotTotal += -delta;
+						Rotator3D.transform.Rotate (new Vector3 (0f, delta, 0f));
+					}
+					ThrusterAt (0, amount);
 				}
-				ThrusterAt (0, amount);
-			}
 		
-			if (Input.GetKey (KeyCode.W)) {
-				body.AddForceAtPosition (body.transform.right * (speed * amount), position);
+				if (MInput.fwd) {
+					body.AddForceAtPosition (body.transform.right * (speed * amount), position);
 			
-				ThrusterAt (1, amount);
-			}
-		
-			if (Input.GetKey (KeyCode.D)) {
-				body.AddForceAtPosition (-body.transform.up * (speed * amount), position);
-				if (rotTotal + delta <= 3) {
-					rotTotal += delta;
-					Rotator3D.transform.Rotate (new Vector3 (0f, -delta, 0f));
+					ThrusterAt (1, amount);
 				}
-				ThrusterAt (2, amount);
-			}
 		
-			if (Input.GetKey (KeyCode.S)) {
-				body.AddForceAtPosition (-body.transform.right * (speed * amount), position);
-				ThrusterAt (3, amount);
-			}
-			//  rotation-------------------------------------------------------
+				if (MInput.sright) {
+					body.AddForceAtPosition (-body.transform.up * (speed * amount), position);
+					if (rotTotal + delta <= 3) {
+						rotTotal += delta;
+						Rotator3D.transform.Rotate (new Vector3 (0f, -delta, 0f));
+					}
+					ThrusterAt (2, amount);
+				}
 		
-			if (Input.GetKey (KeyCode.E)) {
-				body.AddTorque (-rotSpeed * amount);
-				ThrusterAt (5, amount);
-			} 
-			if (Input.GetKey (KeyCode.Q)) {
-				body.AddTorque (rotSpeed * amount);
-				ThrusterAt (4, amount);
-			}
-			//-------------------------------------------------------------------
+				if (MInput.bck) {
+					body.AddForceAtPosition (-body.transform.right * (speed * amount), position);
+					ThrusterAt (3, amount);
+				}
+				//  rotation-------------------------------------------------------
+		
+				if (MInput.rright) {
+					body.AddTorque (-rotSpeed * amount);
+					ThrusterAt (5, amount);
+				} 
+				if (MInput.rleft) {
+					body.AddTorque (rotSpeed * amount);
+					ThrusterAt (4, amount);
+				}
+				//-------------------------------------------------------------------
 
 //		if (HeldMoveKeys ()) {
-			GameEvents.startCounting = true;
-		} else if (stabilizeOn && (body.velocity != Vector2.zero || body.angularVelocity != 0f)) {
-			//			print ("Stabilising...");
-			Stabilize (amount * 0.7f);
+				GameEvents.startCounting = true;
+			} else if (stabilizeOn && (body.velocity != Vector2.zero || body.angularVelocity != 0f)) {
+				Stabilize (amount);
+			} else {
+				stabilizing = false;
+			}
 		}
 	}
 
@@ -182,32 +192,32 @@ public class Moves : MonoBehaviour
 //		float delta = amount / 30;
 		rotTotal = Mathf.Clamp (rotTotal, -5f, 5f);
 //		Vector3 position = body.transform.position;
-		if (Input.GetKey (KeyCode.A)) {
+		if (MInput.sleft) {
 			body.velocity = Vector2.MoveTowards (body.velocity, new Vector2 (-lim, 0), speed * amount * Time.deltaTime);
 //			ThrustDirectionNormalise(amount,-1f);
 		}
 		
-		if (Input.GetKey (KeyCode.W)) {
+		if (MInput.fwd) {
 			body.velocity = Vector2.MoveTowards (body.velocity, new Vector2 (0, lim), speed * amount * Time.deltaTime);
 //			ThrustDirectionNormalise(amount,-1f);
 		}
 		
-		if (Input.GetKey (KeyCode.D)) {
+		if (MInput.sright) {
 			body.velocity = Vector2.MoveTowards (body.velocity, new Vector2 (lim, 0), speed * amount * Time.deltaTime);
 //			ThrustDirectionNormalise(amount,-1f);
 		}
 		
-		if (Input.GetKey (KeyCode.S)) {
+		if (MInput.bck) {
 			body.velocity = Vector2.MoveTowards (body.velocity, new Vector2 (0, -lim), speed * amount * Time.deltaTime);
 //			ThrustDirectionNormalise(amount,-1f);
 		}
 		//  rotation-------------------------------------------------------
 		
-		if (Input.GetKey (KeyCode.E)) {
+		if (MInput.rright) {
 			body.AddTorque (-rotSpeed * amount);
 			ThrusterAt (5, amount);
 		} 
-		if (Input.GetKey (KeyCode.Q)) {
+		if (MInput.rleft) {
 			body.AddTorque (rotSpeed * amount);
 			ThrusterAt (4, amount);
 		}
@@ -216,7 +226,28 @@ public class Moves : MonoBehaviour
 			GameEvents.startCounting = true;
 		}
 
-		;
+	}
+
+	void navigateFollow (float amount)
+	{
+		if (HeldMoveKeys ()) {
+			GameEvents.startCounting = true;
+		}
+		if (Input.GetMouseButton (0)) {
+			
+			Vector3 mousePos = Input.mousePosition - Camera.main.transform.position;
+			mousePos.z = Camera.main.transform.position.z;
+			print (mousePos);
+			Vector3 pos = Camera.main.ScreenToWorldPoint (mousePos);
+			pos.z = 0;
+//			pos.x = transform.position.x- pos.x;
+//			pos.y = transform.position.y-pos.y;
+			print ("2: " + pos);
+//			pos -= transform.position;
+			StartCoroutine (AnimationScript.AnimatePrefabXYZ (gameObject, pos, 1f, 0f));
+//			this.transform.position = pos;
+		}
+
 	}
 
 	float getThrusterAmount (float amount)
@@ -233,9 +264,9 @@ public class Moves : MonoBehaviour
 	public static bool HeldMoveKeys ()
 	{
 
-		return Input.GetKey (KeyCode.Q) || Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.E)
-			|| Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.D)
-			|| Input.GetKeyUp (KeyCode.X);
+		return MInput.rleft || MInput.fwd || MInput.rright
+		|| MInput.sleft || MInput.bck || MInput.sright
+		|| Input.GetKeyUp (KeyCode.X);
 	}
 
 	void StabilizeRotation (float amount)
@@ -253,11 +284,14 @@ public class Moves : MonoBehaviour
 		}
 	}
 
+	bool stabilizing = false;
 	void Stabilize (float amount)
 	{
 		if (fuelGuage > 0 || unlimitedFuel) {
-			if (body.velocity != Vector2.zero || body.angularVelocity != 0)
-				reduceFuel (amount * 0.5f);
+			stabilizing = true;
+			if (body.velocity != Vector2.zero || body.angularVelocity != 0) {
+				reduceFuel (amount * 0.3f);
+			}
 			body.velocity = Vector2.MoveTowards (body.velocity, Vector2.zero, speed * amount * Time.deltaTime);
 			body.angularVelocity = Mathf.MoveTowards (body.angularVelocity, 0f, 3f * rotSpeed * amount * Time.deltaTime);
 
@@ -320,7 +354,7 @@ public class Moves : MonoBehaviour
 				break;
 			}
 		}
-		if (fuelSlider != null) {
+		if (fuelSlider != null && !stabilizing) {
 			reduceFuel (amount / 2f);
 		}
 	}
