@@ -93,7 +93,9 @@ public class ButtonPresses : MonoBehaviour
 
 			Transform tut0 = canvasObj.FindChild ("Tutorial0");
 			tutDialog = tut0.FindChild ("Dialog").gameObject;
-			tut0.gameObject.SetActive ((Application.loadedLevel == 1));
+			tut0.gameObject.SetActive (true);
+			tut0.FindChild("Dialog").gameObject.SetActive ((Application.loadedLevel == 1));
+			Instance.StartCoroutine (TutorialInfo());
 			//-------sucess menus
 			int lev = Application.loadedLevel;
 			if (lev == 1) {
@@ -681,6 +683,28 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabZ (Camera.main.gameObject, -150f, 3f, dl += 1.5f));
 	}
 
+	public string tutPrimary = "";
+	public string tutSecondary = "";
+
+	IEnumerator TutorialInfo(){
+		float ttime = 0.7f;
+
+		yield return new WaitForSeconds (1f);
+		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
+		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, tutPrimary, ttime));
+
+//		yield return new WaitForSeconds (1f);
+		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, tutSecondary, ttime));
+
+		yield return new WaitForSeconds (7f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
+		yield return new WaitForSeconds (2f);
+
+		tut0.SetActive (false);
+	}
+
 	IEnumerator TutorialController ()
 	{
 		float ttime = 0.7f;
@@ -748,7 +772,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Great!", ttime));
 		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now, let's see if you can...\n" +
-		"Collect at least 6 red orbs\n" +
+		"Collect at least 6 shiny orbs\n" +
 		"\n" +
 		"(Use the maneuvering keys to move around)", ttime));
 
@@ -771,7 +795,7 @@ public class ButtonPresses : MonoBehaviour
 		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, 
 			"Stabilisers assist beginners by automatically bringing them down to a stop\n" +
-			"For best experience, the stabilisers are turned off by default in future levels\n\n" +
+			"Be careful since stabilisers use more fuel (Bottom left Guage) \n\n" +
 			"Press X to disable stabilisers\n", ttime));
 		while (!Input.GetKey (KeyCode.X))
 			yield return new WaitForEndOfFrame ();
@@ -787,7 +811,7 @@ public class ButtonPresses : MonoBehaviour
 			yield return new WaitForEndOfFrame ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
-		yield return new WaitForSeconds (1.5f);
+		yield return new WaitForSeconds (0.5f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
 		"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
@@ -798,9 +822,9 @@ public class ButtonPresses : MonoBehaviour
 			yield return new WaitForEndOfFrame ();
 //		ToggleTabPanel ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "That's it for now...", ttime));
-		yield return new WaitForSeconds (3f);
+		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Let's Dock...", ttime));
-		yield return new WaitForSeconds (3f);
+		yield return new WaitForSeconds (2f);
 
 		//-----------SATELLITE
 //		*/
@@ -892,7 +916,7 @@ public class ButtonPresses : MonoBehaviour
 				Destroy (player.GetComponent<SpringJoint2D> ());
 				Destroy (player.GetComponent<Rigidbody2D> ());
 				Destroy (player.transform.FindChild ("outline").gameObject);
-				Destroy (player.transform.FindChild ("Nose").gameObject);
+				//Destroy (player.transform.FindChild ("Nose").gameObject);
 				Destroy (player.transform.FindChild ("Trail").gameObject);
 
 				GameObject satellite = lev.FindChild ("Dockables/Satellite").gameObject;
@@ -906,7 +930,7 @@ public class ButtonPresses : MonoBehaviour
 
 
 //				player.transform.Rotate (new Vector3 (0, 0, 90f));
-//				satellite.transform.Rotate (new Vector3 (0, 0, 90f));
+				satellite.transform.eulerAngles= (new Vector3 (0, 0, 90f));
 
 				Instance.StartCoroutine (
 					AnimationScript.FadeOutPanel (
