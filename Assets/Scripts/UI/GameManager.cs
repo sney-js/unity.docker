@@ -50,45 +50,17 @@ public class GameManager : MonoBehaviour
 
 	public static string GetLevelName (int lev)
 	{
+		string[] levNames = {"MAIN MENU", 
+			"LEARNER", "MASTER", "FESTIVE",
+			"MIGHTY", "PROTECTOR",
+			"DESOLATE", 
+			"TERROR", 
+			"SURVIVOR", 
+			"COMPANION",
+			"DANCERS", "HOPE"
+		};
 		string str = lev + ". ";
-		switch (lev) {
-		case 0:
-			str += "MAIN MENU";
-			break;
-		case 1:
-			str += "LEARNER";
-			break;
-		case 2:
-			str += "CHAOS";
-			break;
-		case 3:
-			str += "PROTECTOR";
-			break;
-		case 4:
-			str += "MIGHTY";
-			break;
-		case 5:
-			str += "SURVIVOR";
-			break;
-		case 6:
-			str += "DESOLATE";
-			break;
-		case 7:
-			str += "FESTIVE";
-			break;
-		case 8:
-			str += "TERROR";
-			break;
-		case 9:
-			str += "COMPANION";
-			break;
-		case 10:
-			str += "DANCERS";
-			break;
-		case 11:
-			str += "UNFORGIVING";
-			break;
-		}
+		str += levNames[lev];
 		return str;
 	}
 

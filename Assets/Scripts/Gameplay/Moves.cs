@@ -290,7 +290,7 @@ public class Moves : MonoBehaviour
 		if (fuelGuage > 0 || unlimitedFuel) {
 			stabilizing = true;
 			if (body.velocity != Vector2.zero || body.angularVelocity != 0) {
-				reduceFuel (amount * 0.3f);
+				reduceFuel (amount * 0.5f);
 			}
 			body.velocity = Vector2.MoveTowards (body.velocity, Vector2.zero, speed * amount * Time.deltaTime);
 			body.angularVelocity = Mathf.MoveTowards (body.angularVelocity, 0f, 3f * rotSpeed * amount * Time.deltaTime);
@@ -355,7 +355,7 @@ public class Moves : MonoBehaviour
 			}
 		}
 		if (fuelSlider != null && !stabilizing) {
-			reduceFuel (amount / 2f);
+			reduceFuel (amount * 0.6f);
 		}
 	}
 
