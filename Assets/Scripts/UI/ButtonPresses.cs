@@ -71,6 +71,7 @@ public class ButtonPresses : MonoBehaviour
 
 //			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();			
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
+			StartScreenFade=true;
 			if (StartScreenFade) {
 				canvasObj.FindChild ("StartScreen").gameObject.SetActive (GameManager.Run1);
 				if (GameManager.Run1) {

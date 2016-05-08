@@ -6,7 +6,7 @@ public class ScoreConnection : MonoBehaviour
 	public static ScoreConnection instance;
 
 	private string secretKey = "2pAk&&";
-	private static string buildversion = "1.0#2016-2-26--20:43#";
+	private static string buildversion = "1.1#2016-2-26--20:43#";
 
 	void Start ()
 	{
@@ -74,24 +74,24 @@ public class ScoreConnection : MonoBehaviour
 
 	public static float GetCurrentGameVersion ()
 	{
-//		try {
-//			string line;
-//			System.IO.StreamReader file = new System.IO.StreamReader (Application.dataPath + "/Resources/version.txt"); //load text file with data
-//			while ((line = file.ReadLine ()) != null) { //while text exists.. repeat
-//			
-//				float version = AboutStringParseVersion (line);
-//				System.DateTime date = 
-//					AboutStringParseTime (line);
-//				print (version + " , " + date);
-//				return version;
-//			}
-//			file.Close ();
-//		} catch (System.Exception e) {
-//		}
-//		return -1;
-//
 		float version = AboutStringParseVersion (buildversion);
-		System.DateTime date = AboutStringParseTime (buildversion);
+		try {
+			string line;
+			System.IO.StreamReader file = new System.IO.StreamReader (Application.dataPath + "/Resources/version.txt"); //load text file with data
+			while ((line = file.ReadLine ()) != null) { //while text exists.. repeat
+			
+				version = AboutStringParseVersion (line);
+				System.DateTime date = 
+					AboutStringParseTime (line);
+				print (version + " , " + date);
+				return version;
+			}
+			file.Close ();
+		} catch (System.Exception e) {
+			print ("ERROR checking version from file");
+//			System.DateTime date = AboutStringParseTime (buildversion);
+		}
+
 //		print (version + " , " + date);
 		return version;
 	}

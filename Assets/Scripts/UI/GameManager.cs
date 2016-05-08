@@ -51,13 +51,17 @@ public class GameManager : MonoBehaviour
 	public static string GetLevelName (int lev)
 	{
 		string[] levNames = {"MAIN MENU", 
-			"LEARNER", "MASTER", "FESTIVE",
-			"MIGHTY", "PROTECTOR",
+			"LEARNER", 
+			"CHAOS",
+			"ILLUSION",
+			"MIGHTY", 
 			"DESOLATE", 
+			"FESTIVE",
 			"TERROR", 
 			"SURVIVOR", 
-			"COMPANION",
-			"DANCERS", "HOPE"
+			"TENACIOUS",
+			"PATIENT", 
+			"DESTROYER"
 		};
 		string str = lev + ". ";
 		str += levNames[lev];

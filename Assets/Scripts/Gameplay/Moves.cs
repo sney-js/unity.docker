@@ -26,7 +26,7 @@ public class Moves : MonoBehaviour
 	public int
 		navType = 1;
 	private bool stabilizeOn;
-
+	bool stabilizing = false;
 	//------------------------------------------------Editor Classes----------------------------------------
 
 	[System.Serializable]
@@ -72,11 +72,7 @@ public class Moves : MonoBehaviour
 		if (Input.GetKeyUp (KeyCode.X)) {
 			stabilizeOn = !stabilizeOn;
 			GameManager.SetStabiliserPref (stabilizeOn ? 1 : 0);
-//			print ("X key up!!! " + stabilizeOn);
-			
 			StartCoroutine (AnimationScript.FlashScreen (null, 1.5f, 2, "Stabilisation " + (stabilizeOn ? "On" : "Off")));
-		
-			
 		}
 	}
 
@@ -269,22 +265,8 @@ public class Moves : MonoBehaviour
 		|| Input.GetKeyUp (KeyCode.X);
 	}
 
-	void StabilizeRotation (float amount)
-	{
-		if (fuelGuage > 0 && body.angularVelocity != 0) {
-			reduceFuel (amount);
-			body.angularVelocity = Mathf.MoveTowards (body.angularVelocity, 0f, 3f * rotSpeed * amount * Time.deltaTime);
-			
-			if (body.angularVelocity > 0)
-				ThrusterAt (5, amount);
-			else if (body.angularVelocity < 0)
-				ThrusterAt (4, amount);
-			
-			ThrustDirectionNormalise (amount, 1);
-		}
-	}
 
-	bool stabilizing = false;
+
 	void Stabilize (float amount)
 	{
 		if (fuelGuage > 0 || unlimitedFuel) {
@@ -293,7 +275,7 @@ public class Moves : MonoBehaviour
 				reduceFuel (amount * 0.5f);
 			}
 			body.velocity = Vector2.MoveTowards (body.velocity, Vector2.zero, speed * amount * Time.deltaTime);
-			body.angularVelocity = Mathf.MoveTowards (body.angularVelocity, 0f, 3f * rotSpeed * amount * Time.deltaTime);
+			body.angularVelocity = Mathf.MoveTowards (body.angularVelocity, 0f, 9f * rotSpeed * amount * Time.deltaTime);
 
 			if (body.angularVelocity > 0)
 				ThrusterAt (5, amount);
