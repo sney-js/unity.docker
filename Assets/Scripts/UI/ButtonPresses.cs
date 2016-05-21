@@ -13,7 +13,7 @@ public class ButtonPresses : MonoBehaviour
 	private Toggle t_antialias, t_bloom, t_grain, t_shadow;
 	private Slider t_mouse;
 	private int t_qualityLevel;
-	public bool NoPause = false, StartScreenFade = false, GoToMainMenuNow = false;
+	public bool NoPause = false, StartScreenFade = true, GoToMainMenuNow = false;
 	private GameObject MoreOptionsPanel, optionsPanel, helptip, TabMenu, ShortCutDialog, tutDialog, player;
 	private Transform successObjTarget, canvasObj, UI;
 	public Sprite[] headlights, CriteriaBox1Sprites;
@@ -71,7 +71,7 @@ public class ButtonPresses : MonoBehaviour
 
 //			Instance.lightIndicator = UI.transform.FindChild ("Other/LightIndicator/Image").gameObject.GetComponent<Image> ();			
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
-			StartScreenFade=true;
+//			StartScreenFade=true;
 			if (StartScreenFade) {
 				canvasObj.FindChild ("StartScreen").gameObject.SetActive (GameManager.Run1);
 				if (GameManager.Run1) {
@@ -95,8 +95,9 @@ public class ButtonPresses : MonoBehaviour
 			Transform tut0 = canvasObj.FindChild ("Tutorial0");
 			tutDialog = tut0.FindChild ("Dialog").gameObject;
 			tut0.gameObject.SetActive (true);
-			tut0.FindChild("Dialog").gameObject.SetActive ((Application.loadedLevel == 1));
-			Instance.StartCoroutine (TutorialInfo());
+			tut0.FindChild ("Dialog").gameObject.SetActive ((Application.loadedLevel == 1));
+			if (Application.loadedLevel > 1)
+				Instance.StartCoroutine (TutorialInfo ());
 			//-------sucess menus
 			int lev = Application.loadedLevel;
 			if (lev == 1) {
@@ -175,7 +176,8 @@ public class ButtonPresses : MonoBehaviour
 
 	#region Main Menu
 
-	public void OpenGamePage(){
+	public void OpenGamePage ()
+	{
 		Application.OpenURL ("https://aneilator.itch.io/docker");
 	}
 
@@ -687,7 +689,8 @@ public class ButtonPresses : MonoBehaviour
 	public string tutPrimary = "";
 	public string tutSecondary = "";
 
-	IEnumerator TutorialInfo(){
+	IEnumerator TutorialInfo ()
+	{
 		float ttime = 0.7f;
 
 		yield return new WaitForSeconds (1f);
@@ -703,7 +706,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
 		yield return new WaitForSeconds (2f);
 
-		tut0.SetActive (false);
+			tut0.SetActive (false);
 	}
 
 	IEnumerator TutorialController ()
@@ -715,7 +718,7 @@ public class ButtonPresses : MonoBehaviour
 		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
 		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
-
+		print (MInput.CONTROL);
 		yield return new WaitForSeconds (1f);
 		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
 		objective.text = "Hold W to accelerate forwards";
@@ -723,7 +726,7 @@ public class ButtonPresses : MonoBehaviour
 //		GameEvents.PlayerFuelUnlimited(true);
 //		DimFuel(true);
 		//----------1
-		while (MInput.fwd)
+		while (!MInput.fwd)
 			yield return new WaitForEndOfFrame ();
 
 		//-----------2
@@ -931,7 +934,7 @@ public class ButtonPresses : MonoBehaviour
 
 
 //				player.transform.Rotate (new Vector3 (0, 0, 90f));
-				satellite.transform.eulerAngles= (new Vector3 (0, 0, 90f));
+				satellite.transform.eulerAngles = (new Vector3 (0, 0, 90f));
 
 				Instance.StartCoroutine (
 					AnimationScript.FadeOutPanel (

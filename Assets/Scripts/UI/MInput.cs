@@ -13,10 +13,10 @@ public class MInput
 	public static bool fwd {
 		get {
 			if (MInput.CONTROL <= KEYBOARD2) {
-//				return Input.GetKey (KeyCode.W);
+				return Input.GetKey (KeyCode.W);
 
 //				Debug.Log(Input.GetAxis ("Vertical"));
-				return Input.GetAxis ("Vertical") > 0;
+//				return Input.GetAxis ("Vertical") > 0;
 			}
 			else
 				return Input.GetAxis ("Vertical") > 0;

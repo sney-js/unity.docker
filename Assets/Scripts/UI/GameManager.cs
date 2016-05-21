@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 //		DontDestroyOnLoad(this);
 //		FixedTimeStepChanged=FixedTimeStep;
 //		controlType = MInput.KEYBOARD2;
-		MInput.CONTROL = MInput.KEYBOARD1;
+
 		Time.timeScale = 1;
 		Application.targetFrameRate = 60;
 	}

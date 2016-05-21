@@ -9,7 +9,7 @@ public class HealthLoss : MonoBehaviour
 	// Use this for initialization
 
 	private Slider healthSlider;
-	private float durability = 18f;
+	private float durability = 60f;
 	private int healthBars = 3;
 
 //	bool flash = true;

@@ -22,7 +22,7 @@ public class Moves : MonoBehaviour
 	private Thrusters thrusterScript;
 	private float fuelGuage;
 	private float initialMass;
-	[Range (1, 2)]
+	[Range (1, 3)]
 	public int
 		navType = 1;
 	private bool stabilizeOn;
@@ -32,7 +32,7 @@ public class Moves : MonoBehaviour
 	[System.Serializable]
 	public class BurnerValues
 	{
-		public float BurnerLess = 0.2f, BurnerNormal = 1.0f, BurnerHigh = 1.8f;
+		public float BurnerLess = 0.2f, BurnerNormal = 1.0f, BurnerHigh = 2f;
 		//		[HideInInspector]
 	}
 
@@ -40,6 +40,7 @@ public class Moves : MonoBehaviour
 
 	void Start ()
 	{ 
+		MInput.CONTROL = navType;
 		if (thrustersObj != null) {
 			Transform tt = thrustersObj.transform.Find ("Flames");
 
@@ -63,8 +64,11 @@ public class Moves : MonoBehaviour
 		SetFuelLevel ();
 		initialMass = gameObject.GetComponent<Rigidbody2D> ().mass;
 		initialMass += (initialFuel / fuelDensity);
-		stabilizeOn = Application.loadedLevel == 1 || GameManager.GetStabiliserPref() ? true : false;
-
+		stabilizeOn = Application.loadedLevel == 1 || GameManager.GetStabiliserPref () ? true : false;
+		if (stabilizeOn) {
+			body.drag = 0.5f;
+			body.angularDrag = 2f;
+		}
 	}
 
 	void Update ()
@@ -105,74 +109,82 @@ public class Moves : MonoBehaviour
 
 	void navigate (float amount)
 	{
-		if (MInput.CONTROL == MInput.KEYBOARD2) {
+		if (navType == MInput.KEYBOARD2) {
 			navigateAlternate (amount);
 			return;
-		}
-		if (MInput.CONTROL == MInput.MIXED) {
+		} else if (navType == MInput.MIXED) {
 			navigateFollow (amount);
+			navigateNormal (amount);
 			return;
-		} else if (MInput.CONTROL == MInput.KEYBOARD1) {
-		
-			/*
+		} else if (navType == MInput.KEYBOARD1) {
+			navigateNormal (amount);
+			return;
+		}
+	}
+
+	float timeHeld = 0f;
+
+	void navigateNormal (float amount)
+	{
+		/*
 		 * Input.GetAxis("Vertical") > 0 // gets forward
 			Input.GetAxis("Vertical") < 0 // gets backward
 			Input.GetAxis("Horizontal") > 0 // gets right
 			Input.GetAxis("Horizontal") < 0 // gets left
 			*/
-			if (HeldMoveKeys ()) {
+		if (HeldMoveKeys ()) {
+			Vector2 vel = body.velocity;
 
-				float delta = amount / 30;
-				rotTotal = Mathf.Clamp (rotTotal, -5f, 5f);
-				Vector3 position = body.transform.position;
-
-				if (MInput.sleft) {
-					body.AddForceAtPosition (body.transform.up * (speed * amount), position);
-					if (rotTotal - delta >= -3) {
-						rotTotal += -delta;
-						Rotator3D.transform.Rotate (new Vector3 (0f, delta, 0f));
-					}
-					ThrusterAt (0, amount);
-				}
-		
-				if (MInput.fwd) {
-					body.AddForceAtPosition (body.transform.right * (speed * amount), position);
-			
-					ThrusterAt (1, amount);
-				}
-		
-				if (MInput.sright) {
-					body.AddForceAtPosition (-body.transform.up * (speed * amount), position);
-					if (rotTotal + delta <= 3) {
-						rotTotal += delta;
-						Rotator3D.transform.Rotate (new Vector3 (0f, -delta, 0f));
-					}
-					ThrusterAt (2, amount);
-				}
-		
-				if (MInput.bck) {
-					body.AddForceAtPosition (-body.transform.right * (speed * amount), position);
-					ThrusterAt (3, amount);
-				}
-				//  rotation-------------------------------------------------------
-		
-				if (MInput.rright) {
-					body.AddTorque (-rotSpeed * amount);
-					ThrusterAt (5, amount);
-				} 
-				if (MInput.rleft) {
-					body.AddTorque (rotSpeed * amount);
-					ThrusterAt (4, amount);
-				}
-				//-------------------------------------------------------------------
-
-//		if (HeldMoveKeys ()) {
-				GameEvents.startCounting = true;
-			} else if (stabilizeOn && (body.velocity != Vector2.zero || body.angularVelocity != 0f)) {
-				Stabilize (amount);
-			} else {
-				stabilizing = false;
+			timeHeld += Time.deltaTime;
+			float delta = amount / 30;
+			//nudging rocket left/right
+			rotTotal = Mathf.Clamp (rotTotal, -5f, 5f);
+			Vector3 position = body.transform.position;
+//			amount = Mathf.Clamp (Burner.BurnerHigh * Mathf.Exp (1f* -timeHeld), 0, Burner.BurnerHigh);
+//			print ("amount:" + amount + " ,from: " + timeHeld);
+			if (MInput.fwd) {
+				body.AddForceAtPosition (body.transform.right * (speed * amount), position);
+				ThrusterAt (1, amount);
 			}
+			if (MInput.sleft) {
+				body.AddForceAtPosition (body.transform.up * (speed * amount), position);
+				if (rotTotal - delta >= -3) {
+					rotTotal += -delta;
+					Rotator3D.transform.Rotate (new Vector3 (0f, delta, 0f));
+				}
+				ThrusterAt (0, amount);
+			}
+			if (MInput.sright) {
+				body.AddForceAtPosition (-body.transform.up * (speed * amount), position);
+				if (rotTotal + delta <= 3) {
+					rotTotal += delta;
+					Rotator3D.transform.Rotate (new Vector3 (0f, -delta, 0f));
+				}
+				ThrusterAt (2, amount);
+			}
+			if (MInput.bck) {
+				body.AddForceAtPosition (-body.transform.right * (speed * amount), position);
+				ThrusterAt (3, amount);
+			}
+			//  rotation-------------------------------------------------------
+			if (MInput.rright) {
+				body.AddTorque (-rotSpeed * amount);
+				ThrusterAt (5, amount);
+			}
+			if (MInput.rleft) {
+				body.AddTorque (rotSpeed * amount);
+				ThrusterAt (4, amount);
+			}
+			//-------------------------------------------------------------------
+			//		if (HeldMoveKeys ()) {
+			GameEvents.startCounting = true;
+		} else if (stabilizeOn && (body.velocity != Vector2.zero || body.angularVelocity != 0f)) {
+			Stabilize (amount);
+		} else {
+			stabilizing = false;
+			body.drag = 0f;
+			body.angularDrag = 0f;
+			timeHeld = 0f;
 		}
 	}
 
@@ -224,25 +236,33 @@ public class Moves : MonoBehaviour
 
 	}
 
+
 	void navigateFollow (float amount)
 	{
 		if (HeldMoveKeys ()) {
 			GameEvents.startCounting = true;
 		}
-		if (Input.GetMouseButton (0)) {
+//		if (Input.GetMouseButton (0)) {
 			
-			Vector3 mousePos = Input.mousePosition - Camera.main.transform.position;
-			mousePos.z = Camera.main.transform.position.z;
-			print (mousePos);
-			Vector3 pos = Camera.main.ScreenToWorldPoint (mousePos);
-			pos.z = 0;
+		Vector3 mousePos = Input.mousePosition - Camera.main.transform.position;
+		mousePos.z = Camera.main.transform.position.z;
+		Vector3 pos = Camera.main.ScreenToWorldPoint (mousePos);
+		pos.z = 0;
+//		print ("Mouse:" + pos);
+//		print ("you  :" + transform.position);
+		pos.x -= transform.position.x;
+		pos.y -= transform.position.y;
+		float angle = -Mathf.Atan2 (pos.x, pos.y) * Mathf.Rad2Deg - 90;
+//		print ("angle  :" + angle);
 //			pos.x = transform.position.x- pos.x;
 //			pos.y = transform.position.y-pos.y;
-			print ("2: " + pos);
 //			pos -= transform.position;
-			StartCoroutine (AnimationScript.AnimatePrefabXYZ (gameObject, pos, 1f, 0f));
+		transform.rotation = Quaternion.Euler (new Vector3 (0, 0, angle));
+//			transform.Rotate(new Vector3(0,0, angle) * Time.deltaTime * 2f);
+		//				Input.GetAxis("Mouse Y"),
+//			StartCoroutine (AnimationScript.AnimatePrefabXYZ (gameObject, pos, 1f, 0f));
 //			this.transform.position = pos;
-		}
+//		}
 
 	}
 
@@ -253,7 +273,7 @@ public class Moves : MonoBehaviour
 //		am = Mathf.Clamp(sp,0.1f,2f);
 //		if (sp>am) am = sp*0.5f;
 //		print("am: "+am +" ,sp: "+sp);
-		am = 2f;
+		am = Burner.BurnerHigh;
 		return am;
 	}
 
@@ -270,19 +290,25 @@ public class Moves : MonoBehaviour
 	void Stabilize (float amount)
 	{
 		if (fuelGuage > 0 || unlimitedFuel) {
-			stabilizing = true;
-			if (body.velocity != Vector2.zero || body.angularVelocity != 0) {
-				reduceFuel (amount * 0.5f);
+			if (!stabilizing) {
+				stabilizing = true;
+				body.drag = 0.5f;
+				body.angularDrag = 2f;
 			}
-			body.velocity = Vector2.MoveTowards (body.velocity, Vector2.zero, speed * amount * Time.deltaTime);
-			body.angularVelocity = Mathf.MoveTowards (body.angularVelocity, 0f, 9f * rotSpeed * amount * Time.deltaTime);
-
+			/*
+			if (body.velocity != Vector2.zero || body.angularVelocity != 0) {
+				reduceFuel (amount * 0.2f);
+			}
+//			body.velocity = Vector2.MoveTowards (body.velocity, Vector2.zero, speed * amount * Time.deltaTime);
+//			body.angularVelocity = Mathf.MoveTowards (body.angularVelocity, 0f, 9f * rotSpeed * amount * Time.deltaTime);
+			float amountRot = Mathf.Clamp (Mathf.Abs (body.angularVelocity * 0.1f), 0, amount);
 			if (body.angularVelocity > 0)
-				ThrusterAt (5, amount);
+				ThrusterAt (5, amountRot);
 			else if (body.angularVelocity < 0)
-				ThrusterAt (4, amount);
+				ThrusterAt (4, amountRot);
 
 			ThrustDirectionNormalise (amount, 1);
+			*/
 		}
 	}
 
@@ -296,9 +322,10 @@ public class Moves : MonoBehaviour
 
 		float maxAmountX = amount, maxAmountY = amount;
 		if (Mathf.Abs (norm.x) <= Mathf.Abs (norm.y))
-			maxAmountX = Mathf.Abs (norm.x) / Mathf.Abs (norm.y) * amount;
+			maxAmountX = (Mathf.Abs (norm.x) / Mathf.Abs (norm.y)) * amount;
 		else
-			maxAmountY = Mathf.Abs (norm.y) / Mathf.Abs (norm.x) * amount;
+			maxAmountY = (Mathf.Abs (norm.y) / Mathf.Abs (norm.x)) * amount;
+
 		if (norm.x > 0 && norm.y != 0)
 			ThrusterAt (3, maxAmountX);
 		if (norm.x < 0 && norm.y != 0)
@@ -336,7 +363,7 @@ public class Moves : MonoBehaviour
 				break;
 			}
 		}
-		if (fuelSlider != null && !stabilizing) {
+		if (fuelSlider != null) {
 			reduceFuel (amount * 0.6f);
 		}
 	}
