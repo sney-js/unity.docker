@@ -24,6 +24,8 @@ public class ArrowFollow : MonoBehaviour
 		nextActionTime = 0.0f;
 		nextActionTimeText = 0.0f;
 	}
+
+	public static float distance=400;
 	
 	// Update is called once per frame
 	void LateUpdate ()
@@ -36,7 +38,7 @@ public class ArrowFollow : MonoBehaviour
 				Vector3 fromDist = fromTrack.transform.position;
 				fromDist.z = 0f;
 				fromDist = Camera.main.ScreenToWorldPoint (fromTrack.transform.position);
-				float distance = Vector2.Distance (fromDist, goToTrack.transform.position);
+				distance = Vector2.Distance (fromDist, goToTrack.transform.position);
 				text.text = distance.ToString ("0.0");
 			}
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
+[RequireComponent (typeof(Camera))]
 public class CameraScript : MonoBehaviour
 {
 	public static float mouseSensitivity = 0.5f;
@@ -24,11 +24,14 @@ public class CameraScript : MonoBehaviour
 	float TimeDoubleClick = 0.5f;
 	bool CenterOnPlayer = false;
 	public float sunAt = -1f;
+	Rigidbody2D targetPhysics;
 
 	void Start ()
 	{
-		if (target == null)
+		if (target == null) {
 			target = GameObject.Find ("Player").transform;
+		}
+		targetPhysics = target.gameObject.GetComponent<Rigidbody2D> ();
 		lastPosition = target.position;
 		offSet = Vector3.zero;
 	
@@ -62,7 +65,8 @@ public class CameraScript : MonoBehaviour
 		if (FollowsBounds) {
 			adjustViewBounds ();
 		}
-		
+		adjustToPlayerSpeed ();
+
 		transform.position = Vector3.SmoothDamp (transform.position, panPos, ref velocity, dampTime * Time.smoothDeltaTime);
 		
 	}
@@ -118,8 +122,8 @@ public class CameraScript : MonoBehaviour
 			}
 		} else {
 			line.SetVertexCount (9);
-			float[] XX = {maxX, minX}; // n/2%2=0 = max
-			float[] YY = {maxY, minY}; // n%2. 0=max
+			float[] XX = { maxX, minX }; // n/2%2=0 = max
+			float[] YY = { maxY, minY }; // n%2. 0=max
 			float r = 5;
 //			float px = maxX, py = maxY - r;
 
@@ -151,6 +155,44 @@ public class CameraScript : MonoBehaviour
 	#endregion
 
 	#region Move Camera
+
+	Vector3 velocity2;
+
+	float lastFactor = 0;
+	float lastDistance = ArrowFollow.distance;
+
+	void adjustToPlayerSpeed ()
+	{
+		Vector3 velOffset = new Vector3 (targetPhysics.velocity.x, targetPhysics.velocity.y, 0) / 3f;
+		var magnitude = Mathf.Clamp (targetPhysics.velocity.magnitude, 0, 50f);
+		var factor = Mathf.Exp (0.02f * magnitude) - 1;
+		velOffset *= factor;
+
+		if (ArrowFollow.distance < 100 && lastDistance != ArrowFollow.distance) {
+			float delta = Mathf.Clamp01 (1f * (50 - (ArrowFollow.distance / 100)));
+			lastDistance = ArrowFollow.distance;
+//			velOffset.z += delta;
+		}
+		factor = Mathf.Exp (0.01f * magnitude) - 1;
+		if (factor > lastFactor)
+			velOffset.z -= factor * 2;
+		else if (factor < lastFactor) {
+			velOffset.z += factor * 2;
+		}
+		lastFactor = factor;
+//		print ("Factor:" + factor);
+//		velOffset *= targetPhysics.velocity.magnitude;
+		Vector3 offSet2 = Vector3.SmoothDamp (offSet, velOffset, ref velocity2, 0.1f * Time.smoothDeltaTime);
+//		Vector3 destination = target.position + offSet;
+//		destination.z = panPos.z;
+		panPos = panPos + offSet2;
+//		panPos.z = Mathf.Clamp (velOffset.z, -200, -100);
+//		panPos.z = -170 - factor*400f;
+////		transform.position = 
+//		var panPos2 = panPos;
+//		transform.position = Vector3.SmoothDamp (transform.position, panPos2, ref velocity, dampTime * Time.smoothDeltaTime);
+//		throw new System.NotImplementedException ();
+	}
 
 	void MouseDrag ()
 	{
@@ -221,13 +263,13 @@ public class CameraScript : MonoBehaviour
 		}
 
 	}
-	
+
 	void KeyFreePan ()
 	{
 		
 		keyWorking = false;
-		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.LeftArrow) || 
-			Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.DownArrow)) {
+		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.LeftArrow) ||
+		    Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.DownArrow)) {
 			
 			keyWorking = true;
 			//-------------------------zoom-------------------------
@@ -370,8 +412,8 @@ public class CameraScript : MonoBehaviour
 		float screenAspect = (float)Screen.width / (float)Screen.height;
 		float cameraHeight = camera.orthographicSize * 2;
 		Bounds bounds = new Bounds (
-			camera.transform.position,
-			new Vector3 (cameraHeight * screenAspect, cameraHeight, 0));
+			                camera.transform.position,
+			                new Vector3 (cameraHeight * screenAspect, cameraHeight, 0));
 		return bounds;
 	}
 
