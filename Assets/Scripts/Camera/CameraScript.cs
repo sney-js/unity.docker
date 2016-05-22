@@ -34,7 +34,7 @@ public class CameraScript : MonoBehaviour
 		targetPhysics = target.gameObject.GetComponent<Rigidbody2D> ();
 		lastPosition = target.position;
 		offSet = Vector3.zero;
-	
+		offSetZoom = transform.position.z;
 		dampTime = 3f;
 		if (InitialDelayFollow > 0f && follow)
 			StartCoroutine (DelaySnap (InitialDelayFollow));
@@ -158,40 +158,35 @@ public class CameraScript : MonoBehaviour
 
 	Vector3 velocity2;
 
-	float lastFactor = 0;
-	float lastDistance = ArrowFollow.distance;
+	float offSetZoom;
 
 	void adjustToPlayerSpeed ()
 	{
 		Vector3 velOffset = new Vector3 (targetPhysics.velocity.x, targetPhysics.velocity.y, 0) / 3f;
 		var magnitude = Mathf.Clamp (targetPhysics.velocity.magnitude, 0, 50f);
-		var factor = Mathf.Exp (0.02f * magnitude) - 1;
+		var factor = Mathf.Exp (0.01f * magnitude) - 1;
 		velOffset *= factor;
 
-		if (ArrowFollow.distance < 100 && lastDistance != ArrowFollow.distance) {
-			float delta = Mathf.Clamp01 (1f * (50 - (ArrowFollow.distance / 100)));
-			lastDistance = ArrowFollow.distance;
-//			velOffset.z += delta;
+		adjustZoomPlayerSpeed (velOffset, magnitude);
+
+		panPos += Vector3.SmoothDamp (offSet, velOffset, ref velocity2, 0.1f * Time.smoothDeltaTime);
+	}
+
+	float velocityZoom;
+
+	void adjustZoomPlayerSpeed (Vector3 velOffset, float magnitude)
+	{
+		float zoomamount = offSetZoom;
+		var currDistance = ArrowFollow.distance;
+		float maxDist = 25;
+
+		float factor = Mathf.Exp (0.007f * magnitude) - 1;
+		zoomamount += zoomamount*factor;
+		if (currDistance < maxDist){
+			zoomamount = -90 + zoomamount*factor;
 		}
-		factor = Mathf.Exp (0.01f * magnitude) - 1;
-		if (factor > lastFactor)
-			velOffset.z -= factor * 2;
-		else if (factor < lastFactor) {
-			velOffset.z += factor * 2;
-		}
-		lastFactor = factor;
-//		print ("Factor:" + factor);
-//		velOffset *= targetPhysics.velocity.magnitude;
-		Vector3 offSet2 = Vector3.SmoothDamp (offSet, velOffset, ref velocity2, 0.1f * Time.smoothDeltaTime);
-//		Vector3 destination = target.position + offSet;
-//		destination.z = panPos.z;
-		panPos = panPos + offSet2;
-//		panPos.z = Mathf.Clamp (velOffset.z, -200, -100);
-//		panPos.z = -170 - factor*400f;
-////		transform.position = 
-//		var panPos2 = panPos;
-//		transform.position = Vector3.SmoothDamp (transform.position, panPos2, ref velocity, dampTime * Time.smoothDeltaTime);
-//		throw new System.NotImplementedException ();
+		zoomamount = Mathf.Clamp (zoomamount, maxZoomOut,-30);
+		panPos.z = Mathf.SmoothDamp (panPos.z, zoomamount, ref velocityZoom, 10f* Time.smoothDeltaTime);
 	}
 
 	void MouseDrag ()
@@ -349,6 +344,7 @@ public class CameraScript : MonoBehaviour
 			transform.position = new Vector3 (transform.position.x, transform.position.y, zoomLerped);
 		}
 		panPos.z = zoomamount;
+		offSetZoom = zoomamount;
 	}
 
 	//--------------------------------------------X-----------------------------------//

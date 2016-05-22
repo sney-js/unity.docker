@@ -109,7 +109,7 @@ public class Moves : MonoBehaviour
 
 	void navigate (float amount)
 	{
-		if (navType == MInput.KEYBOARD2) {
+		if (navType == MInput.KEYBOARD1) {
 			navigateAlternate (amount);
 			return;
 		} else if (navType == MInput.MIXED) {

@@ -12,20 +12,22 @@ public class ArrowFollow : MonoBehaviour
 	public GameObject blob;
 	public float min = 0.02f, max = 0.98f;
 	private float nextActionTime = 0.0f, nextActionTimeText = 0.0f;
-	private float period = 0.04f;
+	private float period = 0.02f;
 	// Use this for initialization
 	void Start ()
 	{
 		if (goToTrack == null)
 			goToTrack = GameObject.Find ("Level/Dockables/Satellite");
-		fromTrack = blob;
+		if (fromTrack == null)
+			fromTrack = GameObject.Find ("Level/Player");
+//			fromTrack = blob;
 		min = 0.02f;
 		max = 0.98f;
 		nextActionTime = 0.0f;
 		nextActionTimeText = 0.0f;
 	}
 
-	public static float distance=400;
+	public static float distance = 400;
 	
 	// Update is called once per frame
 	void LateUpdate ()
@@ -35,11 +37,11 @@ public class ArrowFollow : MonoBehaviour
 
 			if (Time.time > nextActionTimeText) { 
 				nextActionTimeText += (0.1f); 
-				Vector3 fromDist = fromTrack.transform.position;
+				distance = Vector2.Distance (fromTrack.transform.position, goToTrack.transform.position);
+				Vector3 fromDist = Camera.main.ScreenToWorldPoint (blob.transform.position);
 				fromDist.z = 0f;
-				fromDist = Camera.main.ScreenToWorldPoint (fromTrack.transform.position);
-				distance = Vector2.Distance (fromDist, goToTrack.transform.position);
-				text.text = distance.ToString ("0.0");
+				float distanceBlob = Vector2.Distance (fromDist, goToTrack.transform.position);
+				text.text = distanceBlob.ToString ("0.0");
 			}
 
 			Vector3 v3Screen = Camera.main.WorldToViewportPoint (goToTrack.transform.position);
