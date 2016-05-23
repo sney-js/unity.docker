@@ -11,6 +11,7 @@ public class CameraScript : MonoBehaviour
 	public bool follow = true;
 	public float InitialDelayFollow = 0f;
 	public bool FollowsBounds = true;
+	public float startZoom = 0;
 	public float minX = -1000f, maxX = 1000f, minY = -1000f, maxY = 1000f;
 	private Vector3 velocity = Vector3.zero;
 	private bool snap = true;
@@ -31,14 +32,17 @@ public class CameraScript : MonoBehaviour
 		if (target == null) {
 			target = GameObject.Find ("Player").transform;
 		}
+		if (startZoom == 0) {
+			startZoom = transform.position.z;
+		}
 		targetPhysics = target.gameObject.GetComponent<Rigidbody2D> ();
 		lastPosition = target.position;
 		offSet = Vector3.zero;
 		offSetZoom = transform.position.z;
 		dampTime = 3f;
-		if (InitialDelayFollow > 0f && follow)
+		if (InitialDelayFollow > 0f && follow) {
 			StartCoroutine (DelaySnap (InitialDelayFollow));
-
+		}
 		DrawOutline (false);
 		StartCoroutine (FadeInMusic ());
 	}
@@ -58,14 +62,15 @@ public class CameraScript : MonoBehaviour
 			bool letPan = !GameEvents.LevelFail && !GameEvents.LevelSuccess;
 			if (letPan) {	
 				KeyFreePan ();
-				if (!keyWorking)
+				if (!keyWorking) {
 					MouseDrag ();
+				}
+				adjustToPlayerSpeed ();
 			}
 		}
 		if (FollowsBounds) {
 			adjustViewBounds ();
 		}
-		adjustToPlayerSpeed ();
 
 		transform.position = Vector3.SmoothDamp (transform.position, panPos, ref velocity, dampTime * Time.smoothDeltaTime);
 		
@@ -91,11 +96,12 @@ public class CameraScript : MonoBehaviour
 	{
 		follow = false;
 		yield return new WaitForSeconds (delay);
-		follow = true;
 		float tempDamp = dampTime;
 		dampTime = 10f;
+		follow = true;
+		offSetZoom = startZoom;
 		//		print ("Delay over. Follow true: "+follow);
-		yield return new WaitForSeconds (1f);
+		yield return new WaitForSeconds (0.4f);
 		dampTime = tempDamp;
 	}
 
@@ -181,12 +187,12 @@ public class CameraScript : MonoBehaviour
 		float maxDist = 25;
 
 		float factor = Mathf.Exp (0.007f * magnitude) - 1;
-		zoomamount += zoomamount*factor;
-		if (currDistance < maxDist){
-			zoomamount = -90 + zoomamount*factor;
+		zoomamount += zoomamount * factor;
+		if (currDistance < maxDist) {
+			zoomamount = -90 + zoomamount * factor;
 		}
-		zoomamount = Mathf.Clamp (zoomamount, maxZoomOut,-30);
-		panPos.z = Mathf.SmoothDamp (panPos.z, zoomamount, ref velocityZoom, 10f* Time.smoothDeltaTime);
+		zoomamount = Mathf.Clamp (zoomamount, maxZoomOut, -30);
+		panPos.z = Mathf.SmoothDamp (panPos.z, zoomamount, ref velocityZoom, 10f * Time.smoothDeltaTime);
 	}
 
 	void MouseDrag ()

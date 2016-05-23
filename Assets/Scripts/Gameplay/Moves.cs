@@ -6,25 +6,25 @@ using System.Collections;
 public class Moves : MonoBehaviour
 {
 	
-	private Rigidbody2D body;
 	public float speed = 5f;
 	public float rotSpeed = 75f;
-	private Slider fuelSlider;
 	public float initialFuel = 1000;
-	private Text fuelText;
 	public GameObject thrustersObj;
 	public static bool allowMoving = true;
 	public GameObject Rotator3D;
-	private float rotTotal = 0;
 	public BurnerValues Burner;
 	public float fuelDensity = 10000f;
 	public bool unlimitedFuel = false;
+	[Range (1, 3)]
+	private int navType = 2;
+
+	private Rigidbody2D body;
+	private Slider fuelSlider;
+	private Text fuelText;
+	private float rotTotal = 0;
 	private Thrusters thrusterScript;
 	private float fuelGuage;
 	private float initialMass;
-	[Range (1, 3)]
-	public int
-		navType = 1;
 	private bool stabilizeOn;
 	bool stabilizing = false;
 	//------------------------------------------------Editor Classes----------------------------------------
@@ -116,7 +116,7 @@ public class Moves : MonoBehaviour
 			navigateFollow (amount);
 			navigateNormal (amount);
 			return;
-		} else if (navType == MInput.KEYBOARD1) {
+		} else if (navType == MInput.KEYBOARD2) {
 			navigateNormal (amount);
 			return;
 		}

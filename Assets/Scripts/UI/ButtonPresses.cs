@@ -38,7 +38,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance = this;
 		QualityOptions = new OptionsDetails ();
 //		new ScoreConnection ();
-
+		StartScreenFade=true;
 		canvasObj = GameObject.Find ("Canvas").transform;
 		isMainMenu = Application.loadedLevel == 0;
 		if (!isMainMenu) {
