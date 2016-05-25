@@ -173,14 +173,14 @@ public class CameraScript : MonoBehaviour
 		var factor = Mathf.Exp (0.01f * magnitude) - 1;
 		velOffset *= factor;
 
-		adjustZoomPlayerSpeed (velOffset, magnitude);
+		adjustZoomPlayerSpeed (ref velOffset, magnitude);
 
 		panPos += Vector3.SmoothDamp (offSet, velOffset, ref velocity2, 0.1f * Time.smoothDeltaTime);
 	}
 
 	float velocityZoom;
 
-	void adjustZoomPlayerSpeed (Vector3 velOffset, float magnitude)
+	void adjustZoomPlayerSpeed (ref Vector3 velOffset, float magnitude)
 	{
 		float zoomamount = offSetZoom;
 		var currDistance = ArrowFollow.distance;
@@ -189,6 +189,7 @@ public class CameraScript : MonoBehaviour
 		float factor = Mathf.Exp (0.007f * magnitude) - 1;
 		zoomamount += zoomamount * factor;
 		if (currDistance < maxDist) {
+			CenterOnPlayer = true;
 			zoomamount = -90 + zoomamount * factor;
 		}
 		zoomamount = Mathf.Clamp (zoomamount, maxZoomOut, -30);
@@ -254,9 +255,10 @@ public class CameraScript : MonoBehaviour
 			OneClick = Time.time;
 		}
 		if (CenterOnPlayer && !isOutOfBounds (panPos, 1)) {
-			offSet = Vector3.Lerp (offSet, Vector3.zero, 0.4f);
-			if (offSet == Vector3.zero)
-				CenterOnPlayer = false;
+			offSet = Vector3.Lerp (offSet, Vector3.zero, 5f * Time.smoothDeltaTime);
+			StartCoroutine (resetCenterVarAfter (2f));
+//			if (offSet == Vector3.zero)
+//				CenterOnPlayer = false;
 		}
 		//--------------------------------------------Rotate-----------------------------------//
 		if (Input.GetMouseButton (2)) {
@@ -265,6 +267,11 @@ public class CameraScript : MonoBehaviour
 
 	}
 
+	IEnumerator resetCenterVarAfter(float delay)
+	{
+		yield return new WaitForSeconds (delay);
+		CenterOnPlayer = false;
+	}
 	void KeyFreePan ()
 	{
 		
