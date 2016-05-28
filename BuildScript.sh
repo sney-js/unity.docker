@@ -55,7 +55,8 @@ echo "... Build Platform : "$BUILD_METHOD
 echo "... Building Now ... " 
 #----------------Run Build Command
 DIR=`pwd`
-BUILD="$UNITYLOC -quit -batchmode -projectPath $DIR -logFile $LOGLOC -executeMethod ToBuild.Build$BUILD_METHOD"
+UNITYLOC="/c/Program\ Files/Unity/Editor/Unity.exe"
+BUILD="${UNITYLOC} -quit -batchmode -projectPath $DIR -logFile $LOGLOC -executeMethod ToBuild.Build$BUILD_METHOD"
 	
 if $BUILD; then 
 	echo "... Build Complete!"

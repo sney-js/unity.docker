@@ -38,7 +38,7 @@ public class ButtonPresses : MonoBehaviour
 		Instance = this;
 		QualityOptions = new OptionsDetails ();
 //		new ScoreConnection ();
-		StartScreenFade=true;
+		StartScreenFade = true;
 		canvasObj = GameObject.Find ("Canvas").transform;
 		isMainMenu = Application.loadedLevel == 0;
 		if (!isMainMenu) {
@@ -609,7 +609,7 @@ public class ButtonPresses : MonoBehaviour
 
 	#region Tutorial
 
-	public static bool IN_TUTORIAL=false;
+	public static bool IN_TUTORIAL = false;
 
 	public void AcceptTutorial ()
 	{
@@ -650,7 +650,7 @@ public class ButtonPresses : MonoBehaviour
 		yield break;
 	}
 
-	void SetUpTutorial ()
+	float SetUpTutorial ()
 	{
 		IN_TUTORIAL = true;
 		float size = 100f;
@@ -664,8 +664,8 @@ public class ButtonPresses : MonoBehaviour
 		float dl = 0.3f;
 		Vector3 newCamPos = Camera.main.transform.position;
 		newCamPos.z = -600f;
-		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (Camera.main.gameObject, newCamPos, 0.6f, dl));
-
+//		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (Camera.main.gameObject, newCamPos, 0.6f, dl));
+		Instance.StartCoroutine(cameraScript.DelaySnap(dl, -550f));
 		GameObject.Find ("CenterPuller").GetComponent<SpringJoint2D> ().frequency = 0.14f;
 		GameObject parent = GameObject.Find ("AsteroidGroup");
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabPos (parent, 1.5f, 0.8f, dl += 0.7f));
@@ -685,8 +685,8 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabXYZ (player, newPosPlayer, 1.3f, dl += 0.5f));
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabRotation (player, new Vector3 (0f, 0f, 90f), 1.3f, dl));
 		GameEvents.CheatOn (false);
-
-		Instance.StartCoroutine (AnimationScript.AnimatePrefabZ (Camera.main.gameObject, -150f, 3f, dl += 1.5f));
+		return dl;
+//		Instance.StartCoroutine (AnimationScript.AnimatePrefabZ (Camera.main.gameObject, -150f, 3f, dl += 1.5f));
 	}
 
 	public string tutPrimary = "";
@@ -709,15 +709,17 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
 		yield return new WaitForSeconds (2f);
 
-			tut0.SetActive (false);
+		tut0.SetActive (false);
 	}
 
 	IEnumerator TutorialController ()
 	{
 		IN_TUTORIAL = true;
 		float ttime = 0.7f;
-		SetUpTutorial ();
-
+		float totDelay = SetUpTutorial ();
+		CameraScript cs = Camera.main.gameObject.GetComponent<CameraScript> ();
+//		yield return new WaitForSeconds (totDelay+=1.5f);
+		Instance.StartCoroutine (cs.DelaySnap (totDelay += 1.5f, -220f));
 		yield return new WaitForSeconds (5f);
 		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
 		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
@@ -730,7 +732,7 @@ public class ButtonPresses : MonoBehaviour
 //		GameEvents.PlayerFuelUnlimited(true);
 //		DimFuel(true);
 		//----------1
-		/*
+
 		while (!MInput.fwd)
 			yield return new WaitForEndOfFrame ();
 
@@ -768,18 +770,18 @@ public class ButtonPresses : MonoBehaviour
 		yield return new WaitForSeconds (2f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "That's all from maneuvering!", ttime));
 		yield return new WaitForSeconds (3f);
-
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective,
-			"1. Click and Drag mouse to pan camera around     (or Arrow Keys)\n" +
-			"2. Scroll mouse to zoom in-out                            (or RCtrl/RCmd + Arrow Keys)\n" +
-			"3. Right click to reset camera                               (or Tap C)\n\n" +
+			"CAMERA CONTROLS: \n"+
+			"\t     Pan     -  Drag mouse         \t(or Arrow Keys)\n" +
+			"\t     Zoom  -  Scroll mouse        \t(or RCtrl/RCmd + Arrow Keys)\n" +
+			"\t     Reset  -  Right click          \t(or Tap C)\n\n" +
 			"When you are ready to proceed, press ENTER.", ttime));
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
 		//-----------3
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Great!", ttime));
-		yield return new WaitForSeconds (2f);
+		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now, let's see if you can...\n" +
 		"Collect at least 6 shiny orbs\n" +
 		"\n" +
@@ -794,28 +796,26 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.AnimatePrefabRotation (player, angle, 1.5f, 0.8f));
 //		print(player.GetComponent<Rigidbody2D>().velocity);
 
+		yield return new WaitForSeconds (2f);
 		while (!GameEvents.LevelFail && GameEvents.Score < 6) {
 			yield return new WaitForEndOfFrame ();
 		}
 		//--------------
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Impressive!", ttime));
 		yield return new WaitForSeconds (3f);
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "One more thing...", ttime));
-		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, 
 			"Stabilisers prevent you from going out of control\n" +
-			"\n\n" +
-			"Press X to disable stabilisers\n", ttime));
+			"Press X to disable stabilisers", ttime));
 		while (!Input.GetKey (KeyCode.X))
 			yield return new WaitForEndOfFrame ();
 		//----------kk
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now your movement is frictionless. Try it!\n\nPress Enter when you are ready to proceed", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Now your movement is frictionless. Try it!\nPress Enter when you are ready to proceed", ttime));
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
-		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "But before we begin, a quick guide of game options...", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "One last thing...", ttime));
 
 		yield return new WaitForSeconds (3f);
-		*/
+
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with the satellite...\n" +
 		"Press TAB to see Level objectives and leaderboard", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
@@ -826,8 +826,8 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
 		"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
-		"If you complete all 3 objectives, you get a gold medal\n" +
-		"When you have a gold medal, you can add your best time on the online leaderboard (right)\n\n" +
+		"To get GOLD Medal: complete all 3 objectives\n" +
+		"With GOLD, you can add your best time on the online leaderboard (right)\n\n" +
 		"Press TAB again to proceed", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
@@ -864,8 +864,8 @@ public class ButtonPresses : MonoBehaviour
 			yield return new WaitForEndOfFrame ();
 		}
 		//-----------3
-//		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Wow!", ttime));
-//		yield return new WaitForSeconds (3f);
+		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Docking successful!", ttime));
+		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Congratulations. You have finished your training...\n\n" +
 		"If you'd like to play around more, You can press F to undock\n" +
 		"Whenever you feel ready, press SPACE BAR to start Level 1!", ttime));
@@ -874,6 +874,7 @@ public class ButtonPresses : MonoBehaviour
 			yield return new WaitForEndOfFrame ();
 		}
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
+		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "", ttime));
 //		IN_TUTORIAL = false;
 //		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Brilliant!", ttime));
 //		yield return new WaitForSeconds (3f);

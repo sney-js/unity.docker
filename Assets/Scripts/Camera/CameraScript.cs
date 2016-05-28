@@ -41,7 +41,7 @@ public class CameraScript : MonoBehaviour
 		offSetZoom = transform.position.z;
 		dampTime = 8f;
 		if (InitialDelayFollow > 0f && follow) {
-			StartCoroutine (DelaySnap (InitialDelayFollow));
+			StartCoroutine (DelaySnap (InitialDelayFollow, startZoom));
 		}
 		DrawOutline (false);
 		StartCoroutine (FadeInMusic ());
@@ -92,14 +92,14 @@ public class CameraScript : MonoBehaviour
 		}
 	}
 
-	IEnumerator DelaySnap (float delay)
+	public  IEnumerator DelaySnap (float delay, float zoomTo)
 	{
 		follow = false;
 		yield return new WaitForSeconds (delay);
 		float tempDamp = dampTime;
 		dampTime = 20f;
 		follow = true;
-		offSetZoom = startZoom;
+		offSetZoom = zoomTo;
 		//		print ("Delay over. Follow true: "+follow);
 		yield return new WaitForSeconds (0.4f);
 		dampTime = tempDamp;
