@@ -607,7 +607,9 @@ public class ButtonPresses : MonoBehaviour
 
 	#endregion
 
-	#region tutorial
+	#region Tutorial
+
+	public static bool IN_TUTORIAL=false;
 
 	public void AcceptTutorial ()
 	{
@@ -650,6 +652,7 @@ public class ButtonPresses : MonoBehaviour
 
 	void SetUpTutorial ()
 	{
+		IN_TUTORIAL = true;
 		float size = 100f;
 		CameraScript cameraScript = Camera.main.GetComponent<CameraScript> ();
 		cameraScript.minX = -size;
@@ -711,6 +714,7 @@ public class ButtonPresses : MonoBehaviour
 
 	IEnumerator TutorialController ()
 	{
+		IN_TUTORIAL = true;
 		float ttime = 0.7f;
 		SetUpTutorial ();
 
@@ -726,6 +730,7 @@ public class ButtonPresses : MonoBehaviour
 //		GameEvents.PlayerFuelUnlimited(true);
 //		DimFuel(true);
 		//----------1
+		/*
 		while (!MInput.fwd)
 			yield return new WaitForEndOfFrame ();
 
@@ -798,8 +803,8 @@ public class ButtonPresses : MonoBehaviour
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "One more thing...", ttime));
 		yield return new WaitForSeconds (3f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, 
-			"Stabilisers assist beginners by automatically bringing them down to a stop\n" +
-			"Be careful since stabilisers use more fuel (Bottom left Guage) \n\n" +
+			"Stabilisers prevent you from going out of control\n" +
+			"\n\n" +
 			"Press X to disable stabilisers\n", ttime));
 		while (!Input.GetKey (KeyCode.X))
 			yield return new WaitForEndOfFrame ();
@@ -808,14 +813,16 @@ public class ButtonPresses : MonoBehaviour
 		while (!Input.GetKey (KeyCode.Return))
 			yield return new WaitForEndOfFrame ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "But before we begin, a quick guide of game options...", ttime));
+
 		yield return new WaitForSeconds (3f);
+		*/
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Your main aim in each level is to dock with the satellite...\n" +
 		"Press TAB to see Level objectives and leaderboard", ttime));
 		while (!Input.GetKey (KeyCode.Tab))
 			yield return new WaitForEndOfFrame ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
-		yield return new WaitForSeconds (0.5f);
+		yield return new WaitForSeconds (1f);
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "The icons on the left show game objectives\n" +
 		"     1. Dock\n     2. Score 10 (Collect orbs)\n     3. Time: within 15 seconds\n\n" +
@@ -834,6 +841,7 @@ public class ButtonPresses : MonoBehaviour
 //		*/
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, 
 			"To dock with the satellite, advance ahead until your nose is within its docking area.\n", ttime));
+		
 		//------
 		Vector3 newPosPlayer2 = player.transform.position;
 		newPosPlayer2.x = 0f;
@@ -866,6 +874,7 @@ public class ButtonPresses : MonoBehaviour
 			yield return new WaitForEndOfFrame ();
 		}
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "", ttime));
+//		IN_TUTORIAL = false;
 //		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Brilliant!", ttime));
 //		yield return new WaitForSeconds (3f);
 //		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Here we go!", ttime));

@@ -15,7 +15,8 @@ public class AnimationScript : MonoBehaviour
 
 	public static IEnumerator ChangeText (Text text, string str, float overTime)
 	{
-		Color moreAlphaC = text.color, normC = text.color;
+		Color moreAlphaC = Color.white, normC = text.color;
+		moreAlphaC.a = 0.7f;
 		normC.a = 0f;
 		
 		float startTime = Time.time;

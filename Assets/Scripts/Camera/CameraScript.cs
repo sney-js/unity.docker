@@ -39,7 +39,7 @@ public class CameraScript : MonoBehaviour
 		lastPosition = target.position;
 		offSet = Vector3.zero;
 		offSetZoom = transform.position.z;
-		dampTime = 3f;
+		dampTime = 8f;
 		if (InitialDelayFollow > 0f && follow) {
 			StartCoroutine (DelaySnap (InitialDelayFollow));
 		}
@@ -65,8 +65,8 @@ public class CameraScript : MonoBehaviour
 				if (!keyWorking) {
 					MouseDrag ();
 				}
-				adjustToPlayerSpeed ();
 			}
+			adjustToPlayerSpeed ();
 		}
 		if (FollowsBounds) {
 			adjustViewBounds ();
@@ -97,7 +97,7 @@ public class CameraScript : MonoBehaviour
 		follow = false;
 		yield return new WaitForSeconds (delay);
 		float tempDamp = dampTime;
-		dampTime = 10f;
+		dampTime = 20f;
 		follow = true;
 		offSetZoom = startZoom;
 		//		print ("Delay over. Follow true: "+follow);
@@ -175,7 +175,8 @@ public class CameraScript : MonoBehaviour
 
 		adjustZoomPlayerSpeed (ref velOffset, magnitude);
 
-		panPos += Vector3.SmoothDamp (offSet, velOffset, ref velocity2, 0.1f * Time.smoothDeltaTime);
+		panPos += velOffset;// Vector3.Lerp (offSet, velOffset, Time.smoothDeltaTime);
+//		panPos += Vector3.SmoothDamp (offSet, velOffset, ref velocity2, 10f * Time.smoothDeltaTime);
 	}
 
 	float velocityZoom;
@@ -188,12 +189,12 @@ public class CameraScript : MonoBehaviour
 
 		float factor = Mathf.Exp (0.007f * magnitude) - 1;
 		zoomamount += zoomamount * factor;
-		if (currDistance < maxDist) {
+		if (currDistance < maxDist && !ButtonPresses.IN_TUTORIAL) {
 			CenterOnPlayer = true;
 			zoomamount = -90 + zoomamount * factor;
 		}
 		zoomamount = Mathf.Clamp (zoomamount, maxZoomOut, -30);
-		panPos.z = Mathf.SmoothDamp (panPos.z, zoomamount, ref velocityZoom, 10f * Time.smoothDeltaTime);
+		panPos.z = zoomamount;// Mathf.SmoothDamp (panPos.z, zoomamount, ref velocityZoom, 10f * Time.smoothDeltaTime);
 	}
 
 	void MouseDrag ()

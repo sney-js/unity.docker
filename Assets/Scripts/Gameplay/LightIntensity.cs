@@ -16,6 +16,7 @@ public class LightIntensity : MonoBehaviour {
 //	private float nextActionTime = 0.0f; 
 	public float period = 0.1f;
 	private static bool toggleCalled;
+	[Range (0,3)]
 	public int StartingAmount=0;
 
 	void Start () {
