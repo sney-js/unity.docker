@@ -1,9 +1,13 @@
-#rm -r Executables/*;
+if [ "$1" == "-clean" ]; then
+	rm -r Executables/*;
+	echo "Directory clean!"
+	exit 0
+fi
 if [ "$1" == "win" ]; then
 	echo "Starting Windows Unity builds..."
-	#"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\Snehil\Documents\Programming\Unity\game.unity.docker" -executeMethod ToBuild.BuildWindows
-	#"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\Snehil\Documents\Programming\Unity\game.unity.docker" -executeMethod ToBuild.BuildMac
-	#"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\Snehil\Documents\Programming\Unity\game.unity.docker" -executeMethod ToBuild.BuildWindows_32  
+	"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\Snehil\Documents\Programming\Unity\game.unity.docker" -executeMethod ToBuild.BuildWindows
+	"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\Snehil\Documents\Programming\Unity\game.unity.docker" -executeMethod ToBuild.BuildMac
+	"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\Snehil\Documents\Programming\Unity\game.unity.docker" -executeMethod ToBuild.BuildWindows_32  
 else
 	echo "Starting Unix Unity builds..."
 	./BuildScript.sh -platform mac;
@@ -18,9 +22,9 @@ cd Executables/;
 
 if [ "$1" == "win" ]; then
 	echo "Please zip folders... as names:"
-	echo "--Docker_Mac.zip"
-	echo "--Docker_Win.zip"
-	echo "--Docker_Win_32.zip"
+	echo "Docker_Mac.zip"
+	echo "Docker_Win.zip"
+	echo "Docker_Win_32.zip"
 else
 	echo "Folders zipped!"
 	zip -r Docker_Mac.zip MacOS/;

@@ -68,15 +68,22 @@ public class Moves : MonoBehaviour
 		if (stabilizeOn) {
 			body.drag = 0.5f;
 			body.angularDrag = 2f;
-		}
 	}
-
+//		trailRender = transform.FindChild ("Trail").gameObject.GetComponent<TrailRenderer> ();
+		trailRender2 = transform.FindChild ("Trail_2").gameObject.GetComponent<TrailRenderer> ();
+//		trailRender.enabled = stabilizeOn;
+		trailRender2.enabled = stabilizeOn;
+	}
+	TrailRenderer trailRender ;TrailRenderer trailRender2; 
 	void Update ()
 	{
 		if (Input.GetKeyUp (KeyCode.X)) {
 			stabilizeOn = !stabilizeOn;
 			GameManager.SetStabiliserPref (stabilizeOn ? 1 : 0);
 			StartCoroutine (AnimationScript.FlashScreen (null, 1.5f, 2, "Stabilisation " + (stabilizeOn ? "On" : "Off")));
+//			trailRender.enabled = stabilizeOn;
+			trailRender2.enabled = stabilizeOn;
+//			trailRender2.
 		}
 	}
 

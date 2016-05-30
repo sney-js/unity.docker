@@ -181,13 +181,17 @@ public class CameraScript : MonoBehaviour
 
 	float velocityZoom;
 
+	public bool HighSpeedRot=false;
+
 	void adjustZoomPlayerSpeed (ref Vector3 velOffset, float magnitude)
 	{
 		float zoomamount = offSetZoom;
 		var currDistance = ArrowFollow.distance;
 		float maxDist = 25;
-
-		float factor = Mathf.Exp (0.007f * magnitude) - 1;
+		var delta = 0.007f;
+		if (HighSpeedRot)
+			delta *= 0.06f;
+		float factor = Mathf.Exp (delta * magnitude) - 1;
 		zoomamount += zoomamount * factor;
 		if (currDistance < maxDist && !ButtonPresses.IN_TUTORIAL) {
 			CenterOnPlayer = true;
@@ -348,9 +352,9 @@ public class CameraScript : MonoBehaviour
 		float zoomamount = panPos.z;
 		float mouseAmnt = Time.timeScale == 0 ? 1.5f : 2.5f;
 		if (direction < 0)
-			zoomamount *= isKey ? 1.15f : mouseAmnt;
+			zoomamount *= isKey ? 1.5f : mouseAmnt;
 		else if (direction > 0)
-			zoomamount /= isKey ? 1.15f : mouseAmnt;
+			zoomamount /= isKey ? 1.5f : mouseAmnt;
 		zoomamount = Mathf.Clamp (zoomamount, maxZoomOut, -15f);
 
 		if (Time.timeScale == 0) {
