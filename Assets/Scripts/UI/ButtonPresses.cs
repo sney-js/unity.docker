@@ -58,6 +58,7 @@ public class ButtonPresses : MonoBehaviour
 		player = GameObject.Find ("Player").gameObject;
 		helptip = canvasObj.FindChild ("HelpTip").gameObject;
 		//------------------------------------
+		IN_TUTORIAL = false;
 		inTutorial = false;
 		menuShowing = false;
 
