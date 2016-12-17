@@ -41,11 +41,13 @@ public class TinyGravity : MonoBehaviour
 	void OnTriggerStay2D (Collider2D other)
 	{
 		if (StartAtAwake || GameEvents.startCounting){
-		if (other.gameObject.name == "outline") {
-			CheckAndPull (other.transform.parent.transform);
-		} else if (other.tag == "Rock") {
-			CheckAndPull (other.transform);
+			if (other.gameObject.name == "outline") {
+				CheckAndPull (other.transform.parent.transform);
+			}
 		}
+		if (other.tag == "Rock") {
+//			print ("pulling "+other.name);
+			CheckAndPull (other.transform);
 		}
 
 	}

@@ -164,9 +164,9 @@ public class ButtonPresses : MonoBehaviour
 				ToggleTabPanel ();
 			}
 		}
-		if (Input.GetKeyUp (KeyCode.Return) && GameEvents.LevelSuccess) {
-			Instance.LoadLevel (true);
-		}
+//		if (Input.GetKeyUp (KeyCode.Return) && GameEvents.LevelSuccess) {
+//			Instance.LoadLevel (true);
+//		}
 		if (GoToMainMenuNow) {
 			GoToMainMenuNow = false;
 			MainMenu ();
