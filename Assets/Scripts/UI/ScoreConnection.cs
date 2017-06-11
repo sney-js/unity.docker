@@ -13,9 +13,13 @@ public class ScoreConnection : MonoBehaviour
 		instance = this;
 	}
 
+	const string hostname = "http://docker.000webhostapp.com/";
+
 	public static void ReceiveScore (int level, string dateRange)
 	{
-		string url = "http://arc-nova.net78.net/ReceiveScores.php";
+		string url = hostname + "ReceiveScores.php";
+
+		print ("Receiving");
 		if (dateRange == null)
 			dateRange = "year";
 
@@ -26,13 +30,14 @@ public class ScoreConnection : MonoBehaviour
 		form.AddField ("DATERANGE", dateRange);
 		
 		WWW receive = new WWW (url, form);
+		print (receive.ToString());
 		if (instance != null)
 			instance.StartCoroutine (instance.WaitForRequest (receive, "displaying"));
 	}
 
 	public static void AddScore (string name, float score)
 	{
-		string url = "http://arc-nova.net78.net/AddScore.php";
+		string url = hostname + "AddScore.php";
 		string scoreText = score.ToString ("0.000");
 //		name = WWW.EscapeURL(name);
 		string hash = ComputeHash (name + scoreText + instance.secretKey);
@@ -66,7 +71,7 @@ public class ScoreConnection : MonoBehaviour
 
 	public static void ReceiveRemoteVersion ()
 	{
-		string url = "http://arc-nova.net78.net/About.php";
+		string url = hostname + "About.php";
 		
 		WWW www = new WWW (url + "?VERSION=" + GetCurrentGameVersion ());
 		ButtonPresses.Instance.StartCoroutine (ButtonPresses.WaitForVersion (www, "check-update"));
