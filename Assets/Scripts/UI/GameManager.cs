@@ -218,6 +218,8 @@ public class GameManager : MonoBehaviour
 
 		string[] crinames = GameEvents.GetCriteriasNames ();
 
+		print (lev + ",medal:"+medal+" ,saved: "+PlayerPrefs.GetInt (lev + "_Medal"));
+
 		if (ArrayContains (crinames, "SCORE")) {
 			if (GetLevelSavedScore () < GameEvents.Score)
 				PlayerPrefs.SetInt (lev + "_Score", GameEvents.Score);
