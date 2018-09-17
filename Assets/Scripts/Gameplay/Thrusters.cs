@@ -29,8 +29,8 @@ public class Thrusters
 		normalThrust1_Size = bThrus [0].gameObject.GetComponent<ParticleSystem> ().startSize;
 		normalThrust1_Life = bThrus [0].gameObject.GetComponent<ParticleSystem> ().startSpeed;
 
-		normalThrust2_Size = bThrus [0].FindChild ("Glow").gameObject.GetComponent<ParticleSystem> ().startSize;
-		normalThrust2_Life = bThrus [0].FindChild ("Glow").gameObject.GetComponent<ParticleSystem> ().startSpeed;
+		normalThrust2_Size = bThrus [0].Find ("Glow").gameObject.GetComponent<ParticleSystem> ().startSize;
+		normalThrust2_Life = bThrus [0].Find ("Glow").gameObject.GetComponent<ParticleSystem> ().startSpeed;
 
 		maxAmount = GameObject.Find ("Player").gameObject.GetComponent<Moves> ().Burner.BurnerHigh;
 	}
@@ -80,7 +80,7 @@ public class Thrusters
 	void hide (Transform t)
 	{
 		t.gameObject.GetComponent<ParticleSystem> ().Stop ();
-		Light light = t.FindChild ("glowLight").gameObject.GetComponent<Light> ();
+		Light light = t.Find ("glowLight").gameObject.GetComponent<Light> ();
 		light.intensity = Mathf.Lerp (light.intensity, 0f, 0.4f);
 		//		t.gameObject.GetComponent<Renderer> ().enabled = false;
 	}
@@ -164,12 +164,12 @@ public class Thrusters
 
 //		if (amount < 0.8)
 //			amount = 0.8f;
-		ParticleSystem flameGlow = t.FindChild ("Glow").gameObject.GetComponent<ParticleSystem> ();
+		ParticleSystem flameGlow = t.Find ("Glow").gameObject.GetComponent<ParticleSystem> ();
 		flameGlow.startSpeed = normalThrust2_Life * amount;
 		flameGlow.startSize = normalThrust2_Size * amount;
 		flameGlow.Play ();
 
-		Light light = t.FindChild ("glowLight").gameObject.GetComponent<Light> ();
+		Light light = t.Find ("glowLight").gameObject.GetComponent<Light> ();
 		light.intensity = Mathf.Lerp (0f, amount, 0.4f);
 
 	}

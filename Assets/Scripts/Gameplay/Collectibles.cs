@@ -12,7 +12,7 @@ public class Collectibles : MonoBehaviour
 	void Start ()
 	{
 		callOnce = true;
-		scoretext = GameObject.Find ("Canvas").transform.FindChild ("UI/Score").GetComponent<Text> ();
+		scoretext = GameObject.Find ("Canvas").transform.Find ("UI/Score").GetComponent<Text> ();
 	}
 	
 	void OnTriggerEnter2D (Collider2D other)
@@ -24,8 +24,8 @@ public class Collectibles : MonoBehaviour
 			GameEvents.Score++;
 //			StartCoroutine( AnimationScript.FlashScreen(null, 1f, 1, null));
 			SoundScript.PlayOnce (CollectSound, true);
-			if (transform.FindChild ("Particles").gameObject != null) {
-				ParticleSystem sysP = transform.FindChild ("Particles").gameObject.GetComponent<ParticleSystem> ();
+			if (transform.Find ("Particles").gameObject != null) {
+				ParticleSystem sysP = transform.Find ("Particles").gameObject.GetComponent<ParticleSystem> ();
 				if (sysP != null) {
 					sysP.Stop ();
 					found = false;

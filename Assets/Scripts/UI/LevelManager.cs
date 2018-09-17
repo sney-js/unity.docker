@@ -48,15 +48,15 @@ public class LevelManager : MonoBehaviour {
 
 			Transform level = LevelGrid.transform.GetChild(i);
 			//---------------------------set Text/Image----
-			level.FindChild("Text").GetComponent<Text>().text = GameManager.GetLevelName(i+1);
+			level.Find("Text").GetComponent<Text>().text = GameManager.GetLevelName(i+1);
 
 			if (i==totLevels-2) {
-				level.FindChild("ReqText").gameObject.SetActive(true);
-				level.FindChild("ReqText").GetComponent<Text>().text = "Required: All Silver";
+				level.Find("ReqText").gameObject.SetActive(true);
+				level.Find("ReqText").GetComponent<Text>().text = "Required: All Silver";
 			}
 			else if (i==totLevels-1) {
-				level.FindChild("ReqText").gameObject.SetActive(true);
-				level.FindChild("ReqText").GetComponent<Text>().text = "Required: All Gold";
+				level.Find("ReqText").gameObject.SetActive(true);
+				level.Find("ReqText").GetComponent<Text>().text = "Required: All Gold";
 			}
 
 			Sprite myscreen = screens[0];
@@ -67,7 +67,7 @@ public class LevelManager : MonoBehaviour {
 				}
 			}
 
-			level.FindChild("Image").GetComponent<Image>().sprite = myscreen;
+			level.Find("Image").GetComponent<Image>().sprite = myscreen;
 			//-----------------------------------------------
 
 			string key = "Level#"+(i+1)+"_Medal";
@@ -86,12 +86,12 @@ public class LevelManager : MonoBehaviour {
 			//----------------------------------------LOCK/BUTTON---------------------------------------------
 			bool levAllowed = IsLevelAllowed(i+1) && ok;
 			if (!levAllowed) ok=false;
-//			print("Level "+(i+1)+" Allowed?="+levAllowed);
+			print("Level "+(i+1)+" Allowed?="+levAllowed);
 
 //			bool lockRelease = ((achievedMedal==0 && !ok) || (i==totLevels-1 && !allGold) || (i==totLevels-2 && !allSilver))
 //				&& (i!=0);
 
-			Button button = level.FindChild("Button").gameObject.GetComponent<Button>();
+			Button button = level.Find("Button").gameObject.GetComponent<Button>();
 			button.interactable = levAllowed;
 			Navigation nav = Navigation.defaultNavigation;
 			nav.mode = Navigation.Mode.None;

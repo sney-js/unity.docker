@@ -157,7 +157,7 @@ public class AnimationScript : MonoBehaviour
 	public static IEnumerator FadeOutPanel (CanvasGroup overlay, float overTime)
 	{
 		Animator anim = overlay.gameObject.GetComponent<Animator> ();
-		anim.Stop ();
+		anim.StopPlayback();
 		float startTime = Time.time;
 		while (Time.time < startTime + overTime) {
 			overlay	.alpha = Mathf.Lerp (overlay.alpha, 0, (Time.time - startTime) / overTime);
@@ -174,7 +174,7 @@ public class AnimationScript : MonoBehaviour
 		if (overlay == null)
 			overlay = GameObject.Find ("Canvas/DamageImage").gameObject.GetComponent<Image> ();
 
-		Text info = overlay.transform.FindChild ("Text").GetComponent<Text> ();
+		Text info = overlay.transform.Find ("Text").GetComponent<Text> ();
 		info.text = str == null ? "" : str;
 
 		Color col = new Color32 (255, 63, 90, 0);
@@ -259,8 +259,8 @@ public class AnimationScript : MonoBehaviour
 	{
 		float FlashTime = 0.3f;
 
-		CanvasGroup overlay = GameObject.Find ("Canvas").transform.FindChild ("GameOverImage").GetComponent<CanvasGroup> ();
-		Text failText = overlay.transform.FindChild ("FailText").gameObject.GetComponent<Text> ();
+		CanvasGroup overlay = GameObject.Find ("Canvas").transform.Find ("GameOverImage").GetComponent<CanvasGroup> ();
+		Text failText = overlay.transform.Find ("FailText").gameObject.GetComponent<Text> ();
 		failText.text = GameManager.getMsg (msgID);
 
 		float startTime = Time.time;
@@ -276,7 +276,7 @@ public class AnimationScript : MonoBehaviour
 
 
 		float sliderTime = 2f;
-		Slider slider = overlay.transform.FindChild ("Slider").gameObject.GetComponent<Slider> ();
+		Slider slider = overlay.transform.Find ("Slider").gameObject.GetComponent<Slider> ();
 		slider.value = 0;
 		startTime = Time.time;
 		while (Time.time < startTime + sliderTime) {
@@ -315,29 +315,29 @@ public class AnimationScript : MonoBehaviour
 //
 		if (myCanvas == null)
 			myCanvas = GameObject.Find ("Canvas").transform;
-		Transform successScreen = myCanvas.FindChild ("GameSuccessImage");
+		Transform successScreen = myCanvas.Find ("GameSuccessImage");
 		//-------------------------------------write values---------------------------------------
 		ButtonPresses.initialiseCriteriaIcons (false);
 		//----------------------------------------------------------------------------------------
 		corr.StartCoroutine (CriteriaAnimOffset (0, 2.4f));
 
-		Text bestTime = successScreen.FindChild ("LeftGroup/BestTime/Result").GetComponent<Text> ();
-		Text resultTime = successScreen.FindChild ("LeftGroup/TimeGroup/Result").GetComponent<Text> ();
+		Text bestTime = successScreen.Find ("LeftGroup/BestTime/Result").GetComponent<Text> ();
+		Text resultTime = successScreen.Find ("LeftGroup/TimeGroup/Result").GetComponent<Text> ();
 		resultTime.text = timeTaken.ToString ("0.000") + " s";
 		bestTime.text = BestTime == float.PositiveInfinity ? "N/A" : BestTime.ToString ("0.000") + " s";
 		float AnimTimeGroupStart = 3.7f;
 
 		string[] crinames = GameEvents.GetCriteriasNames ();
-		Text resultScore = successScreen.FindChild ("LeftGroup/ScoreGroup/Result").GetComponent<Text> (); 
+		Text resultScore = successScreen.Find ("LeftGroup/ScoreGroup/Result").GetComponent<Text> (); 
 		if (crinames [1].Equals ("SCORE")) {
 			resultScore.text = score.ToString ();
 			corr.StartCoroutine (IncreaseText (resultScore, score, 2.5f, GameEvents.IsScoreChecked (), 1, corr));
 		} else if (crinames [1].Equals ("FUEL")) {
 			resultScore.text = fuel.ToString ();
-			successScreen.FindChild ("LeftGroup/ScoreGroup/Text").GetComponent<Text> ().text = "Fuel Used :";
+			successScreen.Find ("LeftGroup/ScoreGroup/Text").GetComponent<Text> ().text = "Fuel Used :";
 			corr.StartCoroutine (IncreaseText (resultScore, fuel, 2.5f, GameEvents.IsFuelChecked (), 2, corr));
 		} else {
-			successScreen.FindChild ("LeftGroup/ScoreGroup").gameObject.SetActive (false);
+			successScreen.Find ("LeftGroup/ScoreGroup").gameObject.SetActive (false);
 			AnimTimeGroupStart = 2.6f;
 			bool satisfyNoDock = (crinames [1].Equals ("NODOCK") && GameEvents.IsNoDock ());
 			bool satisfyFullHealth = (crinames [1].Equals ("HEALTH") && GameEvents.IsHealthFull ());
@@ -354,17 +354,17 @@ public class AnimationScript : MonoBehaviour
 		//-------------------------------------------------------------------------------
 		int medalReceived = GameManager.GetMedal ();
 
-		Transform medalPanel = successScreen.FindChild ("LeftGroup/MedalPanel");
+		Transform medalPanel = successScreen.Find ("LeftGroup/MedalPanel");
 //		print("RECCC:"+medalReceived);
 		switch (medalReceived) {
 		case 3:
-			medalPanel.FindChild ("GOLD").gameObject.SetActive (true);
+			medalPanel.Find ("GOLD").gameObject.SetActive (true);
 			break;
 		case 2:
-			medalPanel.FindChild ("SILVER").gameObject.SetActive (true);
+			medalPanel.Find ("SILVER").gameObject.SetActive (true);
 			break;
 		case 1:
-			medalPanel.FindChild ("BRONZE").gameObject.SetActive (true);
+			medalPanel.Find ("BRONZE").gameObject.SetActive (true);
 			break;
 		default:
 			break;
@@ -392,7 +392,7 @@ public class AnimationScript : MonoBehaviour
 		}
 
 
-		Transform successScreen = myCanvas.FindChild ("GameSuccessImage");
+		Transform successScreen = myCanvas.Find ("GameSuccessImage");
 		obj.text = isTime ? currTotal.ToString ("0.000") + "s" : currTotal.ToString ("0");
 
 
@@ -427,7 +427,7 @@ public class AnimationScript : MonoBehaviour
 			if (criteriaAchieved)
 				corr.StartCoroutine (CriteriaAnimOffset (2, 0.1f));
 			if (BestTime > to) {
-				successScreen.FindChild ("LeftGroup/BestTime/Result").GetComponent<Text> ().text = to.ToString ("0.000") + "s";
+				successScreen.Find ("LeftGroup/BestTime/Result").GetComponent<Text> ().text = to.ToString ("0.000") + "s";
 			}
 			successScreen.GetComponent<Animator> ().speed = 1f;
 		}
@@ -435,8 +435,8 @@ public class AnimationScript : MonoBehaviour
 
 	public static IEnumerator CriteriaAnimOffset (int criteriaNum, float time)
 	{
-		Transform cgroup = GameObject.Find ("Canvas").transform.FindChild ("GameSuccessImage/LeftGroup/CriteriaGroup");
-		Animator anim = cgroup.FindChild ("Box" + criteriaNum).gameObject.GetComponent<Animator> ();
+		Transform cgroup = GameObject.Find ("Canvas").transform.Find ("GameSuccessImage/LeftGroup/CriteriaGroup");
+		Animator anim = cgroup.Find ("Box" + criteriaNum).gameObject.GetComponent<Animator> ();
 		yield return new WaitForSeconds (time);
 		anim.enabled = true;
 

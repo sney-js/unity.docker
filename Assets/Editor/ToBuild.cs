@@ -39,7 +39,7 @@ public class ToBuild : MonoBehaviour
 	static void ExecuteBuild (int platform)
 	{
 		string folder = "Default";
-		BuildTarget target = BuildTarget.StandaloneOSXUniversal;
+		BuildTarget target = BuildTarget.StandaloneOSX;
 		string extension = "";
 
 		switch (platform) {
@@ -49,7 +49,7 @@ public class ToBuild : MonoBehaviour
 			break;
 		case 1:
 			folder = "MacOS";
-			target = BuildTarget.StandaloneOSXUniversal;
+			target = BuildTarget.StandaloneOSX;
 			break;
 		case 2:
 			folder = "Windows";

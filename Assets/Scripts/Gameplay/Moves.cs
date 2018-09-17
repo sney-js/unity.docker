@@ -44,12 +44,12 @@ public class Moves : MonoBehaviour
 		if (thrustersObj != null) {
 			Transform tt = thrustersObj.transform.Find ("Flames");
 
-			Transform[] lThrus = { tt.FindChild ("FlameNE"), tt.FindChild ("FlameSE") };
-			Transform[] rThrus = { tt.FindChild ("FlameNW"), tt.FindChild ("FlameSW") };
-			Transform[] fThrus = { tt.FindChild ("FlameSR"), tt.FindChild ("FlameSL") };
-			Transform[] bThrus = { tt.FindChild ("FlameNR"), tt.FindChild ("FlameNL") };
-			Transform[] spinQThrus = { tt.FindChild ("FlameNE"), tt.FindChild ("FlameSW") };
-			Transform[] spinEThrus = { tt.FindChild ("FlameNW"), tt.FindChild ("FlameSE") };
+			Transform[] lThrus = { tt.Find ("FlameNE"), tt.Find ("FlameSE") };
+			Transform[] rThrus = { tt.Find ("FlameNW"), tt.Find ("FlameSW") };
+			Transform[] fThrus = { tt.Find ("FlameSR"), tt.Find ("FlameSL") };
+			Transform[] bThrus = { tt.Find ("FlameNR"), tt.Find ("FlameNL") };
+			Transform[] spinQThrus = { tt.Find ("FlameNE"), tt.Find ("FlameSW") };
+			Transform[] spinEThrus = { tt.Find ("FlameNW"), tt.Find ("FlameSE") };
 
 			thrusterScript = new Thrusters (thrustersObj, lThrus, rThrus, fThrus, bThrus, spinQThrus, spinEThrus);
 
@@ -70,7 +70,7 @@ public class Moves : MonoBehaviour
 			body.angularDrag = 2f;
 	}
 //		trailRender = transform.FindChild ("Trail").gameObject.GetComponent<TrailRenderer> ();
-		trailRender2 = transform.FindChild ("Trail_2").gameObject.GetComponent<TrailRenderer> ();
+		trailRender2 = transform.Find ("Trail_2").gameObject.GetComponent<TrailRenderer> ();
 //		trailRender.enabled = stabilizeOn;
 		trailRender2.enabled = stabilizeOn;
 	}

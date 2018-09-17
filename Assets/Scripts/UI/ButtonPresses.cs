@@ -42,21 +42,21 @@ public class ButtonPresses : MonoBehaviour
 		canvasObj = GameObject.Find ("Canvas").transform;
 		isMainMenu = Application.loadedLevel == 0;
 		if (!isMainMenu) {
-			Instance.lightIndicator = canvasObj.FindChild ("UI/Other/LightIndicator/Image").gameObject.GetComponent<Image> ();
-			Instance.dockIndicator = canvasObj.FindChild ("UI/Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
+			Instance.lightIndicator = canvasObj.Find ("UI/Other/LightIndicator/Image").gameObject.GetComponent<Image> ();
+			Instance.dockIndicator = canvasObj.Find ("UI/Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
 		}
 	}
 
 	// Use this for initialization
 	void Start ()
 	{
-		optionsPanel = canvasObj.transform.FindChild ("OptionsPanel").gameObject;
-		MoreOptionsPanel = optionsPanel.transform.FindChild ("MoreOptions").gameObject;
-		ShortCutDialog = optionsPanel.transform.FindChild ("ShortcutDialog").gameObject;
-		UI = canvasObj.FindChild ("UI").transform;
-		successObjTarget = canvasObj.FindChild ("GameSuccessImage/OnlineScoreDisplay/Panel");
+		optionsPanel = canvasObj.transform.Find ("OptionsPanel").gameObject;
+		MoreOptionsPanel = optionsPanel.transform.Find ("MoreOptions").gameObject;
+		ShortCutDialog = optionsPanel.transform.Find ("ShortcutDialog").gameObject;
+		UI = canvasObj.Find ("UI").transform;
+		successObjTarget = canvasObj.Find ("GameSuccessImage/OnlineScoreDisplay/Panel");
 		player = GameObject.Find ("Player").gameObject;
-		helptip = canvasObj.FindChild ("HelpTip").gameObject;
+		helptip = canvasObj.Find ("HelpTip").gameObject;
 		//------------------------------------
 		IN_TUTORIAL = false;
 		inTutorial = false;
@@ -66,7 +66,7 @@ public class ButtonPresses : MonoBehaviour
 
 		if (isMainMenu) {
 			ScoreConnection.ReceiveRemoteVersion ();
-			Button start = Instance.canvasObj.transform.FindChild ("MainMenu/Start").GetComponent<Button> ();
+			Button start = Instance.canvasObj.transform.Find ("MainMenu/Start").GetComponent<Button> ();
 			start.Select ();
 		} else {
 
@@ -74,36 +74,36 @@ public class ButtonPresses : MonoBehaviour
 //			Instance.dockIndicator = UI.transform.FindChild ("Other/DockIndicator/Image").gameObject.GetComponent<Image> ();
 //			StartScreenFade=true;
 			if (StartScreenFade) {
-				canvasObj.FindChild ("StartScreen").gameObject.SetActive (GameManager.Run1);
+				canvasObj.Find ("StartScreen").gameObject.SetActive (GameManager.Run1);
 				if (GameManager.Run1) {
-					canvasObj.FindChild ("StartScreen/LevelTitle").GetComponent<Text> ().text = 
+					canvasObj.Find ("StartScreen/LevelTitle").GetComponent<Text> ().text = 
 						GameManager.GetLevelName (Application.loadedLevel);
 				}
 			}
 			
-			TabMenu = canvasObj.FindChild ("TabMenu").gameObject;
-			Text leveltext = TabMenu.transform.FindChild ("LeftGroup/MoreInfo/LevelText").GetComponent<Text> ();
+			TabMenu = canvasObj.Find ("TabMenu").gameObject;
+			Text leveltext = TabMenu.transform.Find ("LeftGroup/MoreInfo/LevelText").GetComponent<Text> ();
 			leveltext.text = "Level " + Application.loadedLevel;
 //			print ("this level:"+Application.loadedLevel+" ,next allowed:"+LevelManager.GetNextLevel ());
 			if (LevelManager.GetNextLevel () != Application.loadedLevel + 1) {
-				optionsPanel.transform.FindChild ("PrevNextGroup/Next").GetComponent<Button> ().interactable = false;
+				optionsPanel.transform.Find ("PrevNextGroup/Next").GetComponent<Button> ().interactable = false;
 			}
 			//options Criteria
 			FromOptionsLeaderboard = true;
 			initialiseCriteriaIcons (true);
 			ToggleDateRangeClicksOptions (2);
 
-			Transform tut0 = canvasObj.FindChild ("Tutorial0");
-			tutDialog = tut0.FindChild ("Dialog").gameObject;
+			Transform tut0 = canvasObj.Find ("Tutorial0");
+			tutDialog = tut0.Find ("Dialog").gameObject;
 			tut0.gameObject.SetActive (true);
-			tut0.FindChild ("Dialog").gameObject.SetActive ((Application.loadedLevel == 1));
+			tut0.Find ("Dialog").gameObject.SetActive ((Application.loadedLevel == 1));
 			if (Application.loadedLevel > 1)
 				Instance.StartCoroutine (TutorialInfo ());
 			//-------sucess menus
 			int lev = Application.loadedLevel;
 			if (lev == 1) {
-				canvasObj.FindChild ("GameSuccessImage/TopBar/PrevLevel").gameObject.GetComponent<Button> ().interactable = false;
-				tut0.FindChild ("Dialog/No").gameObject.GetComponent<Button> ().Select ();
+				canvasObj.Find ("GameSuccessImage/TopBar/PrevLevel").gameObject.GetComponent<Button> ().interactable = false;
+				tut0.Find ("Dialog/No").gameObject.GetComponent<Button> ().Select ();
 			}
 //			else if (lev==Application.levelCount-1) 
 //				canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.GetComponent<Button>().interactable=false;
@@ -189,7 +189,7 @@ public class ButtonPresses : MonoBehaviour
 		string data = www.text;
 		bool successful = www.error == null && data != null && data != "";
 
-		Text vtext = Instance.optionsPanel.transform.FindChild ("About/Version").GetComponent<Text> ();
+		Text vtext = Instance.optionsPanel.transform.Find ("About/Version").GetComponent<Text> ();
 		float yourVersion = ScoreConnection.GetCurrentGameVersion ();
 		vtext.text = "Version: " + yourVersion + "\r\n";
 
@@ -200,8 +200,8 @@ public class ButtonPresses : MonoBehaviour
 				float remoteVersion = ScoreConnection.AboutStringParseVersion (data);
 //				System.DateTime date = ScoreConnection.AboutStringParseTime (data);
 
-				Text updTxt = Instance.optionsPanel.transform.FindChild ("About/vtest").GetComponent<Text> ();
-				GameObject updateReminder = Instance.canvasObj.FindChild ("Update_Reminder").gameObject;
+				Text updTxt = Instance.optionsPanel.transform.Find ("About/vtest").GetComponent<Text> ();
+				GameObject updateReminder = Instance.canvasObj.Find ("Update_Reminder").gameObject;
 				if (yourVersion < remoteVersion) {
 					print ("UPDATE AVAILABLE!");
 					updateReminder.SetActive (true); 
@@ -221,16 +221,16 @@ public class ButtonPresses : MonoBehaviour
 	//---------------------------------------------------------------------------------
 	public void showLevelSelection ()
 	{
-		GameObject lv = canvasObj.FindChild ("LevelSelection").gameObject;
+		GameObject lv = canvasObj.Find ("LevelSelection").gameObject;
 		lv.SetActive (true);
 		lv.GetComponent<Animator> ().Play ("LevelSelectionEnter");
 		lv.GetComponent<Animator> ().Rebind ();
-		lv.transform.FindChild ("Actual/Area/Grid/Level#1/Button").gameObject.GetComponent<Button> ().Select ();
+		lv.transform.Find ("Actual/Area/Grid/Level#1/Button").gameObject.GetComponent<Button> ().Select ();
 	}
 
 	public void hideLevelSelection ()
 	{
-		GameObject lv = canvasObj.FindChild ("LevelSelection").gameObject;
+		GameObject lv = canvasObj.Find ("LevelSelection").gameObject;
 		lv.SetActive (true);
 		lv.GetComponent<Animator> ().Play ("LevelSelectionExit");
 	}
@@ -252,7 +252,7 @@ public class ButtonPresses : MonoBehaviour
 				GameEvents.UnPauseGame ();
 			}
 			TabMenu.GetComponent<CanvasGroup> ().alpha = 1f;
-			Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
+			Animator anim = Instance.canvasObj.Find ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
 			bool rev = anim.GetBool ("reverse");
 			
 			//hide
@@ -284,7 +284,7 @@ public class ButtonPresses : MonoBehaviour
 			anim.enabled = true;
 			anim.SetBool ("isExiting", false);
 			anim.Rebind ();
-			Button resume = Instance.optionsPanel.transform.FindChild ("OptionsBox/Resume").GetComponent<Button> ();
+			Button resume = Instance.optionsPanel.transform.Find ("OptionsBox/Resume").GetComponent<Button> ();
 			resume.Select ();
 		}
 		optionsPanel.SetActive (!optionsPanel.activeInHierarchy);
@@ -380,13 +380,13 @@ public class ButtonPresses : MonoBehaviour
 
 	public void ToggleAbout ()
 	{
-		GameObject about = Instance.optionsPanel.transform.FindChild ("About").gameObject;
+		GameObject about = Instance.optionsPanel.transform.Find ("About").gameObject;
 		about.SetActive (!about.activeInHierarchy);
 	}
 
 	public void ResetSettings ()
 	{
-		Text lv = canvasObj.FindChild ("LevelSelection/Actual/Reset/Text").gameObject.GetComponent<Text> ();
+		Text lv = canvasObj.Find ("LevelSelection/Actual/Reset/Text").gameObject.GetComponent<Text> ();
 		if (lv.text.Equals ("Reset Progress"))
 			lv.text = "Click again to Confirm";
 		else {
@@ -402,12 +402,12 @@ public class ButtonPresses : MonoBehaviour
 	void initSettings ()
 	{
 		
-		t_mouse = MoreOptionsPanel.transform.FindChild ("Line1/Slider").gameObject.GetComponent<Slider> ();
-		QualityText = MoreOptionsPanel.transform.FindChild ("Line2/Switcher/QualityText").gameObject.GetComponent<Text> ();
-		t_antialias = MoreOptionsPanel.transform.FindChild ("Line3/Toggle").gameObject.GetComponent<Toggle> ();
-		t_bloom = MoreOptionsPanel.transform.FindChild ("Line4/Toggle").gameObject.GetComponent<Toggle> ();
-		t_grain = MoreOptionsPanel.transform.FindChild ("Line5/Toggle").gameObject.GetComponent<Toggle> ();
-		t_shadow = MoreOptionsPanel.transform.FindChild ("Line6/Toggle").gameObject.GetComponent<Toggle> ();
+		t_mouse = MoreOptionsPanel.transform.Find ("Line1/Slider").gameObject.GetComponent<Slider> ();
+		QualityText = MoreOptionsPanel.transform.Find ("Line2/Switcher/QualityText").gameObject.GetComponent<Text> ();
+		t_antialias = MoreOptionsPanel.transform.Find ("Line3/Toggle").gameObject.GetComponent<Toggle> ();
+		t_bloom = MoreOptionsPanel.transform.Find ("Line4/Toggle").gameObject.GetComponent<Toggle> ();
+		t_grain = MoreOptionsPanel.transform.Find ("Line5/Toggle").gameObject.GetComponent<Toggle> ();
+		t_shadow = MoreOptionsPanel.transform.Find ("Line6/Toggle").gameObject.GetComponent<Toggle> ();
 		
 		try {
 			
@@ -632,10 +632,10 @@ public class ButtonPresses : MonoBehaviour
 	IEnumerator ShowSimpleHelpMsg ()
 	{
 		float ttime = 0.7f;
-		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
-		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
-		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
-		Text tipInfo = tut0.transform.FindChild ("Tip_Info").gameObject.GetComponent<Text> ();
+		GameObject tut0 = Instance.canvasObj.Find ("Tutorial0").gameObject;
+		Text objectiveMain = tut0.transform.Find ("Objective_info").gameObject.GetComponent<Text> ();
+		Text objective = tut0.transform.Find ("Objective").gameObject.GetComponent<Text> ();
+		Text tipInfo = tut0.transform.Find ("Tip_Info").gameObject.GetComponent<Text> ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, "Dock with the satellite", ttime));
 		yield return new WaitForSeconds (8f);
@@ -698,12 +698,12 @@ public class ButtonPresses : MonoBehaviour
 		float ttime = 0.7f;
 
 		yield return new WaitForSeconds (1f);
-		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
-		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
+		GameObject tut0 = Instance.canvasObj.Find ("Tutorial0").gameObject;
+		Text objectiveMain = tut0.transform.Find ("Objective_info").gameObject.GetComponent<Text> ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, tutPrimary, ttime));
 
 //		yield return new WaitForSeconds (1f);
-		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
+		Text objective = tut0.transform.Find ("Objective").gameObject.GetComponent<Text> ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objective, tutSecondary, ttime));
 
 		yield return new WaitForSeconds (7f);
@@ -722,12 +722,12 @@ public class ButtonPresses : MonoBehaviour
 //		yield return new WaitForSeconds (totDelay+=1.5f);
 		Instance.StartCoroutine (cs.DelaySnap (totDelay += 1.5f, -220f));
 		yield return new WaitForSeconds (5f);
-		GameObject tut0 = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
-		Text objectiveMain = tut0.transform.FindChild ("Objective_info").gameObject.GetComponent<Text> ();
+		GameObject tut0 = Instance.canvasObj.Find ("Tutorial0").gameObject;
+		Text objectiveMain = tut0.transform.Find ("Objective_info").gameObject.GetComponent<Text> ();
 		Instance.StartCoroutine (AnimationScript.ChangeText (objectiveMain, "OBJECTIVE:", ttime));
 		print (MInput.CONTROL);
 		yield return new WaitForSeconds (1f);
-		Text objective = tut0.transform.FindChild ("Objective").gameObject.GetComponent<Text> ();
+		Text objective = tut0.transform.Find ("Objective").gameObject.GetComponent<Text> ();
 		objective.text = "Hold W to accelerate forwards";
 		//----------1
 //		GameEvents.PlayerFuelUnlimited(true);
@@ -918,7 +918,7 @@ public class ButtonPresses : MonoBehaviour
 		if (IsNext) {
 			if (Application.loadedLevel == Application.levelCount - 1) {
 				Transform lev = GameObject.Find ("Level").transform;
-				Destroy (lev.FindChild ("AsteroidGroup").gameObject);
+				Destroy (lev.Find ("AsteroidGroup").gameObject);
 
 //				player.GetComponent<Collider2D> ().enabled = false;
 //				MonoBehaviour[] colls = player.GetComponents<MonoBehaviour> ();
@@ -930,18 +930,18 @@ public class ButtonPresses : MonoBehaviour
 				Destroy (player.GetComponent<HealthLoss> ());
 				Destroy (player.GetComponent<SpringJoint2D> ());
 				Destroy (player.GetComponent<Rigidbody2D> ());
-				Destroy (player.transform.FindChild ("outline").gameObject);
+				Destroy (player.transform.Find ("outline").gameObject);
 				//Destroy (player.transform.FindChild ("Nose").gameObject);
-				Destroy (player.transform.FindChild ("Trail").gameObject);
+				Destroy (player.transform.Find ("Trail").gameObject);
 
-				GameObject satellite = lev.FindChild ("Dockables/Satellite").gameObject;
+				GameObject satellite = lev.Find ("Dockables/Satellite").gameObject;
 
 				Destroy (satellite.GetComponent<AnimationMovements> ());
 				Destroy (satellite.GetComponent<SpringJoint2D> ());
 				Destroy (satellite.GetComponent<Rigidbody2D> ());
-				Destroy (satellite.transform.FindChild ("outline").gameObject);
-				Destroy (satellite.transform.FindChild ("touchdown").gameObject);
-				Destroy (satellite.transform.FindChild ("DockArea").gameObject);
+				Destroy (satellite.transform.Find ("outline").gameObject);
+				Destroy (satellite.transform.Find ("touchdown").gameObject);
+				Destroy (satellite.transform.Find ("DockArea").gameObject);
 
 
 //				player.transform.Rotate (new Vector3 (0, 0, 90f));
@@ -949,7 +949,7 @@ public class ButtonPresses : MonoBehaviour
 
 				Instance.StartCoroutine (
 					AnimationScript.FadeOutPanel (
-						Instance.canvasObj.FindChild ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> ()
+						Instance.canvasObj.Find ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> ()
 					, 2f));
 				lev.GetComponent<Animator> ().enabled = true;
 
@@ -986,12 +986,12 @@ public class ButtonPresses : MonoBehaviour
 	public static void DimHealth (bool dim)
 	{
 		
-		Instance.UI.FindChild ("Health").GetComponent<CanvasGroup> ().alpha = dim ? 0.2f : 1f;
+		Instance.UI.Find ("Health").GetComponent<CanvasGroup> ().alpha = dim ? 0.2f : 1f;
 	}
 
 	public static void DimFuel (bool dim)
 	{
-		Instance.UI.FindChild ("Fuel").GetComponent<CanvasGroup> ().alpha = dim ? 0.2f : 1f;
+		Instance.UI.Find ("Fuel").GetComponent<CanvasGroup> ().alpha = dim ? 0.2f : 1f;
 	}
 
 	#endregion
@@ -1007,15 +1007,15 @@ public class ButtonPresses : MonoBehaviour
 		
 		Transform cgroup;
 		if (isOptions)
-			cgroup = Instance.canvasObj.transform.FindChild ("TabMenu/LeftGroup/CriteriaGroup").transform;
+			cgroup = Instance.canvasObj.transform.Find ("TabMenu/LeftGroup/CriteriaGroup").transform;
 		else
-			cgroup = Instance.canvasObj.FindChild ("GameSuccessImage/LeftGroup/CriteriaGroup").transform;
+			cgroup = Instance.canvasObj.Find ("GameSuccessImage/LeftGroup/CriteriaGroup").transform;
 		
 		string[] crinames = GameEvents.GetCriteriasNames ();
 		
 		//box0:
 		if (GameManager.GetLevelSavedDocked ()) {
-			cgroup.FindChild ("Box0/Icon").GetComponent<Image> ().color = orange;
+			cgroup.Find ("Box0/Icon").GetComponent<Image> ().color = orange;
 		}
 		//box1:
 		string box1Text = "OK";
@@ -1024,42 +1024,42 @@ public class ButtonPresses : MonoBehaviour
 			box1Text = winScore.ToString ();
 			box1spriteNum = 0;
 			if (GameManager.GetLevelSavedScore () >= winScore) {
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+				cgroup.Find ("Box1/Icon").GetComponent<Image> ().color = orange;
 			}
 		}
 		if (GameManager.ArrayContains (crinames, "FUEL")) {
 			box1Text = winFuel.ToString ();
 			box1spriteNum = 3;
 			if (GameManager.GetLevelSavedFuel ()) {
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+				cgroup.Find ("Box1/Icon").GetComponent<Image> ().color = orange;
 			}
 		}
 		if (GameManager.ArrayContains (crinames, "NODOCK")) {
 			box1Text = "Avoid";
 			box1spriteNum = 1;
 			if (GameManager.GetLevelSavedNoDock ())
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+				cgroup.Find ("Box1/Icon").GetComponent<Image> ().color = orange;
 		}
 		if (GameManager.ArrayContains (crinames, "HEALTH")) {
 			box1Text = "No Damage";
 			box1spriteNum = 2;
 			if (GameManager.GetLevelSavedHealth ())
-				cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().color = orange;
+				cgroup.Find ("Box1/Icon").GetComponent<Image> ().color = orange;
 		}
-		cgroup.FindChild ("Box1/Text").GetComponent<Text> ().text = box1Text;
-		cgroup.FindChild ("Box1/Icon").GetComponent<Image> ().sprite = Instance.CriteriaBox1Sprites [box1spriteNum];
+		cgroup.Find ("Box1/Text").GetComponent<Text> ().text = box1Text;
+		cgroup.Find ("Box1/Icon").GetComponent<Image> ().sprite = Instance.CriteriaBox1Sprites [box1spriteNum];
 		
 		//box2:
 		if (GameManager.ArrayContains (crinames, "TIME")) {
 			if (GameManager.GetLevelSavedTime () <= timeWin) {
-				cgroup.FindChild ("Box2/Icon").GetComponent<Image> ().color = orange;
+				cgroup.Find ("Box2/Icon").GetComponent<Image> ().color = orange;
 			}
-			cgroup.FindChild ("Box2/Text").GetComponent<Text> ().text = timeWin.ToString () + "s";
+			cgroup.Find ("Box2/Text").GetComponent<Text> ().text = timeWin.ToString () + "s";
 		}
 		
 		if (isOptions) {
 			float BestTime = GameManager.GetLevelSavedTime ();
-			Text bestTime = Instance.canvasObj.transform.FindChild ("TabMenu/LeftGroup/MoreInfo/TimeGroup/Result").GetComponent<Text> ();
+			Text bestTime = Instance.canvasObj.transform.Find ("TabMenu/LeftGroup/MoreInfo/TimeGroup/Result").GetComponent<Text> ();
 			bestTime.text = BestTime == float.PositiveInfinity ? "N/A" : BestTime.ToString ("0.000") + " s";
 		}
 		
@@ -1069,11 +1069,11 @@ public class ButtonPresses : MonoBehaviour
 	{
 		Text nameT, scoreT;
 		if (FromOptionsLeaderboard) {
-			nameT = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay/Panel/Area/Target/Text_names").GetComponent<Text> ();
-			scoreT = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay/Panel/Area/Target/Text_scores").GetComponent<Text> ();
+			nameT = Instance.canvasObj.Find ("TabMenu/OnlineScoreDisplay/Panel/Area/Target/Text_names").GetComponent<Text> ();
+			scoreT = Instance.canvasObj.Find ("TabMenu/OnlineScoreDisplay/Panel/Area/Target/Text_scores").GetComponent<Text> ();
 		} else {
-			nameT = Instance.successObjTarget.transform.FindChild ("Area/Target/Text_names").GetComponent<Text> ();
-			scoreT = Instance.successObjTarget.transform.FindChild ("Area/Target/Text_scores").GetComponent<Text> ();
+			nameT = Instance.successObjTarget.transform.Find ("Area/Target/Text_names").GetComponent<Text> ();
+			scoreT = Instance.successObjTarget.transform.Find ("Area/Target/Text_scores").GetComponent<Text> ();
 		}
 		nameT.text = names;
 
@@ -1095,7 +1095,7 @@ public class ButtonPresses : MonoBehaviour
 	public static void RefreshScores ()
 	{
 		for (int i = 0; i < 3; i++) {
-			if (Instance.successObjTarget.transform.FindChild ("ToggleGroup/" + i).GetComponent<Toggle> ().isOn) {
+			if (Instance.successObjTarget.transform.Find ("ToggleGroup/" + i).GetComponent<Toggle> ().isOn) {
 				Instance.ToggleDateRangeClicks (i);
 				break;
 			}
@@ -1104,7 +1104,7 @@ public class ButtonPresses : MonoBehaviour
 
 	public void ToggleConfirmSendScore ()
 	{
-		GameObject cnf = Instance.successObjTarget.transform.FindChild ("ConfirmSend").gameObject;
+		GameObject cnf = Instance.successObjTarget.transform.Find ("ConfirmSend").gameObject;
 		cnf.SetActive (!cnf.activeInHierarchy);
 //		GameEvents.StopListeningKeys = cnf.activeInHierarchy;
 		GameEvents.StopListeningKeysMain = cnf.activeInHierarchy;
@@ -1118,7 +1118,7 @@ public class ButtonPresses : MonoBehaviour
 		float bestTime = GameManager.GetLevelSavedTime ();
 //		float sentTime = GameManager.GetLevelSavedSentTime();
 //		if (bestTime < sentTime){
-		Text inp = Instance.successObjTarget.transform.FindChild ("ConfirmSend/Panel/InputField/Text").GetComponent<Text> ();
+		Text inp = Instance.successObjTarget.transform.Find ("ConfirmSend/Panel/InputField/Text").GetComponent<Text> ();
 		string name = inp.text;
 		if (string.IsNullOrEmpty (inp.text)) {
 //			print ("not valid");
@@ -1144,8 +1144,8 @@ public class ButtonPresses : MonoBehaviour
 
 //		print ("BestTime:" + bestTime + " ,senttime:" + sentTime);
 		bool visibile = GameManager.GetLevelSavedMedal () == 3 && bestTime < sentTime;
-		Button scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore").GetComponent<Button> ();
-		Text info = Instance.successObjTarget.transform.FindChild ("SendScore/DisabledInfo").GetComponent<Text> ();
+		Button scoreButton = Instance.successObjTarget.transform.Find ("SendScore").GetComponent<Button> ();
+		Text info = Instance.successObjTarget.transform.Find ("SendScore/DisabledInfo").GetComponent<Text> ();
 		scoreButton.interactable = visibile;
 		if (visibile) {
 			info.text = "";
@@ -1157,10 +1157,10 @@ public class ButtonPresses : MonoBehaviour
 		} else {
 		}
 		if (LevelManager.GetNextLevel () != Application.loadedLevel + 1) {
-			Instance.canvasObj.FindChild ("GameSuccessImage/TopBar/NextLevel").gameObject.
+			Instance.canvasObj.Find ("GameSuccessImage/TopBar/NextLevel").gameObject.
 				GetComponent<Button> ().interactable = false;
 		}
-		GameObject tutmain = Instance.canvasObj.FindChild ("Tutorial0").gameObject;
+		GameObject tutmain = Instance.canvasObj.Find ("Tutorial0").gameObject;
 		tutmain.SetActive (false);
 //		print (tutmain.activeInHierarchy);
 
@@ -1169,7 +1169,7 @@ public class ButtonPresses : MonoBehaviour
 
 	public static void ChangeSendScoreText (bool TimeAdded)
 	{
-		Text scoreButton = Instance.successObjTarget.transform.FindChild ("SendScore/Text").GetComponent<Text> ();
+		Text scoreButton = Instance.successObjTarget.transform.Find ("SendScore/Text").GetComponent<Text> ();
 
 		string str = TimeAdded ? "Time Added" : "Try Again";
 
@@ -1188,7 +1188,7 @@ public class ButtonPresses : MonoBehaviour
 
 	public void ToggleTabLeaderboard ()
 	{
-		Animator anim = Instance.canvasObj.FindChild ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
+		Animator anim = Instance.canvasObj.Find ("TabMenu/OnlineScoreDisplay").GetComponent<Animator> ();
 
 		anim.enabled = true;
 		bool currReverse = anim.GetBool ("reverse");

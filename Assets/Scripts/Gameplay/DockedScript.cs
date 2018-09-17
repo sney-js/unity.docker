@@ -21,7 +21,7 @@ public class DockedScript : MonoBehaviour
 	{
 //		dockIndicator = GameObject.Find ("Canvas/UI/Other/DockIndicator").gameObject.GetComponent<Image> ();
 		playerMain = GameObject.Find ("Player").gameObject;
-		dockIcon = GameObject.Find ("Canvas").transform.FindChild ("UI/Other/DockIndicator").gameObject;
+		dockIcon = GameObject.Find ("Canvas").transform.Find ("UI/Other/DockIndicator").gameObject;
 //		indDefColor = dockIndicator.color;
 		undockedCalled=false;
 //		Debug.Log("Name: "+MoverObject.name);

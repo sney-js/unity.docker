@@ -81,7 +81,7 @@ public class GameEvents : MonoBehaviour
 		timeText = UI.Find ("Time").gameObject.GetComponent<Text> ();
 		scoreText = UI.Find ("Score").gameObject.GetComponent<Text> ();
 		infoText = GameObject.Find ("Canvas/InfoOverImage/FailText").gameObject.GetComponent<Text> ();
-		PauseIcon = UI.FindChild ("PauseIcon").gameObject;
+		PauseIcon = UI.Find ("PauseIcon").gameObject;
 		scoreText.enabled = WinWithTriggers.scoreWin || WinWithTriggers.MustScore > 0;
 		scoreText.text = Score.ToString ("00");
 
@@ -364,7 +364,7 @@ public class GameEvents : MonoBehaviour
 
 		//individual changes--------------------------------
 		if (dockedWith.name == "Satellite") {
-			GameObject satLight = dockedWith.transform.FindChild ("Lightings").FindChild ("PointLight").gameObject;
+			GameObject satLight = dockedWith.transform.Find ("Lightings").Find ("PointLight").gameObject;
 			satLight.GetComponent<Animator> ().enabled = false;
 			satLight.GetComponent<Light> ().color = new Color (1f, 0.5f, 0.5f);
 			satLight.GetComponent<Light> ().intensity = 1.5f;
@@ -387,7 +387,7 @@ public class GameEvents : MonoBehaviour
 		}
 
 		if (undockedWith.name == "Satellite") {
-			GameObject satLight = undockedWith.transform.FindChild ("Lightings").FindChild ("PointLight").gameObject;
+			GameObject satLight = undockedWith.transform.Find ("Lightings").Find ("PointLight").gameObject;
 			satLight.GetComponent<Animator> ().enabled = true;
 			satLight.GetComponent<Light> ().color = new Color (0.6f, 0.9f, 1f);
 		}
