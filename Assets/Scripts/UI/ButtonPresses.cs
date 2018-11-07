@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class ButtonPresses : MonoBehaviour
 {
@@ -84,7 +85,7 @@ public class ButtonPresses : MonoBehaviour
 			TabMenu = canvasObj.Find ("TabMenu").gameObject;
 			Text leveltext = TabMenu.transform.Find ("LeftGroup/MoreInfo/LevelText").GetComponent<Text> ();
 			leveltext.text = "Level " + Application.loadedLevel;
-//			print ("this level:"+Application.loadedLevel+" ,next allowed:"+LevelManager.GetNextLevel ());
+			print ("this level:"+Application.loadedLevel+" ,next allowed:"+LevelManager.GetNextLevel ());
 			if (LevelManager.GetNextLevel () != Application.loadedLevel + 1) {
 				optionsPanel.transform.Find ("PrevNextGroup/Next").GetComponent<Button> ().interactable = false;
 			}
@@ -916,8 +917,15 @@ public class ButtonPresses : MonoBehaviour
 	public void LoadLevel (bool IsNext)
 	{
 		if (IsNext) {
-			if (Application.loadedLevel == Application.levelCount - 1) {
-				Transform lev = GameObject.Find ("Level").transform;
+
+            if (Application.loadedLevel == Application.levelCount - 1) {
+
+                GameObject overlay = Instance.canvasObj.Find("GameSuccessImage").gameObject;
+
+                Instance.StartCoroutine(AnimationScript.FadeOutPanel_Disable(overlay, 1f));
+
+
+                Transform lev = GameObject.Find ("Level").transform;
 				Destroy (lev.Find ("AsteroidGroup").gameObject);
 
 //				player.GetComponent<Collider2D> ().enabled = false;
@@ -947,10 +955,7 @@ public class ButtonPresses : MonoBehaviour
 //				player.transform.Rotate (new Vector3 (0, 0, 90f));
 				satellite.transform.eulerAngles = (new Vector3 (0, 0, 90f));
 
-				Instance.StartCoroutine (
-					AnimationScript.FadeOutPanel (
-						Instance.canvasObj.Find ("GameSuccessImage").gameObject.GetComponent<CanvasGroup> ()
-					, 2f));
+				
 				lev.GetComponent<Animator> ().enabled = true;
 
 			} else {

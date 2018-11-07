@@ -168,7 +168,11 @@ public class CameraScript : MonoBehaviour
 
 	void adjustToPlayerSpeed ()
 	{
-		Vector3 velOffset = new Vector3 (targetPhysics.velocity.x, targetPhysics.velocity.y, 0) / 3f;
+        if (!targetPhysics)
+        {
+            return;
+        }
+        Vector3 velOffset = new Vector3 (targetPhysics.velocity.x, targetPhysics.velocity.y, 0) / 3f;
 		var magnitude = Mathf.Clamp (targetPhysics.velocity.magnitude, 0, 50f);
 		var factor = Mathf.Exp (0.01f * magnitude) - 1;
 		velOffset *= factor;

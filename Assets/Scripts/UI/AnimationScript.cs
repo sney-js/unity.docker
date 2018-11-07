@@ -165,6 +165,8 @@ public class AnimationScript : MonoBehaviour
 		}
 		overlay.interactable = false;
 		overlay.blocksRaycasts = false;
+        overlay.alpha = 0f;
+        overlay.gameObject.SetActive(false);
 	}
 
 	public static IEnumerator FlashScreen (Image overlay, float overTime, int color, string str)
