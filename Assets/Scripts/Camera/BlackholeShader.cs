@@ -41,11 +41,14 @@ public class BlackholeShader : MonoBehaviour
 
             Camera camera1 = GetComponent<Camera>();
             Vector2 pos = new Vector2(
-                camera1.WorldToScreenPoint(BH.transform.position).x / camera1.pixelWidth,
-                1 - (camera1.WorldToScreenPoint(BH.transform.position).y / camera1.pixelHeight));
+                camera1.WorldToViewportPoint(BH.transform.position).x / camera1.pixelWidth,
+                (camera1.WorldToViewportPoint(BH.transform.position).z / camera1.pixelHeight));
 
+            Vector3 location = GetComponent<Camera>().WorldToViewportPoint(BH.transform.position);
+            //print(pos);
+            //print(screenPoint);
             // Install all the required parameters for the shader
-            material.SetVector("_Position", new Vector2(pos.x, pos.y));
+            material.SetVector("_Position", new Vector2(location.x, location.y));
             material.SetFloat("_Ratio", ratio);
             material.SetFloat("_Rad", radius);
             material.SetFloat("_Distance", Vector3.Distance(BH.transform.position, this.transform.position));
